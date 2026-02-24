@@ -8,6 +8,7 @@ use App\Http\Controllers\EvaluacionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TwoFactorController;
 use App\Http\Controllers\ReporteController;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,21 +32,9 @@ Route::get('/', function () {
 | Dashboard según rol
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth'])->get('/dashboard', function () {
-
-    $user = auth()->user();
-
-    if ($user->rol->nombre === 'admin') {
-        return view('dashboard.admin');
-    }
-
-    if ($user->rol->nombre === 'evaluador') {
-        return view('dashboard.evaluador');
-    }
-
-    return view('dashboard.visitante');
-
-})->name('dashboard');
+Route::middleware(['auth'])
+    ->get('/dashboard', [DashboardController::class, 'index'])
+    ->name('dashboard');
 
 /*
 |--------------------------------------------------------------------------
@@ -67,10 +56,14 @@ Route::middleware('auth')->group(function () {
 */
 Route::middleware(['auth','rol:admin'])->group(function () {
 
+    // Empresas
     Route::resource('empresas', EmpresaController::class);
-    Route::resource('usuarios', UserController::class)->only(['index','edit','update']);
-    Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
 
+    // Usuarios (ahora incluye crear y guardar)
+    Route::resource('usuarios', UserController::class);
+
+    // Reportes
+    Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
 
 });
 
@@ -87,20 +80,32 @@ Route::middleware(['auth'])->group(function () {
 
 /*
 |--------------------------------------------------------------------------
+| Visitantes
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth','rol:visitante'])->group(function () {
+
+    Route::get('/evaluaciones-publicas', [EvaluacionController::class, 'index'])
+        ->name('evaluaciones.publicas');
+
+});
+
+/*
+|--------------------------------------------------------------------------
+| Historial personal
+|--------------------------------------------------------------------------
+*/
+Route::get('/mis-evaluaciones', [EvaluacionController::class, 'historial'])
+    ->name('evaluaciones.historial')
+    ->middleware('auth');
+
+/*
+|--------------------------------------------------------------------------
 | Prueba rol
 |--------------------------------------------------------------------------
 */
 Route::get('/prueba-rol', function () {
-    return auth()->user()->rol->nombre;
+    return Auth::user()->rol->nombre;
 })->middleware('auth');
-
-Route::middleware(['auth','rol:visitante'])->group(function () {
-    Route::get('/evaluaciones-publicas', [EvaluacionController::class, 'index'])
-        ->name('evaluaciones.publicas');
-});
-
-Route::get('/mis-evaluaciones', [EvaluacionController::class, 'historial'])
-    ->name('evaluaciones.historial');
-
 
 require __DIR__.'/auth.php';

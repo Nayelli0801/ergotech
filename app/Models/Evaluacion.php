@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Empresa;
 
 class Evaluacion extends Model
 {
@@ -24,4 +25,6 @@ class Evaluacion extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+    
 }

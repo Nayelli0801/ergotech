@@ -1,3 +1,38 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.menu-title {
+    margin-top: 22px;
+    margin-bottom: 8px;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: #6b7280;
+    text-transform: uppercase;
+}
+
+.menu-link {
+    display: block;
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-bottom: 4px;
+    transition: 0.2s;
+}
+
+.menu-link:hover {
+    background: rgba(99, 102, 241, 0.15);
+    color: #818cf8;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+aside::-webkit-scrollbar {
+    width: 6px;
+}
+
+aside::-webkit-scrollbar-thumb {
+    background: #6366f1;
+    border-radius: 10px;
+}
