@@ -71,11 +71,29 @@
     <div class="flex-1 flex flex-col">
 
         <!-- TOPBAR -->
-        <header class="h-16 bg-white shadow flex items-center justify-end px-6">
-            <div class="text-gray-700 font-medium">
-                {{ Auth::user()->name }}
+<header class="h-16 bg-white shadow flex items-center justify-end px-6">
+    <div class="flex items-center gap-3">
+
+        {{-- FOTO O INICIAL --}}
+        @if(Auth::user()->profile_photo)
+            <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}"
+                 class="w-10 h-10 rounded-full object-cover ring-2 ring-gray-300">
+        @else
+            <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-sm font-semibold text-gray-700">
+                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
             </div>
-        </header>
+        @endif
+
+        {{-- NOMBRE COMPLETO --}}
+        <span class="text-sm font-medium text-gray-700">
+            {{ Auth::user()->name }}
+            @if(Auth::user()->last_name)
+                {{ Auth::user()->last_name }}
+            @endif
+        </span>
+
+    </div>
+</header>
 
         <!-- MAIN CONTENT -->
         <main class="flex-1 p-6">

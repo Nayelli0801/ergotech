@@ -1,64 +1,82 @@
 <section>
     <header>
         <h2 class="text-lg font-medium text-gray-900">
-            {{ __('Información de Perfil') }}
+            Información de Perfil
         </h2>
 
         <p class="mt-1 text-sm text-gray-600">
-            {{ __("Update your account's profile information and email address.") }}
+            Actualiza la información de tu cuenta y tu foto de perfil.
         </p>
     </header>
 
-    <form id="send-verification" method="post" action="{{ route('verification.send') }}">
-        @csrf
-    </form>
-
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
+    <form method="post" action="{{ route('profile.update') }}" 
+          enctype="multipart/form-data"
+          class="mt-6">
         @csrf
         @method('patch')
 
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $user->name)" required autofocus autocomplete="name" />
-            <x-input-error class="mt-2" :messages="$errors->get('name')" />
-        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />
-            <x-input-error class="mt-2" :messages="$errors->get('email')" />
+            {{-- LADO IZQUIERDO (DATOS) --}}
+            <div class="md:col-span-2 space-y-6">
 
-            @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
                 <div>
-                    <p class="text-sm mt-2 text-gray-800">
-                        {{ __('Your email address is unverified.') }}
-
-                        <button form="send-verification" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            {{ __('Click here to re-send the verification email.') }}
-                        </button>
-                    </p>
-
-                    @if (session('status') === 'verification-link-sent')
-                        <p class="mt-2 font-medium text-sm text-green-600">
-                            {{ __('A new verification link has been sent to your email address.') }}
-                        </p>
-                    @endif
+                    <x-input-label for="name" value="Nombre" />
+                    <x-text-input id="name" name="name" type="text"
+                        class="mt-1 block w-full"
+                        :value="old('name', $user->name)"
+                        required />
                 </div>
-            @endif
-        </div>
 
-        <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
+                <div>
+                    <x-input-label for="last_name" value="Apellido" />
+                    <x-text-input id="last_name" name="last_name" type="text"
+                        class="mt-1 block w-full"
+                        :value="old('last_name', $user->last_name)" />
+                </div>
+                
+                <div>
+                    <x-input-label for="email" value="Correo electrónico" />
+                    <x-text-input id="email" name="email" type="email"
+                        class="mt-1 block w-full"
+                        :value="old('email', $user->email)"
+                        required />
+                </div>
 
-            @if (session('status') === 'profile-updated')
-                <p
-                    x-data="{ show: true }"
-                    x-show="show"
-                    x-transition
-                    x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-gray-600"
-                >{{ __('Saved.') }}</p>
-            @endif
+                <div>
+                    <button type="submit"
+                        class="inline-flex items-center px-5 py-2 bg-gray-800 
+                               text-white text-sm font-medium rounded-lg 
+                               hover:bg-gray-700 transition">
+                         Guardar cambios
+                    </button>
+                </div>
+
+            </div>
+
+            {{-- LADO DERECHO (FOTO) --}}
+            <div class="flex flex-col items-center">
+
+                @if ($user->profile_photo)
+                    <img src="{{ asset('storage/' . $user->profile_photo) }}"
+                        class="w-40 h-40 rounded-full object-cover shadow-md mb-4">
+                @else
+                    <div class="w-40 h-40 rounded-full bg-gray-200 flex items-center justify-center mb-4">
+                        <span class="text-gray-500 text-sm">Sin foto</span>
+                    </div>
+                @endif
+
+                <label class="cursor-pointer inline-flex items-center gap-2 
+                              bg-gray-700 text-white px-4 py-2 
+                              rounded-lg hover:bg-gray-600 transition">
+
+                     Editar foto
+                    <input type="file" name="profile_photo" 
+                           class="hidden" accept="image/*">
+                </label>
+
+            </div>
+
         </div>
     </form>
 </section>
