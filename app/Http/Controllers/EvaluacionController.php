@@ -6,6 +6,7 @@ use App\Models\Empresa;
 use App\Models\User;
 use App\Models\Evaluacion;
 use Illuminate\Http\Request;
+use App\Services\RebaService;
 
 class EvaluacionController extends Controller
 {
@@ -60,25 +61,44 @@ class EvaluacionController extends Controller
             'metodo' => 'required|string|max:255',
             'fecha' => 'required|date',
             'observaciones' => 'nullable|string',
-            'puntaje_total' => 'nullable|integer'
+
+            // Campos REBA
+            'tronco' => 'nullable|integer|min:1|max:5',
+            'cuello' => 'nullable|integer|min:1|max:3',
+            'piernas' => 'nullable|integer|min:1|max:4',
+            'brazo' => 'nullable|integer|min:1|max:6',
+            'antebrazo' => 'nullable|integer|min:1|max:2',
+            'muneca' => 'nullable|integer|min:1|max:3',
+            'actividad' => 'nullable|integer|min:0|max:3',
         ]);
 
-        // 🔥 Cálculo automático del nivel de riesgo si es REBA
+        $puntajeFinal = null;
         $nivel = null;
 
-        if ($request->metodo === 'REBA' && $request->puntaje_total !== null) {
+        if ($request->metodo === 'REBA') {
 
-            $puntaje = $request->puntaje_total;
+            $reba = new RebaService();
 
-            if ($puntaje <= 3) {
-                $nivel = 'Bajo';
-            } elseif ($puntaje <= 7) {
-                $nivel = 'Medio';
-            } elseif ($puntaje <= 10) {
-                $nivel = 'Alto';
-            } else {
-                $nivel = 'Muy Alto';
-            }
+            $grupoA = $reba->calcularGrupoA(
+                $request->tronco,
+                $request->cuello,
+                $request->piernas
+            );
+
+            $grupoB = $reba->calcularGrupoB(
+                $request->brazo,
+                $request->antebrazo,
+                $request->muneca
+            );
+
+            $grupoC = $reba->calcularGrupoC($grupoA, $grupoB);
+
+            $puntajeFinal = $reba->calcularFinal(
+                $grupoC,
+                $request->actividad ?? 0
+            );
+
+            $nivel = $reba->nivelRiesgo($puntajeFinal);
         }
 
         Evaluacion::create([
@@ -87,7 +107,7 @@ class EvaluacionController extends Controller
             'metodo' => $request->metodo,
             'fecha' => $request->fecha,
             'observaciones' => $request->observaciones,
-            'puntaje_total' => $request->puntaje_total,
+            'puntaje_total' => $puntajeFinal,
             'nivel_riesgo' => $nivel
         ]);
 
@@ -126,24 +146,44 @@ class EvaluacionController extends Controller
             'metodo' => 'required|string|max:255',
             'fecha' => 'required|date',
             'observaciones' => 'nullable|string',
-            'puntaje_total' => 'nullable|integer'
+
+            // Campos REBA
+            'tronco' => 'nullable|integer|min:1|max:5',
+            'cuello' => 'nullable|integer|min:1|max:3',
+            'piernas' => 'nullable|integer|min:1|max:4',
+            'brazo' => 'nullable|integer|min:1|max:6',
+            'antebrazo' => 'nullable|integer|min:1|max:2',
+            'muneca' => 'nullable|integer|min:1|max:3',
+            'actividad' => 'nullable|integer|min:0|max:3',
         ]);
 
+        $puntajeFinal = null;
         $nivel = null;
 
-        if ($request->metodo === 'REBA' && $request->puntaje_total !== null) {
+        if ($request->metodo === 'REBA') {
 
-            $puntaje = $request->puntaje_total;
+            $reba = new RebaService();
 
-            if ($puntaje <= 3) {
-                $nivel = 'Bajo';
-            } elseif ($puntaje <= 7) {
-                $nivel = 'Medio';
-            } elseif ($puntaje <= 10) {
-                $nivel = 'Alto';
-            } else {
-                $nivel = 'Muy Alto';
-            }
+            $grupoA = $reba->calcularGrupoA(
+                $request->tronco,
+                $request->cuello,
+                $request->piernas
+            );
+
+            $grupoB = $reba->calcularGrupoB(
+                $request->brazo,
+                $request->antebrazo,
+                $request->muneca
+            );
+
+            $grupoC = $reba->calcularGrupoC($grupoA, $grupoB);
+
+            $puntajeFinal = $reba->calcularFinal(
+                $grupoC,
+                $request->actividad ?? 0
+            );
+
+            $nivel = $reba->nivelRiesgo($puntajeFinal);
         }
 
         $evaluacion->update([
@@ -152,7 +192,7 @@ class EvaluacionController extends Controller
             'metodo' => $request->metodo,
             'fecha' => $request->fecha,
             'observaciones' => $request->observaciones,
-            'puntaje_total' => $request->puntaje_total,
+            'puntaje_total' => $puntajeFinal,
             'nivel_riesgo' => $nivel
         ]);
 

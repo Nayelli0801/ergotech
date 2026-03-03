@@ -77,18 +77,79 @@
                 {{-- FORMULARIO REBA --}}
 <div id="form-reba" class="hidden border-t pt-4 mt-4">
 
-    <h3 class="font-semibold text-lg mb-3 text-blue-600">
-        Evaluación REBA
-    </h3>
+<h3 class="text-xl font-semibold text-blue-600 mb-4">
+    Evaluación REBA
+</h3>
 
-    <div class="grid grid-cols-2 gap-4">
+{{-- GRUPO A --}}
+<div class="bg-blue-50 p-4 rounded mb-6">
+    <h4 class="font-semibold text-blue-700 mb-3">Grupo A</h4>
 
-        <div>
-            <label class="block mb-1">Cuello</label>
-            <input type="number" name="cuello"
-                   class="w-full border rounded px-3 py-2"
-                   min="0" max="5">
-        </div>
+    {{-- Cuello --}}
+    <div class="mb-4">
+        <label class="block font-medium mb-1">Cuello</label>
+        <label class="block"><input type="radio" name="cuello" value="1" required> 1 - Neutro</label>
+        <label class="block"><input type="radio" name="cuello" value="2"> 2 - Flexión/Extensión >20°</label>
+        <label class="block"><input type="radio" name="cuello" value="3"> 3 - Con torsión/inclinación</label>
+    </div>
+
+    {{-- Tronco --}}
+    <div class="mb-4">
+        <label class="block font-medium mb-1">Tronco</label>
+        <label class="block"><input type="radio" name="tronco" value="1" required> 1 - Recto</label>
+        <label class="block"><input type="radio" name="tronco" value="2"> 2 - Flexión 0–20°</label>
+        <label class="block"><input type="radio" name="tronco" value="3"> 3 - Flexión 20–60°</label>
+        <label class="block"><input type="radio" name="tronco" value="4"> 4 - Flexión >60°</label>
+    </div>
+
+    {{-- Piernas --}}
+    <div class="mb-4">
+        <label class="block font-medium mb-1">Piernas</label>
+        <label class="block"><input type="radio" name="piernas" value="1" required> 1 - Soporte bilateral</label>
+        <label class="block"><input type="radio" name="piernas" value="2"> 2 - Peso desigual</label>
+        <label class="block"><input type="radio" name="piernas" value="3"> 3 - En cuclillas</label>
+        <label class="block"><input type="radio" name="piernas" value="4"> 4 - Apoyo inestable</label>
+    </div>
+
+    {{-- Carga --}}
+    <div class="mb-4">
+        <label class="block font-medium mb-1">Carga</label>
+        <label class="block"><input type="radio" name="carga" value="0" required> 0 - <5 kg</label>
+        <label class="block"><input type="radio" name="carga" value="1"> 1 - 5–10 kg</label>
+        <label class="block"><input type="radio" name="carga" value="2"> 2 - >10 kg</label>
+    </div>
+</div>
+
+{{-- GRUPO B --}}
+<div class="bg-green-50 p-4 rounded mb-6">
+    <h4 class="font-semibold text-green-700 mb-3">Grupo B</h4>
+
+    {{-- Brazo --}}
+    <div class="mb-4">
+        <label class="block font-medium mb-1">Brazo</label>
+        <label class="block"><input type="radio" name="brazo" value="1" required> 1 - 20° ext a 20° flex</label>
+        <label class="block"><input type="radio" name="brazo" value="2"> 2 - 20°–45°</label>
+        <label class="block"><input type="radio" name="brazo" value="3"> 3 - 45°–90°</label>
+        <label class="block"><input type="radio" name="brazo" value="4"> 4 - >90°</label>
+    </div>
+
+    {{-- Antebrazo --}}
+    <div class="mb-4">
+        <label class="block font-medium mb-1">Antebrazo</label>
+        <label class="block"><input type="radio" name="antebrazo" value="1" required> 1 - 60°–100°</label>
+        <label class="block"><input type="radio" name="antebrazo" value="2"> 2 - Fuera de rango</label>
+    </div>
+
+    {{-- Muñeca --}}
+    <div class="mb-4">
+        <label class="block font-medium mb-1">Muñeca</label>
+        <label class="block"><input type="radio" name="muneca" value="1" required> 1 - Neutra</label>
+        <label class="block"><input type="radio" name="muneca" value="2"> 2 - Flexión/extensión >15°</label>
+        <label class="block"><input type="radio" name="muneca" value="3"> 3 - Con desviación</label>
+    </div>
+</div>
+
+    
 
         <div>
             <label class="block mb-1">Tronco</label>
