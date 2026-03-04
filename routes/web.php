@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\UserController;
@@ -8,9 +10,7 @@ use App\Http\Controllers\EvaluacionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TwoFactorController;
 use App\Http\Controllers\ReporteController;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\RebaController;
-
 
 /*
 |--------------------------------------------------------------------------
@@ -48,7 +48,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
 });
 
 /*
@@ -56,17 +55,16 @@ Route::middleware('auth')->group(function () {
 | ADMIN
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth','rol:admin'])->group(function () {
+Route::middleware(['auth', 'rol:admin'])->group(function () {
 
     // Empresas
     Route::resource('empresas', EmpresaController::class);
 
-    // Usuarios (ahora incluye crear y guardar)
+    // Usuarios
     Route::resource('usuarios', UserController::class);
 
     // Reportes
     Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
-
 });
 
 /*
@@ -76,9 +74,13 @@ Route::middleware(['auth','rol:admin'])->group(function () {
 */
 Route::middleware(['auth'])->group(function () {
 
-    Route::resource('evaluaciones', EvaluacionController::class);
-    Route::get('evaluaciones/{evaluacion}/pdf', [EvaluacionController::class, 'pdf'])->name('evaluaciones.pdf');    
+    // Resource con parámetro NORMAL {evaluacion}
+    Route::resource('evaluaciones', EvaluacionController::class)
+        ->parameters(['evaluaciones' => 'evaluacion']);
 
+    // PDF (solo una vez)
+    Route::get('evaluaciones/{evaluacion}/pdf', [EvaluacionController::class, 'pdf'])
+        ->name('evaluaciones.pdf');
 });
 
 /*
@@ -86,12 +88,10 @@ Route::middleware(['auth'])->group(function () {
 | Visitantes
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth','rol:visitante'])->group(function () {
+Route::middleware(['auth', 'rol:visitante'])->group(function () {
 
     Route::get('/evaluaciones-publicas', [EvaluacionController::class, 'index'])
         ->name('evaluaciones.publicas');
-        
-
 });
 
 /*
@@ -114,22 +114,10 @@ Route::get('/prueba-rol', function () {
 
 /*
 |--------------------------------------------------------------------------
-| reba calcaular
+| REBA - calcular (AJAX)
 |--------------------------------------------------------------------------
 */
 Route::post('/reba/calcular', [RebaController::class, 'calcular'])
     ->name('reba.calcular');
 
-/*
-|--------------------------------------------------------------------------
-| descarga pdf
-|--------------------------------------------------------------------------
-*/
-Route::get('/evaluaciones/{evaluacion}/pdf', [EvaluacionController::class, 'pdf'])
-    ->name('evaluaciones.pdf');
-
-
-Route::resource('evaluaciones', EvaluacionController::class)
-    ->parameters(['evaluaciones' => 'evaluacion']);
-
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
