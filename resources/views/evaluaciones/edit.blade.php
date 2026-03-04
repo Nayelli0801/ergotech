@@ -41,13 +41,18 @@
                 </div>
 
                 <div class="mb-4">
-                    <label class="block mb-1 font-medium">Método</label>
-                    <input type="text"
-                           name="metodo"
-                           value="{{ $evaluacion->metodo }}"
-                           class="w-full border rounded px-3 py-2"
-                           required>
-                </div>
+    <label class="block mb-1 font-medium">Método</label>
+    <select name="metodo_id" class="w-full border rounded px-3 py-2" required>
+        <option value="">Seleccionar método</option>
+
+        @foreach($metodos as $m)
+            <option value="{{ $m->id }}"
+                {{ old('metodo_id', $evaluacion->metodo_id) == $m->id ? 'selected' : '' }}>
+                {{ $m->nombre }}
+            </option>
+        @endforeach
+    </select>
+</div>
 
                 <div class="mb-4">
                     <label class="block mb-1 font-medium">Fecha</label>

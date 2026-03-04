@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Empresa;
 use App\Models\User;
 use App\Models\RebaDetalle;
+use App\Models\Metodo;
 
 class Evaluacion extends Model
 {
@@ -14,7 +15,8 @@ class Evaluacion extends Model
     protected $fillable = [
         'empresa_id',
         'user_id',
-        'metodo',
+        'metodo_id',        // ✅ nuevo (profesional)
+        'metodo',           // ✅ viejo (texto) - lo dejamos por compatibilidad
         'fecha',
         'observaciones',
         'puntaje',
@@ -34,7 +36,13 @@ class Evaluacion extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    // 🔥 NUEVA RELACIÓN CON REBA
+    // 🔹 Relación con Método (tabla metodos)
+    public function metodoRelacion()
+    {
+        return $this->belongsTo(Metodo::class, 'metodo_id');
+    }
+
+    // 🔥 RELACIÓN CON REBA
     public function reba()
     {
         return $this->hasOne(RebaDetalle::class);

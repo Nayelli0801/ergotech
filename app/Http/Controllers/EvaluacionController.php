@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Evaluacion;
 use Illuminate\Http\Request;
 use App\Services\RebaService;
+use App\Models\Metodo;
 
 class EvaluacionController extends Controller
 {
@@ -25,7 +26,7 @@ class EvaluacionController extends Controller
     // =========================
     public function index()
     {
-        $evaluaciones = Evaluacion::with('empresa', 'evaluador', 'reba')
+        $evaluaciones = Evaluacion::with('empresa', 'evaluador', 'reba', 'metodoRelacion')
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -43,7 +44,8 @@ class EvaluacionController extends Controller
             $q->where('nombre', 'evaluador');
         })->get();
 
-        $metodos = ['REBA', 'RULA', 'NIOSH'];
+        // ✅ Ahora vienen desde la BD
+        $metodos = Metodo::orderBy('nombre')->get();
 
         return view('evaluaciones.create', compact('empresas', 'evaluadores', 'metodos'));
     }
@@ -56,17 +58,20 @@ class EvaluacionController extends Controller
         $validated = $request->validate([
             'empresa_id' => 'required|exists:empresas,id',
             'user_id' => 'required|exists:users,id',
-            'metodo' => 'required|string|max:255',
+
+            // ✅ nuevo
+            'metodo_id' => 'required|exists:metodos,id',
+
             'fecha' => 'required|date',
             'observaciones' => 'nullable|string',
 
-            // REBA
-            'tronco' => 'required_if:metodo,REBA|integer|min:1|max:5',
-            'cuello' => 'required_if:metodo,REBA|integer|min:1|max:3',
-            'piernas' => 'required_if:metodo,REBA|integer|min:1|max:4',
-            'brazo' => 'required_if:metodo,REBA|integer|min:1|max:6',
-            'antebrazo' => 'required_if:metodo,REBA|integer|min:1|max:2',
-            'muneca' => 'required_if:metodo,REBA|integer|min:1|max:3',
+            // REBA (validación condicional por método_id) — la validamos abajo en runtime
+            'tronco' => 'nullable|integer|min:1|max:5',
+            'cuello' => 'nullable|integer|min:1|max:3',
+            'piernas' => 'nullable|integer|min:1|max:4',
+            'brazo' => 'nullable|integer|min:1|max:6',
+            'antebrazo' => 'nullable|integer|min:1|max:2',
+            'muneca' => 'nullable|integer|min:1|max:3',
 
             'carga' => 'nullable|integer|min:0|max:3',
             'actividad' => 'nullable|integer|min:0|max:3',
@@ -77,15 +82,30 @@ class EvaluacionController extends Controller
             'muneca_ajuste' => 'nullable|boolean',
         ]);
 
+        // ✅ Obtenemos el método seleccionado
+        $metodo = Metodo::findOrFail($request->metodo_id);
+        $metodoNombre = strtoupper($metodo->nombre);
+
+        // ✅ Validación estricta SOLO si es REBA
+        if ($metodoNombre === 'REBA') {
+            $request->validate([
+                'tronco' => 'required|integer|min:1|max:5',
+                'cuello' => 'required|integer|min:1|max:3',
+                'piernas' => 'required|integer|min:1|max:4',
+                'brazo' => 'required|integer|min:1|max:6',
+                'antebrazo' => 'required|integer|min:1|max:2',
+                'muneca' => 'required|integer|min:1|max:3',
+            ]);
+        }
+
         $puntajeFinal = null;
         $nivel = null;
         $grupoA = null;
         $grupoB = null;
 
-        if ($request->metodo === 'REBA') {
+        if ($metodoNombre === 'REBA') {
             $reba = new RebaService();
 
-            // ✅ Si tienes versión PRO úsala, si no tienes, cambia por calcularGrupoA/B normales
             if (method_exists($reba, 'calcularGrupoAPro')) {
                 $grupoA = $reba->calcularGrupoAPro(
                     (int)$request->tronco,
@@ -116,14 +136,20 @@ class EvaluacionController extends Controller
         $evaluacion = Evaluacion::create([
             'empresa_id' => $request->empresa_id,
             'user_id' => $request->user_id,
-            'metodo' => $request->metodo,
+
+            // ✅ nuevo
+            'metodo_id' => $request->metodo_id,
+
+            // ✅ compatibilidad (para que tus vistas actuales no se rompan)
+            'metodo' => $metodoNombre,
+
             'fecha' => $request->fecha,
             'observaciones' => $request->observaciones,
             'puntaje_total' => $puntajeFinal,
             'nivel_riesgo' => $nivel
         ]);
 
-        if ($request->metodo === 'REBA') {
+        if ($metodoNombre === 'REBA') {
             $evaluacion->reba()->create([
                 'cuello' => (int)$request->cuello,
                 'tronco' => (int)$request->tronco,
@@ -148,16 +174,16 @@ class EvaluacionController extends Controller
     // =========================
     public function show(Evaluacion $evaluacion)
     {
-        $evaluacion->load('empresa', 'evaluador', 'reba');
+        $evaluacion->load('empresa', 'evaluador', 'reba', 'metodoRelacion');
         return view('evaluaciones.show', compact('evaluacion'));
     }
 
     // =========================
-    // EDITAR (el que te falta)
+    // EDITAR
     // =========================
     public function edit(Evaluacion $evaluacion)
     {
-        $evaluacion->load('reba');
+        $evaluacion->load('reba', 'metodoRelacion');
 
         $empresas = Empresa::all();
 
@@ -165,7 +191,8 @@ class EvaluacionController extends Controller
             $q->where('nombre', 'evaluador');
         })->get();
 
-        $metodos = ['REBA', 'RULA', 'NIOSH'];
+        // ✅ Ahora vienen desde la BD
+        $metodos = Metodo::orderBy('nombre')->get();
 
         return view('evaluaciones.edit', compact('evaluacion', 'empresas', 'evaluadores', 'metodos'));
     }
@@ -180,17 +207,20 @@ class EvaluacionController extends Controller
         $validated = $request->validate([
             'empresa_id' => 'required|exists:empresas,id',
             'user_id' => 'required|exists:users,id',
-            'metodo' => 'required|string|max:255',
+
+            // ✅ nuevo
+            'metodo_id' => 'required|exists:metodos,id',
+
             'fecha' => 'required|date',
             'observaciones' => 'nullable|string',
 
-            // REBA
-            'tronco' => 'required_if:metodo,REBA|integer|min:1|max:5',
-            'cuello' => 'required_if:metodo,REBA|integer|min:1|max:3',
-            'piernas' => 'required_if:metodo,REBA|integer|min:1|max:4',
-            'brazo' => 'required_if:metodo,REBA|integer|min:1|max:6',
-            'antebrazo' => 'required_if:metodo,REBA|integer|min:1|max:2',
-            'muneca' => 'required_if:metodo,REBA|integer|min:1|max:3',
+            // REBA (primero nullable; validamos “required” más abajo si aplica)
+            'tronco' => 'nullable|integer|min:1|max:5',
+            'cuello' => 'nullable|integer|min:1|max:3',
+            'piernas' => 'nullable|integer|min:1|max:4',
+            'brazo' => 'nullable|integer|min:1|max:6',
+            'antebrazo' => 'nullable|integer|min:1|max:2',
+            'muneca' => 'nullable|integer|min:1|max:3',
 
             'carga' => 'nullable|integer|min:0|max:3',
             'actividad' => 'nullable|integer|min:0|max:3',
@@ -201,12 +231,28 @@ class EvaluacionController extends Controller
             'muneca_ajuste' => 'nullable|boolean',
         ]);
 
+        // ✅ Método seleccionado
+        $metodo = Metodo::findOrFail($request->metodo_id);
+        $metodoNombre = strtoupper($metodo->nombre);
+
+        // ✅ Validación estricta SOLO si es REBA
+        if ($metodoNombre === 'REBA') {
+            $request->validate([
+                'tronco' => 'required|integer|min:1|max:5',
+                'cuello' => 'required|integer|min:1|max:3',
+                'piernas' => 'required|integer|min:1|max:4',
+                'brazo' => 'required|integer|min:1|max:6',
+                'antebrazo' => 'required|integer|min:1|max:2',
+                'muneca' => 'required|integer|min:1|max:3',
+            ]);
+        }
+
         $puntajeFinal = null;
         $nivel = null;
         $grupoA = null;
         $grupoB = null;
 
-        if ($request->metodo === 'REBA') {
+        if ($metodoNombre === 'REBA') {
             $reba = new RebaService();
 
             if (method_exists($reba, 'calcularGrupoAPro')) {
@@ -239,15 +285,20 @@ class EvaluacionController extends Controller
         $evaluacion->update([
             'empresa_id' => $request->empresa_id,
             'user_id' => $request->user_id,
-            'metodo' => $request->metodo,
+
+            // ✅ nuevo
+            'metodo_id' => $request->metodo_id,
+
+            // ✅ compatibilidad
+            'metodo' => $metodoNombre,
+
             'fecha' => $request->fecha,
             'observaciones' => $request->observaciones,
             'puntaje_total' => $puntajeFinal,
             'nivel_riesgo' => $nivel
         ]);
 
-        if ($request->metodo === 'REBA') {
-            // si no existe detalle, lo crea
+        if ($metodoNombre === 'REBA') {
             if (!$evaluacion->reba) {
                 $evaluacion->reba()->create([
                     'cuello' => (int)$request->cuello,

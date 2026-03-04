@@ -34,15 +34,17 @@
                 </div>
 
                 {{-- MÉTODO --}}
-                <div class="mb-4">
-                    <label class="block mb-1 font-medium">Método</label>
-                    <select name="metodo" id="metodo" class="w-full border rounded px-3 py-2" required>
-                        <option value="">Seleccionar método</option>
-                        @foreach($metodos as $metodo)
-                            <option value="{{ $metodo }}">{{ $metodo }}</option>
-                        @endforeach
-                    </select>
-                </div>
+<div class="mb-4">
+    <label class="block mb-1 font-medium">Método</label>
+    <select name="metodo_id" id="metodo_id" class="w-full border rounded px-3 py-2" required>
+        <option value="">Seleccionar método</option>
+        @foreach($metodos as $m)
+            <option value="{{ $m->id }}" data-nombre="{{ strtoupper($m->nombre) }}">
+                {{ $m->nombre }}
+            </option>
+        @endforeach
+    </select>
+</div>
 
                 {{-- FECHA --}}
                 <div class="mb-4">
@@ -232,7 +234,7 @@
     <script>
 document.addEventListener('DOMContentLoaded', () => {
 
-    const metodoSelect = document.getElementById('metodo');
+    const metodoSelect = document.getElementById('metodo_id');
     const formReba = document.getElementById('form-reba');
     const resultado = document.getElementById('resultado-reba');
     const btnCalcular = document.getElementById('calcular');
@@ -244,13 +246,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     metodoSelect?.addEventListener('change', function () {
-        if (this.value === 'REBA') {
-            formReba.classList.remove('hidden');
-        } else {
-            formReba.classList.add('hidden');
-            resultado.classList.add('hidden');
-        }
-    });
+    const selected = this.options[this.selectedIndex];
+    const nombre = selected?.dataset?.nombre || '';
+
+    if (nombre === 'REBA') {
+        formReba.classList.remove('hidden');
+    } else {
+        formReba.classList.add('hidden');
+        resultado.classList.add('hidden');
+    }
+});
 
     const pick = (name) => document.querySelector(`input[name="${name}"]:checked`)?.value ?? null;
     const check = (name) => document.querySelector(`input[name="${name}"]`)?.checked ? 1 : 0;
