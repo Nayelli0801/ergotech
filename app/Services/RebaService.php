@@ -4,12 +4,9 @@ namespace App\Services;
 
 class RebaService
 {
-    /*
-    |--------------------------------------------------------------------------
-    | TABLA GRUPO A
-    |--------------------------------------------------------------------------
-    */
-
+    // =========================
+    // TABLA GRUPO A (BASE)
+    // =========================
     private function tablaGrupoA()
     {
         return [
@@ -41,18 +38,9 @@ class RebaService
         ];
     }
 
-    public function calcularGrupoA($tronco, $cuello, $piernas)
-    {
-        $tabla = $this->tablaGrupoA();
-        return $tabla[$tronco][$cuello][$piernas] ?? 0;
-    }
-
-        /*
-    |--------------------------------------------------------------------------
-    | TABLA GRUPO B
-    |--------------------------------------------------------------------------
-    */
-
+    // =========================
+    // TABLA GRUPO B (BASE)
+    // =========================
     private function tablaGrupoB()
     {
         return [
@@ -83,18 +71,9 @@ class RebaService
         ];
     }
 
-    public function calcularGrupoB($brazo, $antebrazo, $muneca)
-    {
-        $tabla = $this->tablaGrupoB();
-        return $tabla[$brazo][$antebrazo][$muneca] ?? 0;
-    }
-
-        /*
-    |--------------------------------------------------------------------------
-    | TABLA GRUPO C
-    |--------------------------------------------------------------------------
-    */
-
+    // =========================
+    // TABLA GRUPO C
+    // =========================
     private function tablaGrupoC()
     {
         return [
@@ -113,14 +92,64 @@ class RebaService
         ];
     }
 
+    // =========================
+    // UTIL: LIMITAR
+    // =========================
+    private function clamp($value, $min, $max)
+    {
+        return max($min, min($max, (int)$value));
+    }
+
+    // =========================
+    // GRUPO A PROFESIONAL
+    // (postura + ajustes + carga)
+    // =========================
+    public function calcularGrupoAPro($tronco, $cuello, $piernas, $troncoAjuste = false, $cuelloAjuste = false, $carga = 0)
+    {
+        $tronco = $this->clamp($tronco + ($troncoAjuste ? 1 : 0), 1, 5);
+        $cuello = $this->clamp($cuello + ($cuelloAjuste ? 1 : 0), 1, 3);
+        $piernas = $this->clamp($piernas, 1, 4);
+
+        $tabla = $this->tablaGrupoA();
+        $base = $tabla[$tronco][$cuello][$piernas] ?? 0;
+
+        // carga (0-2 usualmente). Suma directa.
+        $carga = $this->clamp($carga, 0, 3);
+
+        return $this->clamp($base + $carga, 1, 12);
+    }
+
+    // =========================
+    // GRUPO B PROFESIONAL
+    // (postura + ajuste muñeca + agarre)
+    // =========================
+    public function calcularGrupoBPro($brazo, $antebrazo, $muneca, $munecaAjuste = false, $agarre = 0)
+    {
+        $brazo = $this->clamp($brazo, 1, 6);
+        $antebrazo = $this->clamp($antebrazo, 1, 2);
+        $muneca = $this->clamp($muneca + ($munecaAjuste ? 1 : 0), 1, 3);
+
+        $tabla = $this->tablaGrupoB();
+        $base = $tabla[$brazo][$antebrazo][$muneca] ?? 0;
+
+        // agarre/acoplamiento (0-2 típico)
+        $agarre = $this->clamp($agarre, 0, 3);
+
+        return $this->clamp($base + $agarre, 1, 12);
+    }
+
     public function calcularGrupoC($grupoA, $grupoB)
     {
+        $grupoA = $this->clamp($grupoA, 1, 12);
+        $grupoB = $this->clamp($grupoB, 1, 12);
+
         $tabla = $this->tablaGrupoC();
         return $tabla[$grupoA][$grupoB - 1] ?? 0;
     }
 
-        public function calcularFinal($grupoC, $actividad = 0)
+    public function calcularFinal($grupoC, $actividad = 0)
     {
+        $actividad = $this->clamp($actividad, 0, 3);
         return $grupoC + $actividad;
     }
 
@@ -131,5 +160,17 @@ class RebaService
         if ($puntaje <= 7) return 'Riesgo medio';
         if ($puntaje <= 10) return 'Riesgo alto';
         return 'Riesgo muy alto';
+    }
+
+    public function recomendacion($nivel)
+    {
+        switch ($nivel) {
+            case 'Riesgo inapreciable': return 'No se requieren acciones.';
+            case 'Riesgo bajo': return 'No se requiere acción inmediata.';
+            case 'Riesgo medio': return 'Se recomienda analizar mejoras.';
+            case 'Riesgo alto': return 'Se requiere intervención pronta.';
+            case 'Riesgo muy alto': return 'Intervención inmediata necesaria.';
+            default: return '';
+        }
     }
 }

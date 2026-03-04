@@ -8,7 +8,7 @@
     <div class="py-6">
         <div class="max-w-xl mx-auto bg-white shadow rounded p-6">
 
-            <form action="{{ route('evaluaciones.update', $evaluacion->id) }}" method="POST">
+            <form action="{{ route('evaluaciones.update', $evaluacion) }}" method="POST">
                 @csrf
                 @method('PUT')
 

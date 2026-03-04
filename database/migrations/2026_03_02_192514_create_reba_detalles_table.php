@@ -12,23 +12,34 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('reba_detalles', function (Blueprint $table) {
-    $table->id();
-    $table->foreignId('evaluacion_id')->constrained()->onDelete('cascade');
 
-    $table->integer('cuello');
-    $table->integer('tronco');
-    $table->integer('piernas');
-    $table->integer('carga');
-    $table->integer('brazo');
-    $table->integer('antebrazo');
-    $table->integer('muneca');
+            $table->id();
 
-    $table->integer('puntaje_a');
-    $table->integer('puntaje_b');
-    $table->integer('puntaje_final');
+            // Relación con evaluación
+            $table->foreignId('evaluacion_id')
+                ->constrained('evaluaciones')
+                ->onDelete('cascade');
 
-    $table->timestamps();
-});
+            // ====== POSTURAS ======
+            $table->unsignedTinyInteger('cuello');       // 1–3
+            $table->unsignedTinyInteger('tronco');       // 1–5
+            $table->unsignedTinyInteger('piernas');      // 1–4
+            $table->unsignedTinyInteger('carga')->default(0);   // 0–3
+
+            $table->unsignedTinyInteger('brazo');        // 1–6
+            $table->unsignedTinyInteger('antebrazo');    // 1–2
+            $table->unsignedTinyInteger('muneca');       // 1–3
+
+            // ====== ACTIVIDAD ======
+            $table->unsignedTinyInteger('actividad')->default(0); // 0–3
+
+            // ====== RESULTADOS ======
+            $table->unsignedTinyInteger('puntaje_a');
+            $table->unsignedTinyInteger('puntaje_b');
+            $table->unsignedTinyInteger('puntaje_final');
+
+            $table->timestamps();
+        });
     }
 
     /**

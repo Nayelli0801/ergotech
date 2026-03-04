@@ -9,6 +9,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TwoFactorController;
 use App\Http\Controllers\ReporteController;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\RebaController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -109,5 +111,25 @@ Route::get('/mis-evaluaciones', [EvaluacionController::class, 'historial'])
 Route::get('/prueba-rol', function () {
     return Auth::user()->rol->nombre;
 })->middleware('auth');
+
+/*
+|--------------------------------------------------------------------------
+| reba calcaular
+|--------------------------------------------------------------------------
+*/
+Route::post('/reba/calcular', [RebaController::class, 'calcular'])
+    ->name('reba.calcular');
+
+/*
+|--------------------------------------------------------------------------
+| descarga pdf
+|--------------------------------------------------------------------------
+*/
+Route::get('/evaluaciones/{evaluacion}/pdf', [EvaluacionController::class, 'pdf'])
+    ->name('evaluaciones.pdf');
+
+
+Route::resource('evaluaciones', EvaluacionController::class)
+    ->parameters(['evaluaciones' => 'evaluacion']);
 
 require __DIR__.'/auth.php';

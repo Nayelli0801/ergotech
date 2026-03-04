@@ -6,17 +6,22 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up()
+    public function up(): void
     {
-        Schema::table('evaluaciones', function (Blueprint $table) {
-            $table->dropColumn('puntaje');
-        });
+        if (Schema::hasColumn('evaluaciones', 'puntaje')) {
+            Schema::table('evaluaciones', function (Blueprint $table) {
+                $table->dropColumn('puntaje');
+            });
+        }
     }
 
-    public function down()
+    public function down(): void
     {
-        Schema::table('evaluaciones', function (Blueprint $table) {
-            $table->integer('puntaje')->nullable();
-        });
+        // Si quieres poder revertir, solo agrega la columna si no existe
+        if (!Schema::hasColumn('evaluaciones', 'puntaje')) {
+            Schema::table('evaluaciones', function (Blueprint $table) {
+                $table->integer('puntaje')->nullable();
+            });
+        }
     }
 };
