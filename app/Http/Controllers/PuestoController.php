@@ -2,63 +2,71 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Puesto;
+use App\Models\Sucursal;
 use Illuminate\Http\Request;
 
 class PuestoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $puestos = Puesto::with('sucursal.empresa')->latest()->get();
+        return view('puestos.index', compact('puestos'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        $sucursales = Sucursal::with('empresa')->where('activo', 1)->get();
+        return view('puestos.create', compact('sucursales'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'sucursal_id' => 'required|exists:sucursales,id',
+            'nombre' => 'required|string|max:255',
+            'area' => 'nullable|string|max:255',
+            'descripcion' => 'nullable|string',
+            'activo' => 'required|boolean',
+        ]);
+
+        Puesto::create($request->all());
+
+        return redirect()->route('puestos.index')
+            ->with('success', 'Puesto registrado correctamente.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
-        //
+        $puesto = Puesto::findOrFail($id);
+        $sucursales = Sucursal::with('empresa')->where('activo', 1)->get();
+
+        return view('puestos.edit', compact('puesto', 'sucursales'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'sucursal_id' => 'required|exists:sucursales,id',
+            'nombre' => 'required|string|max:255',
+            'area' => 'nullable|string|max:255',
+            'descripcion' => 'nullable|string',
+            'activo' => 'required|boolean',
+        ]);
+
+        $puesto = Puesto::findOrFail($id);
+        $puesto->update($request->all());
+
+        return redirect()->route('puestos.index')
+            ->with('success', 'Puesto actualizado correctamente.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
-        //
+        $puesto = Puesto::findOrFail($id);
+        $puesto->delete();
+
+        return redirect()->route('puestos.index')
+            ->with('success', 'Puesto eliminado correctamente.');
     }
 }

@@ -2,63 +2,81 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Puesto;
+use App\Models\Trabajador;
 use Illuminate\Http\Request;
 
 class TrabajadorController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $trabajadores = Trabajador::with('puesto.sucursal.empresa')->latest()->get();
+        return view('trabajadores.index', compact('trabajadores'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        $puestos = Puesto::with('sucursal.empresa')->where('activo', 1)->get();
+        return view('trabajadores.create', compact('puestos'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'puesto_id' => 'required|exists:puestos,id',
+            'nombre' => 'required|string|max:255',
+            'apellido_paterno' => 'nullable|string|max:255',
+            'apellido_materno' => 'nullable|string|max:255',
+            'sexo' => 'nullable|string|max:50',
+            'edad' => 'nullable|integer|min:0',
+            'estatura' => 'nullable|numeric|min:0',
+            'peso' => 'nullable|numeric|min:0',
+            'antiguedad' => 'nullable|numeric|min:0',
+            'activo' => 'required|boolean',
+        ]);
+
+        Trabajador::create($request->all());
+
+        return redirect()->route('trabajadores.index')
+            ->with('success', 'Trabajador registrado correctamente.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
-        //
+        $trabajador = Trabajador::findOrFail($id);
+        $puestos = Puesto::with('sucursal.empresa')->where('activo', 1)->get();
+
+        return view('trabajadores.edit', compact('trabajador', 'puestos'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'puesto_id' => 'required|exists:puestos,id',
+            'nombre' => 'required|string|max:255',
+            'apellido_paterno' => 'nullable|string|max:255',
+            'apellido_materno' => 'nullable|string|max:255',
+            'sexo' => 'nullable|string|max:50',
+            'edad' => 'nullable|integer|min:0',
+            'estatura' => 'nullable|numeric|min:0',
+            'peso' => 'nullable|numeric|min:0',
+            'antiguedad' => 'nullable|numeric|min:0',
+            'activo' => 'required|boolean',
+        ]);
+
+        $trabajador = Trabajador::findOrFail($id);
+        $trabajador->update($request->all());
+
+        return redirect()->route('trabajadores.index')
+            ->with('success', 'Trabajador actualizado correctamente.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
-        //
+        $trabajador = Trabajador::findOrFail($id);
+        $trabajador->delete();
+
+        return redirect()->route('trabajadores.index')
+            ->with('success', 'Trabajador eliminado correctamente.');
     }
 }
