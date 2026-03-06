@@ -8,6 +8,9 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TwoFactorController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\EmpresaController;
+use App\Http\Controllers\SucursalController;
+use App\Http\Controllers\PuestoController;
+use App\Http\Controllers\TrabajadorController;
 use App\Http\Controllers\EvaluacionController;
 use App\Http\Controllers\ReporteController;
 
@@ -54,6 +57,9 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'rol:admin'])->group(function () {
     Route::resource('usuarios', UserController::class);
     Route::resource('empresas', EmpresaController::class);
+    Route::resource('sucursales', SucursalController::class);
+    Route::resource('puestos', PuestoController::class);
+    Route::resource('trabajadores', TrabajadorController::class);
     Route::resource('evaluaciones', EvaluacionController::class);
 
     Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');

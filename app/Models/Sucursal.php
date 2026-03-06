@@ -24,4 +24,14 @@ class Sucursal extends Model
     {
         return $this->belongsTo(Empresa::class, 'empresa_id');
     }
+
+    public function puestos()
+    {
+        return $this->hasMany(Puesto::class, 'sucursal_id');
+    }
+
+    public function evaluaciones()
+    {
+        return $this->hasMany(Evaluacion::class, 'sucursal_id');
+    }
 }
