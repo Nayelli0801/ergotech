@@ -6,15 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class Empresa extends Model
 {
-    protected $fillable = [
-        'nombre',
-        'direccion',
-        'telefono',
-        'correo',
-    ];
-
-    public function evaluaciones()
-{
-    return $this->hasMany(Evaluacion::class);
-}
+    //
 }

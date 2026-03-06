@@ -8,10 +8,13 @@ use App\Models\User;
 class Rol extends Model
 {
     protected $table = 'roles';
-    protected $fillable = ['nombre'];
+
+    protected $fillable = [
+        'nombre'
+    ];
 
     public function users()
     {
-        return $this->hasMany(User::class);
+        return $this->hasMany(User::class, 'rol_id');
     }
 }

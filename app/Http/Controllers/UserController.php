@@ -21,19 +21,19 @@ class UserController extends Controller
         return view('usuarios.create', compact('roles'));
     }
 
-    // Guardar usuario
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'last_name' => 'nullable|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
-            // ✅ CORREGIDO: tabla real es roles (no rols)
             'rol_id' => 'required|exists:roles,id',
         ]);
 
         User::create([
             'name' => $request->name,
+            'last_name' => $request->last_name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'rol_id' => $request->rol_id,
@@ -56,11 +56,22 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         $request->validate([
-            // ✅ también valida en update para evitar ids inválidos
+            'name' => 'required|string|max:255',
+            'last_name' => 'nullable|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
             'rol_id' => 'required|exists:roles,id',
+            'password' => 'nullable|min:6',
         ]);
 
+        $user->name = $request->name;
+        $user->last_name = $request->last_name;
+        $user->email = $request->email;
         $user->rol_id = $request->rol_id;
+
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
+        }
+
         $user->save();
 
         return redirect()->route('usuarios.index')

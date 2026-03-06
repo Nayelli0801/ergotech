@@ -14,6 +14,7 @@ class User extends Authenticatable
 
     protected $fillable = [
         'name',
+        'last_name',
         'email',
         'password',
         'rol_id'
@@ -34,19 +35,11 @@ class User extends Authenticatable
         ];
     }
 
-    // Relación con rol
     public function rol()
     {
         return $this->belongsTo(Rol::class, 'rol_id');
     }
 
-    // Evaluaciones del usuario
-    public function evaluaciones()
-    {
-        return $this->hasMany(Evaluacion::class);
-    }
-
-    // Verificar roles
     public function isAdmin()
     {
         return $this->rol && $this->rol->nombre === 'admin';

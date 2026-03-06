@@ -1,0 +1,29 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
+class OwasEvaluacion extends Model
+{
+    use HasFactory;
+
+    protected $table = 'owas_evaluaciones';
+
+    protected $fillable = [
+        'evaluacion_id',
+        'espalda',
+        'brazos',
+        'piernas',
+        'carga',
+        'codigo_postura',
+        'categoria_riesgo',
+        'accion_correctiva',
+    ];
+
+    public function evaluacion()
+    {
+        return $this->belongsTo(Evaluacion::class, 'evaluacion_id');
+    }
+}

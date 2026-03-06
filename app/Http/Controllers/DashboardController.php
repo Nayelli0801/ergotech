@@ -13,17 +13,21 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
-        // ADMIN
-        if ($user->rol->nombre == 'admin') {
+        if (!$user || !$user->rol) {
+            return redirect()->route('login')
+                ->with('error', 'Tu usuario no tiene un rol asignado.');
+        }
 
+        // ADMIN
+        if ($user->rol->nombre === 'admin') {
             $totalUsuarios = User::count();
             $totalEmpresas = Empresa::count();
             $totalEvaluaciones = Evaluacion::count();
 
             $ultimasEvaluaciones = Evaluacion::with('empresa')
-                                    ->latest()
-                                    ->take(5)
-                                    ->get();
+                ->latest()
+                ->take(5)
+                ->get();
 
             return view('dashboard.admin', compact(
                 'totalUsuarios',
@@ -34,11 +38,16 @@ class DashboardController extends Controller
         }
 
         // EVALUADOR
-        if ($user->rol->nombre == 'evaluador') {
+        if ($user->rol->nombre === 'evaluador') {
             return view('dashboard.evaluador');
         }
 
         // VISITANTE
-        return view('dashboard.visitante');
+        if ($user->rol->nombre === 'visitante') {
+            return view('dashboard.visitante');
+        }
+
+        return redirect()->route('login')
+            ->with('error', 'El rol asignado no es válido.');
     }
 }

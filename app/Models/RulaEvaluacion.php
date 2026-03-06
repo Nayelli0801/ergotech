@@ -5,29 +5,29 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class RebaEvaluacion extends Model
+class RulaEvaluacion extends Model
 {
     use HasFactory;
 
-    protected $table = 'reba_evaluaciones';
+    protected $table = 'rula_evaluaciones';
 
     protected $fillable = [
         'evaluacion_id',
-        'cuello',
-        'tronco',
-        'piernas',
         'brazo',
         'antebrazo',
         'muneca',
-        'carga',
-        'tipo_agarre',
-        'actividad',
+        'giro_muneca',
+        'cuello',
+        'tronco',
+        'piernas',
+        'uso_muscular',
+        'carga_fuerza',
         'puntuacion_a',
         'puntuacion_b',
         'puntuacion_c',
+        'puntuacion_d',
         'puntuacion_final',
-        'nivel_riesgo',
-        'accion_requerida',
+        'nivel_accion',
     ];
 
     public function evaluacion()

@@ -2,20 +2,23 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Rol;
+use Illuminate\Support\Facades\DB;
 
 class RolSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
-{
-    Rol::insert([
-        ['nombre' => 'admin'],
-        ['nombre' => 'evaluador']
-    ]);
-}
+    {
+        $roles = ['admin', 'evaluador', 'visitante'];
+
+        foreach ($roles as $rol) {
+            DB::table('roles')->updateOrInsert(
+                ['nombre' => $rol],
+                [
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
+        }
+    }
 }
