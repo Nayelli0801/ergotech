@@ -5,33 +5,22 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class RebaEvaluacion extends Model
+class RebaDetalle extends Model
 {
     use HasFactory;
 
-    protected $table = 'reba_evaluaciones';
+    protected $table = 'reba_detalles';
 
     protected $fillable = [
-        'evaluacion_id',
-        'cuello',
-        'tronco',
-        'piernas',
-        'brazo',
-        'antebrazo',
-        'muneca',
-        'carga',
-        'tipo_agarre',
-        'actividad',
-        'puntuacion_a',
-        'puntuacion_b',
-        'puntuacion_c',
-        'puntuacion_final',
-        'nivel_riesgo',
-        'accion_requerida',
+        'reba_evaluacion_id',
+        'seccion',
+        'concepto',
+        'valor',
+        'puntaje',
     ];
 
-    public function evaluacion()
+    public function rebaEvaluacion()
     {
-        return $this->belongsTo(Evaluacion::class, 'evaluacion_id');
+        return $this->belongsTo(RebaEvaluacion::class, 'reba_evaluacion_id');
     }
 }

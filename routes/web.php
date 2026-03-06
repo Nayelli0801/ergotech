@@ -13,6 +13,7 @@ use App\Http\Controllers\PuestoController;
 use App\Http\Controllers\TrabajadorController;
 use App\Http\Controllers\EvaluacionController;
 use App\Http\Controllers\ReporteController;
+use App\Http\Controllers\RebaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -73,5 +74,16 @@ Route::middleware(['auth', 'rol:admin'])->group(function () {
 Route::get('/prueba-rol', function () {
     return Auth::user()->rol?->nombre;
 })->middleware('auth');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/evaluaciones', [EvaluacionController::class, 'index'])->name('evaluaciones.index');
+    Route::get('/evaluaciones/create', [EvaluacionController::class, 'create'])->name('evaluaciones.create');
+    Route::post('/evaluaciones/seleccionar-metodo', [EvaluacionController::class, 'seleccionarMetodo'])->name('evaluaciones.seleccionarMetodo');
+
+    Route::get('/reba', [RebaController::class, 'index'])->name('reba.index');
+    Route::get('/reba/create', [RebaController::class, 'create'])->name('reba.create');
+    Route::post('/reba', [RebaController::class, 'store'])->name('reba.store');
+    Route::get('/reba/{id}', [RebaController::class, 'show'])->name('reba.show');
+});
 
 require __DIR__ . '/auth.php';
