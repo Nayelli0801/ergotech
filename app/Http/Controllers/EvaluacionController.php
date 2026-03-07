@@ -27,10 +27,10 @@ class EvaluacionController extends Controller
 
     public function create()
     {
-        $empresas = Empresa::all();
-        $sucursales = Sucursal::all();
-        $puestos = Puesto::all();
-        $trabajadores = Trabajador::all();
+        $empresas = Empresa::where('activo', 1)->get();
+        $sucursales = Sucursal::with('empresa')->where('activo', 1)->get();
+        $puestos = Puesto::with('sucursal')->where('activo', 1)->get();
+        $trabajadores = Trabajador::with('puesto')->where('activo', 1)->get();
 
         return view('evaluaciones.create', compact('empresas', 'sucursales', 'puestos', 'trabajadores'));
     }
@@ -42,8 +42,11 @@ class EvaluacionController extends Controller
             'sucursal_id' => 'required|exists:sucursales,id',
             'puesto_id' => 'required|exists:puestos,id',
             'trabajador_id' => 'required|exists:trabajadores,id',
-            'fecha' => 'required|date',
+            'fecha_evaluacion' => 'required|date',
             'metodo' => 'required|string',
+            'area_evaluada' => 'nullable|string|max:255',
+            'actividad_general' => 'nullable|string|max:255',
+            'observaciones' => 'nullable|string',
         ]);
 
         $datos = [
@@ -51,7 +54,9 @@ class EvaluacionController extends Controller
             'sucursal_id' => $request->sucursal_id,
             'puesto_id' => $request->puesto_id,
             'trabajador_id' => $request->trabajador_id,
-            'fecha' => $request->fecha,
+            'fecha_evaluacion' => $request->fecha_evaluacion,
+            'area_evaluada' => $request->area_evaluada,
+            'actividad_general' => $request->actividad_general,
             'observaciones' => $request->observaciones,
         ];
 
@@ -60,16 +65,16 @@ class EvaluacionController extends Controller
                 return redirect()->route('reba.create', $datos);
 
             case 'RULA':
-                return back()->with('error', 'RULA aún no está implementado.');
+                return back()->withInput()->with('error', 'RULA aún no está implementado.');
 
             case 'OWAS':
-                return back()->with('error', 'OWAS aún no está implementado.');
+                return back()->withInput()->with('error', 'OWAS aún no está implementado.');
 
             case 'NIOSH':
-                return back()->with('error', 'NIOSH aún no está implementado.');
+                return back()->withInput()->with('error', 'NIOSH aún no está implementado.');
 
             default:
-                return back()->with('error', 'Método no válido.');
+                return back()->withInput()->with('error', 'Método no válido.');
         }
     }
 }

@@ -8,7 +8,7 @@
                 <p><strong>Sucursal:</strong> {{ $reba->evaluacion->sucursal->nombre ?? 'N/A' }}</p>
                 <p><strong>Puesto:</strong> {{ $reba->evaluacion->puesto->nombre ?? 'N/A' }}</p>
                 <p><strong>Trabajador:</strong> {{ $reba->evaluacion->trabajador->nombre ?? 'N/A' }}</p>
-                <p><strong>Fecha:</strong> {{ $reba->evaluacion->fecha ?? 'N/A' }}</p>
+                <p><strong>Fecha:</strong> {{ $reba->evaluacion->fecha_evaluacion ?? 'N/A' }}</p>
             </div>
         </div>
 

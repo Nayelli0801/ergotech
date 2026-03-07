@@ -3,7 +3,7 @@
         <div class="bg-white shadow-lg rounded-2xl overflow-hidden border border-gray-200">
             <div class="bg-blue-700 text-white px-6 py-4">
                 <h2 class="text-2xl font-bold">Nueva evaluación</h2>
-                <p class="text-sm text-blue-100 mt-1">Selecciona los datos generales y el método de evaluación.</p>
+                <p class="text-sm text-blue-100 mt-1">Captura los datos generales y después selecciona el método de evaluación.</p>
             </div>
 
             <div class="p-6">
@@ -85,11 +85,11 @@
                             </div>
 
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de evaluación</label>
                                 <input
                                     type="date"
-                                    name="fecha"
-                                    value="{{ old('fecha', date('Y-m-d')) }}"
+                                    name="fecha_evaluacion"
+                                    value="{{ old('fecha_evaluacion', date('Y-m-d')) }}"
                                     class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500"
                                     required
                                 >
@@ -104,6 +104,28 @@
                                     <option value="OWAS" {{ old('metodo') == 'OWAS' ? 'selected' : '' }}>OWAS</option>
                                     <option value="NIOSH" {{ old('metodo') == 'NIOSH' ? 'selected' : '' }}>NIOSH</option>
                                 </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Área evaluada</label>
+                                <input
+                                    type="text"
+                                    name="area_evaluada"
+                                    value="{{ old('area_evaluada') }}"
+                                    class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="Ej. Producción, laboratorio, empaque"
+                                >
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Actividad general</label>
+                                <input
+                                    type="text"
+                                    name="actividad_general"
+                                    value="{{ old('actividad_general') }}"
+                                    class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="Ej. Ensamble, inspección, calibración"
+                                >
                             </div>
                         </div>
                     </div>

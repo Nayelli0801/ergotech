@@ -28,7 +28,7 @@
                             <td>{{ $reba->id }}</td>
                             <td>{{ $reba->evaluacion->trabajador->nombre ?? 'N/A' }}</td>
                             <td>{{ $reba->evaluacion->puesto->nombre ?? 'N/A' }}</td>
-                            <td>{{ $reba->evaluacion->fecha ?? 'N/A' }}</td>
+                            <td>{{ $reba->evaluacion->fecha_evaluacion ?? 'N/A' }}</td>
                             <td>{{ $reba->puntuacion_final }}</td>
                             <td>{{ $reba->nivel_riesgo }}</td>
                             <td>

@@ -2,14 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Empresa;
 use App\Models\Evaluacion;
 use App\Models\Metodo;
-use App\Models\Puesto;
 use App\Models\RebaDetalle;
 use App\Models\RebaEvaluacion;
-use App\Models\Sucursal;
-use App\Models\Trabajador;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -29,18 +25,22 @@ class RebaController extends Controller
     }
 
     public function create(Request $request)
-{
-    $datosBase = [
-        'empresa_id' => $request->empresa_id,
-        'sucursal_id' => $request->sucursal_id,
-        'puesto_id' => $request->puesto_id,
-        'trabajador_id' => $request->trabajador_id,
-        'fecha' => $request->fecha,
-        'observaciones' => $request->observaciones,
-    ];
+    {
+        $datosBase = [
+            'empresa_id' => $request->empresa_id,
+            'sucursal_id' => $request->sucursal_id,
+            'puesto_id' => $request->puesto_id,
+            'trabajador_id' => $request->trabajador_id,
+            'fecha_evaluacion' => $request->fecha_evaluacion,
+            'area_evaluada' => $request->area_evaluada,
+            'actividad_general' => $request->actividad_general,
+            'observaciones' => $request->observaciones,
+        ];
 
-    return view('reba.create', compact('datosBase'));
-}
+        $matrices = $this->getRebaMatrices();
+
+        return view('reba.create', compact('datosBase', 'matrices'));
+    }
 
     public function store(Request $request)
     {
@@ -49,17 +49,29 @@ class RebaController extends Controller
             'sucursal_id' => 'required|exists:sucursales,id',
             'puesto_id' => 'required|exists:puestos,id',
             'trabajador_id' => 'required|exists:trabajadores,id',
-            'fecha' => 'required|date',
+            'fecha_evaluacion' => 'required|date',
 
-            'cuello' => 'required|integer|min:1',
-            'tronco' => 'required|integer|min:1',
-            'piernas' => 'required|integer|min:1',
-            'brazo' => 'required|integer|min:1',
-            'antebrazo' => 'required|integer|min:1',
-            'muneca' => 'required|integer|min:1',
-            'carga' => 'required|integer|min:0',
-            'tipo_agarre' => 'required|integer|min:0',
-            'actividad' => 'required|integer|min:0',
+            'area_evaluada' => 'nullable|string|max:255',
+            'actividad_general' => 'nullable|string|max:255',
+            'observaciones' => 'nullable|string',
+
+            'cuello' => 'required|integer|min:1|max:3',
+            'tronco' => 'required|integer|min:1|max:5',
+            'piernas' => 'required|integer|min:1|max:4',
+            'carga' => 'required|integer|min:0|max:2',
+
+            'brazo' => 'required|integer|min:1|max:6',
+            'antebrazo' => 'required|integer|min:1|max:2',
+            'muneca' => 'required|integer|min:1|max:3',
+            'tipo_agarre' => 'required|integer|min:0|max:3',
+
+            'actividad_reba' => 'required|integer|min:0|max:3',
+
+            'ajuste_cuello' => 'nullable|integer|min:0|max:1',
+            'ajuste_tronco' => 'nullable|integer|min:0|max:1',
+            'ajuste_muneca' => 'nullable|integer|min:0|max:1',
+            'lado_evaluado' => 'nullable|string|max:100',
+            'tarea' => 'nullable|string|max:255',
         ]);
 
         DB::beginTransaction();
@@ -71,6 +83,21 @@ class RebaController extends Controller
                 return back()->withInput()->with('error', 'No existe el método REBA en la tabla metodos.');
             }
 
+            $resultado = $this->calcularRebaOficial(
+                (int) $request->cuello,
+                (int) ($request->ajuste_cuello ?? 0),
+                (int) $request->tronco,
+                (int) ($request->ajuste_tronco ?? 0),
+                (int) $request->piernas,
+                (int) $request->carga,
+                (int) $request->brazo,
+                (int) $request->antebrazo,
+                (int) $request->muneca,
+                (int) ($request->ajuste_muneca ?? 0),
+                (int) $request->tipo_agarre,
+                (int) $request->actividad_reba
+            );
+
             $evaluacion = Evaluacion::create([
                 'empresa_id' => $request->empresa_id,
                 'sucursal_id' => $request->sucursal_id,
@@ -78,21 +105,14 @@ class RebaController extends Controller
                 'trabajador_id' => $request->trabajador_id,
                 'metodo_id' => $metodo->id,
                 'user_id' => Auth::id(),
-                'fecha' => $request->fecha,
+                'fecha_evaluacion' => $request->fecha_evaluacion,
+                'area_evaluada' => $request->area_evaluada,
+                'actividad' => $request->actividad_general,
                 'observaciones' => $request->observaciones,
+                'resultado_final' => $resultado['puntuacion_final'],
+                'nivel_riesgo' => $resultado['nivel_riesgo'],
+                'recomendaciones' => $resultado['accion_requerida'],
             ]);
-
-            $resultado = $this->calcularReba(
-                $request->cuello,
-                $request->tronco,
-                $request->piernas,
-                $request->brazo,
-                $request->antebrazo,
-                $request->muneca,
-                $request->carga,
-                $request->tipo_agarre,
-                $request->actividad
-            );
 
             $reba = RebaEvaluacion::create([
                 'evaluacion_id' => $evaluacion->id,
@@ -104,7 +124,7 @@ class RebaController extends Controller
                 'muneca' => $request->muneca,
                 'carga' => $request->carga,
                 'tipo_agarre' => $request->tipo_agarre,
-                'actividad' => $request->actividad,
+                'actividad' => $request->actividad_reba,
                 'puntuacion_a' => $resultado['puntuacion_a'],
                 'puntuacion_b' => $resultado['puntuacion_b'],
                 'puntuacion_c' => $resultado['puntuacion_c'],
@@ -114,60 +134,29 @@ class RebaController extends Controller
             ]);
 
             $detalles = [
-                [
-                    'seccion' => 'A',
-                    'concepto' => 'cuello',
-                    'valor' => $this->textoCuello($request->cuello),
-                    'puntaje' => $request->cuello,
-                ],
-                [
-                    'seccion' => 'A',
-                    'concepto' => 'tronco',
-                    'valor' => $this->textoTronco($request->tronco),
-                    'puntaje' => $request->tronco,
-                ],
-                [
-                    'seccion' => 'A',
-                    'concepto' => 'piernas',
-                    'valor' => $this->textoPiernas($request->piernas),
-                    'puntaje' => $request->piernas,
-                ],
-                [
-                    'seccion' => 'A',
-                    'concepto' => 'carga',
-                    'valor' => $this->textoCarga($request->carga),
-                    'puntaje' => $request->carga,
-                ],
-                [
-                    'seccion' => 'B',
-                    'concepto' => 'brazo',
-                    'valor' => $this->textoBrazo($request->brazo),
-                    'puntaje' => $request->brazo,
-                ],
-                [
-                    'seccion' => 'B',
-                    'concepto' => 'antebrazo',
-                    'valor' => $this->textoAntebrazo($request->antebrazo),
-                    'puntaje' => $request->antebrazo,
-                ],
-                [
-                    'seccion' => 'B',
-                    'concepto' => 'muneca',
-                    'valor' => $this->textoMuneca($request->muneca),
-                    'puntaje' => $request->muneca,
-                ],
-                [
-                    'seccion' => 'B',
-                    'concepto' => 'tipo_agarre',
-                    'valor' => $this->textoAgarre($request->tipo_agarre),
-                    'puntaje' => $request->tipo_agarre,
-                ],
-                [
-                    'seccion' => 'C',
-                    'concepto' => 'actividad',
-                    'valor' => $this->textoActividad($request->actividad),
-                    'puntaje' => $request->actividad,
-                ],
+                ['seccion' => 'A', 'concepto' => 'cuello', 'valor' => $this->textoCuello($request->cuello), 'puntaje' => $request->cuello],
+                ['seccion' => 'A', 'concepto' => 'ajuste_cuello', 'valor' => $this->textoAjusteCuello($request->ajuste_cuello), 'puntaje' => $request->ajuste_cuello ?? 0],
+                ['seccion' => 'A', 'concepto' => 'tronco', 'valor' => $this->textoTronco($request->tronco), 'puntaje' => $request->tronco],
+                ['seccion' => 'A', 'concepto' => 'ajuste_tronco', 'valor' => $this->textoAjusteTronco($request->ajuste_tronco), 'puntaje' => $request->ajuste_tronco ?? 0],
+                ['seccion' => 'A', 'concepto' => 'piernas', 'valor' => $this->textoPiernas($request->piernas), 'puntaje' => $request->piernas],
+                ['seccion' => 'A', 'concepto' => 'carga', 'valor' => $this->textoCarga($request->carga), 'puntaje' => $request->carga],
+
+                ['seccion' => 'B', 'concepto' => 'brazo', 'valor' => $this->textoBrazo($request->brazo), 'puntaje' => $request->brazo],
+                ['seccion' => 'B', 'concepto' => 'antebrazo', 'valor' => $this->textoAntebrazo($request->antebrazo), 'puntaje' => $request->antebrazo],
+                ['seccion' => 'B', 'concepto' => 'muneca', 'valor' => $this->textoMuneca($request->muneca), 'puntaje' => $request->muneca],
+                ['seccion' => 'B', 'concepto' => 'ajuste_muneca', 'valor' => $this->textoAjusteMuneca($request->ajuste_muneca), 'puntaje' => $request->ajuste_muneca ?? 0],
+                ['seccion' => 'B', 'concepto' => 'tipo_agarre', 'valor' => $this->textoAgarre($request->tipo_agarre), 'puntaje' => $request->tipo_agarre],
+
+                ['seccion' => 'C', 'concepto' => 'actividad_reba', 'valor' => $this->textoActividad($request->actividad_reba), 'puntaje' => $request->actividad_reba],
+                ['seccion' => 'GENERAL', 'concepto' => 'lado_evaluado', 'valor' => $request->lado_evaluado ?? 'No especificado', 'puntaje' => 0],
+                ['seccion' => 'GENERAL', 'concepto' => 'tarea', 'valor' => $request->tarea ?? 'No especificada', 'puntaje' => 0],
+                ['seccion' => 'GENERAL', 'concepto' => 'area_evaluada', 'valor' => $request->area_evaluada ?? 'No especificada', 'puntaje' => 0],
+                ['seccion' => 'GENERAL', 'concepto' => 'actividad_general', 'valor' => $request->actividad_general ?? 'No especificada', 'puntaje' => 0],
+
+                ['seccion' => 'RESULTADO', 'concepto' => 'puntuacion_a', 'valor' => 'Resultado Grupo A', 'puntaje' => $resultado['puntuacion_a']],
+                ['seccion' => 'RESULTADO', 'concepto' => 'puntuacion_b', 'valor' => 'Resultado Grupo B', 'puntaje' => $resultado['puntuacion_b']],
+                ['seccion' => 'RESULTADO', 'concepto' => 'puntuacion_c', 'valor' => 'Resultado Tabla C', 'puntaje' => $resultado['puntuacion_c']],
+                ['seccion' => 'RESULTADO', 'concepto' => 'puntuacion_final', 'valor' => $resultado['nivel_riesgo'], 'puntaje' => $resultado['puntuacion_final']],
             ];
 
             foreach ($detalles as $detalle) {
@@ -184,7 +173,7 @@ class RebaController extends Controller
 
             return redirect()->route('reba.show', $reba->id)
                 ->with('success', 'Evaluación REBA guardada correctamente.');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
             return back()->withInput()->with('error', 'Error al guardar: ' . $e->getMessage());
         }
@@ -203,136 +192,247 @@ class RebaController extends Controller
         return view('reba.show', compact('reba'));
     }
 
-    private function calcularReba($cuello, $tronco, $piernas, $brazo, $antebrazo, $muneca, $carga, $tipoAgarre, $actividad)
-    {
-        // Base funcional.
-        // Esto te deja el sistema andando.
-        // Después puedes cambiar esta parte por la matriz oficial exacta de tu documento.
+    private function calcularRebaOficial(
+        int $cuello,
+        int $ajusteCuello,
+        int $tronco,
+        int $ajusteTronco,
+        int $piernas,
+        int $carga,
+        int $brazo,
+        int $antebrazo,
+        int $muneca,
+        int $ajusteMuneca,
+        int $tipoAgarre,
+        int $actividad
+    ): array {
+        $matrices = $this->getRebaMatrices();
 
-        $puntuacionA = $cuello + $tronco + $piernas + $carga;
-        $puntuacionB = $brazo + $antebrazo + $muneca + $tipoAgarre;
-        $puntuacionC = $puntuacionA + $puntuacionB;
+        $cuelloTabla = min(3, $cuello + $ajusteCuello);
+        $troncoTabla = min(5, $tronco + $ajusteTronco);
+        $munecaTabla = min(3, $muneca + $ajusteMuneca);
+
+        $aBase = $matrices['tablaA'][$troncoTabla][$cuelloTabla][$piernas];
+        $puntuacionA = $aBase + $carga;
+        $puntuacionA = max(1, min(12, $puntuacionA));
+
+        $bBase = $matrices['tablaB'][$brazo][$antebrazo][$munecaTabla];
+        $puntuacionB = $bBase + $tipoAgarre;
+        $puntuacionB = max(1, min(12, $puntuacionB));
+
+        $puntuacionC = $matrices['tablaC'][$puntuacionA][$puntuacionB];
         $puntuacionFinal = $puntuacionC + $actividad;
 
-        if ($puntuacionFinal <= 3) {
-            $nivel = 'Riesgo bajo';
-            $accion = 'No es necesaria acción inmediata';
-        } elseif ($puntuacionFinal <= 7) {
-            $nivel = 'Riesgo medio';
-            $accion = 'Puede requerirse acción';
-        } elseif ($puntuacionFinal <= 10) {
-            $nivel = 'Riesgo alto';
-            $accion = 'Es necesaria la actuación pronto';
-        } else {
-            $nivel = 'Riesgo muy alto';
-            $accion = 'Es necesaria la actuación inmediata';
-        }
+        $clasificacion = $this->clasificarRiesgo($puntuacionFinal);
 
         return [
             'puntuacion_a' => $puntuacionA,
             'puntuacion_b' => $puntuacionB,
             'puntuacion_c' => $puntuacionC,
             'puntuacion_final' => $puntuacionFinal,
-            'nivel_riesgo' => $nivel,
-            'accion_requerida' => $accion,
+            'nivel_riesgo' => $clasificacion['nivel'],
+            'accion_requerida' => $clasificacion['accion'],
         ];
     }
 
-    private function textoCuello($valor)
+    private function clasificarRiesgo(int $puntaje): array
     {
-        return match((int)$valor) {
-            1 => 'Cuello neutral',
-            2 => 'Cuello flexionado o extendido',
-            3 => 'Cuello flexionado/extendido con giro o inclinación',
+        if ($puntaje <= 1) {
+            return ['nivel' => 'Inapreciable', 'accion' => 'No requiere acción.'];
+        }
+        if ($puntaje <= 3) {
+            return ['nivel' => 'Bajo', 'accion' => 'Puede ser necesaria alguna acción.'];
+        }
+        if ($puntaje <= 7) {
+            return ['nivel' => 'Medio', 'accion' => 'Se requiere acción.'];
+        }
+        if ($puntaje <= 10) {
+            return ['nivel' => 'Alto', 'accion' => 'Se requiere acción pronto.'];
+        }
+        return ['nivel' => 'Muy alto', 'accion' => 'Se requiere actuación inmediata.'];
+    }
+
+    private function getRebaMatrices(): array
+    {
+        return [
+            'tablaA' => [
+                1 => [
+                    1 => [1 => 1, 2 => 2, 3 => 3, 4 => 4],
+                    2 => [1 => 1, 2 => 2, 3 => 3, 4 => 4],
+                    3 => [1 => 3, 2 => 3, 3 => 5, 4 => 6],
+                ],
+                2 => [
+                    1 => [1 => 2, 2 => 3, 3 => 4, 4 => 5],
+                    2 => [1 => 3, 2 => 4, 3 => 5, 4 => 6],
+                    3 => [1 => 4, 2 => 5, 3 => 6, 4 => 7],
+                ],
+                3 => [
+                    1 => [1 => 2, 2 => 4, 3 => 5, 4 => 6],
+                    2 => [1 => 4, 2 => 5, 3 => 6, 4 => 7],
+                    3 => [1 => 5, 2 => 6, 3 => 7, 4 => 8],
+                ],
+                4 => [
+                    1 => [1 => 3, 2 => 5, 3 => 6, 4 => 7],
+                    2 => [1 => 5, 2 => 6, 3 => 7, 4 => 8],
+                    3 => [1 => 6, 2 => 7, 3 => 8, 4 => 9],
+                ],
+                5 => [
+                    1 => [1 => 4, 2 => 6, 3 => 7, 4 => 8],
+                    2 => [1 => 6, 2 => 7, 3 => 8, 4 => 9],
+                    3 => [1 => 7, 2 => 8, 3 => 9, 4 => 9],
+                ],
+            ],
+            'tablaB' => [
+                1 => [
+                    1 => [1 => 1, 2 => 2, 3 => 2],
+                    2 => [1 => 1, 2 => 2, 3 => 3],
+                ],
+                2 => [
+                    1 => [1 => 1, 2 => 2, 3 => 3],
+                    2 => [1 => 2, 2 => 3, 3 => 4],
+                ],
+                3 => [
+                    1 => [1 => 3, 2 => 4, 3 => 5],
+                    2 => [1 => 4, 2 => 5, 3 => 5],
+                ],
+                4 => [
+                    1 => [1 => 4, 2 => 5, 3 => 5],
+                    2 => [1 => 5, 2 => 6, 3 => 7],
+                ],
+                5 => [
+                    1 => [1 => 6, 2 => 7, 3 => 8],
+                    2 => [1 => 7, 2 => 8, 3 => 8],
+                ],
+                6 => [
+                    1 => [1 => 7, 2 => 8, 3 => 8],
+                    2 => [1 => 8, 2 => 9, 3 => 9],
+                ],
+            ],
+            'tablaC' => [
+                1  => [1 => 1, 2 => 1, 3 => 1, 4 => 2, 5 => 3, 6 => 3, 7 => 4, 8 => 5, 9 => 6, 10 => 7, 11 => 7, 12 => 7],
+                2  => [1 => 1, 2 => 2, 3 => 2, 4 => 3, 5 => 4, 6 => 4, 7 => 5, 8 => 6, 9 => 6, 10 => 7, 11 => 7, 12 => 8],
+                3  => [1 => 2, 2 => 3, 3 => 3, 4 => 3, 5 => 4, 6 => 5, 7 => 6, 8 => 7, 9 => 7, 10 => 8, 11 => 8, 12 => 8],
+                4  => [1 => 3, 2 => 4, 3 => 4, 4 => 4, 5 => 5, 6 => 6, 7 => 7, 8 => 8, 9 => 8, 10 => 9, 11 => 9, 12 => 9],
+                5  => [1 => 4, 2 => 4, 3 => 4, 4 => 5, 5 => 6, 6 => 7, 7 => 8, 8 => 8, 9 => 9, 10 => 9, 11 => 9, 12 => 9],
+                6  => [1 => 6, 2 => 6, 3 => 6, 4 => 7, 5 => 8, 6 => 8, 7 => 9, 8 => 9, 9 => 10, 10 => 10, 11 => 10, 12 => 10],
+                7  => [1 => 7, 2 => 7, 3 => 7, 4 => 8, 5 => 9, 6 => 9, 7 => 9, 8 => 10, 9 => 10, 10 => 11, 11 => 11, 12 => 11],
+                8  => [1 => 8, 2 => 8, 3 => 8, 4 => 9, 5 => 10, 6 => 10, 7 => 10, 8 => 10, 9 => 10, 10 => 11, 11 => 11, 12 => 11],
+                9  => [1 => 9, 2 => 9, 3 => 9, 4 => 10, 5 => 10, 6 => 10, 7 => 11, 8 => 11, 9 => 11, 10 => 12, 11 => 12, 12 => 12],
+                10 => [1 => 10, 2 => 10, 3 => 10, 4 => 11, 5 => 11, 6 => 11, 7 => 11, 8 => 12, 9 => 12, 10 => 12, 11 => 12, 12 => 12],
+                11 => [1 => 11, 2 => 11, 3 => 11, 4 => 11, 5 => 12, 6 => 12, 7 => 12, 8 => 12, 9 => 12, 10 => 12, 11 => 12, 12 => 12],
+                12 => [1 => 12, 2 => 12, 3 => 12, 4 => 12, 5 => 12, 6 => 12, 7 => 12, 8 => 12, 9 => 12, 10 => 12, 11 => 12, 12 => 12],
+            ],
+        ];
+    }
+
+    private function textoCuello($valor): string
+    {
+        return match ((int) $valor) {
+            1 => 'Neutro',
+            2 => 'Flexión/Extensión >20°',
+            3 => 'Con torsión/inclinación',
             default => 'No definido',
         };
     }
 
-    private function textoTronco($valor)
+    private function textoAjusteCuello($valor): string
     {
-        return match((int)$valor) {
-            1 => 'Tronco recto',
-            2 => 'Tronco con ligera flexión',
-            3 => 'Tronco flexionado',
-            4 => 'Tronco muy flexionado o torcido',
-            5 => 'Tronco severamente comprometido',
+        return (int) $valor === 1 ? 'El cuello está girado o flexionado lateralmente' : 'Sin ajuste adicional';
+    }
+
+    private function textoTronco($valor): string
+    {
+        return match ((int) $valor) {
+            1 => 'Recto',
+            2 => 'Flexión 0–20°',
+            3 => 'Flexión 20–60°',
+            4 => 'Flexión >60°',
+            5 => 'Postura severamente comprometida',
             default => 'No definido',
         };
     }
 
-    private function textoPiernas($valor)
+    private function textoAjusteTronco($valor): string
     {
-        return match((int)$valor) {
-            1 => 'Apoyo bilateral estable',
-            2 => 'Apoyo inestable o una pierna flexionada',
-            3 => 'Piernas muy flexionadas',
-            4 => 'Postura inestable severa',
+        return (int) $valor === 1 ? 'El tronco está girado o inclinado lateralmente' : 'Sin ajuste adicional';
+    }
+
+    private function textoPiernas($valor): string
+    {
+        return match ((int) $valor) {
+            1 => 'Soporte bilateral',
+            2 => 'Peso desigual',
+            3 => 'En cuclillas',
+            4 => 'Apoyo inestable',
             default => 'No definido',
         };
     }
 
-    private function textoCarga($valor)
+    private function textoCarga($valor): string
     {
-        return match((int)$valor) {
-            0 => 'Sin carga apreciable',
-            1 => 'Carga ligera',
-            2 => 'Carga moderada',
-            3 => 'Carga alta',
+        return match ((int) $valor) {
+            0 => '< 5 kg',
+            1 => '5–10 kg',
+            2 => '> 10 kg',
             default => 'No definido',
         };
     }
 
-    private function textoBrazo($valor)
+    private function textoBrazo($valor): string
     {
-        return match((int)$valor) {
-            1 => 'Brazo en posición baja',
-            2 => 'Brazo ligeramente elevado',
-            3 => 'Brazo elevado',
-            4 => 'Brazo muy elevado',
-            5 => 'Brazo en postura crítica',
+        return match ((int) $valor) {
+            1 => '20° ext a 20° flex',
+            2 => '20°–45°',
+            3 => '45°–90°',
+            4 => '>90°',
+            5 => 'Elevado con ajuste adicional',
+            6 => 'Muy elevado con ajuste adicional',
             default => 'No definido',
         };
     }
 
-    private function textoAntebrazo($valor)
+    private function textoAntebrazo($valor): string
     {
-        return match((int)$valor) {
-            1 => 'Antebrazo entre 60° y 100°',
-            2 => 'Antebrazo fuera del rango ideal',
-            3 => 'Antebrazo en postura comprometida',
+        return match ((int) $valor) {
+            1 => '60°–100°',
+            2 => 'Fuera de rango',
             default => 'No definido',
         };
     }
 
-    private function textoMuneca($valor)
+    private function textoMuneca($valor): string
     {
-        return match((int)$valor) {
-            1 => 'Muñeca neutral',
-            2 => 'Muñeca flexionada o extendida',
-            3 => 'Muñeca desviada o girada',
-            4 => 'Muñeca severamente comprometida',
+        return match ((int) $valor) {
+            1 => 'Neutra',
+            2 => 'Flexión/extensión >15°',
+            3 => 'Con desviación',
             default => 'No definido',
         };
     }
 
-    private function textoAgarre($valor)
+    private function textoAjusteMuneca($valor): string
     {
-        return match((int)$valor) {
-            0 => 'Agarre bueno',
-            1 => 'Agarre regular',
-            2 => 'Agarre malo',
-            3 => 'Agarre muy malo',
+        return (int) $valor === 1 ? 'La muñeca está girada o desviada' : 'Sin ajuste adicional';
+    }
+
+    private function textoAgarre($valor): string
+    {
+        return match ((int) $valor) {
+            0 => 'Bueno',
+            1 => 'Regular',
+            2 => 'Malo',
+            3 => 'Muy malo',
             default => 'No definido',
         };
     }
 
-    private function textoActividad($valor)
+    private function textoActividad($valor): string
     {
-        return match((int)$valor) {
-            0 => 'Actividad sin repetición importante',
-            1 => 'Actividad repetitiva o estática leve',
-            2 => 'Actividad repetitiva o estática moderada',
-            3 => 'Actividad repetitiva o estática intensa',
+        return match ((int) $valor) {
+            0 => 'Sin repetición importante',
+            1 => 'Repetitiva leve / estática moderada',
+            2 => 'Repetitiva moderada',
+            3 => 'Repetitiva intensa / cambios bruscos',
             default => 'No definido',
         };
     }

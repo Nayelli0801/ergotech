@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-
 class Evaluacion extends Model
 {
     use HasFactory;
@@ -30,27 +29,27 @@ class Evaluacion extends Model
 
     public function empresa()
     {
-        return $this->belongsTo(Empresa::class, 'empresa_id');
+        return $this->belongsTo(Empresa::class);
     }
 
     public function sucursal()
     {
-        return $this->belongsTo(Sucursal::class, 'sucursal_id');
+        return $this->belongsTo(Sucursal::class);
     }
 
     public function puesto()
     {
-        return $this->belongsTo(Puesto::class, 'puesto_id');
+        return $this->belongsTo(Puesto::class);
     }
 
     public function trabajador()
     {
-        return $this->belongsTo(Trabajador::class, 'trabajador_id');
+        return $this->belongsTo(Trabajador::class);
     }
 
     public function metodo()
     {
-        return $this->belongsTo(Metodo::class, 'metodo_id');
+        return $this->belongsTo(Metodo::class);
     }
 
     public function usuario()
@@ -58,23 +57,8 @@ class Evaluacion extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function rula()
-    {
-        return $this->hasOne(RulaEvaluacion::class, 'evaluacion_id');
-    }
-
-    public function reba()
+    public function rebaEvaluacion()
     {
         return $this->hasOne(RebaEvaluacion::class, 'evaluacion_id');
-    }
-
-    public function owas()
-    {
-        return $this->hasOne(OwasEvaluacion::class, 'evaluacion_id');
-    }
-
-    public function niosh()
-    {
-        return $this->hasOne(NioshEvaluacion::class, 'evaluacion_id');
     }
 }
