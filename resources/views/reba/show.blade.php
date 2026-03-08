@@ -14,24 +14,35 @@
 
         <div class="row mb-4">
             <div class="col-md-3">
-                <div class="card"><div class="card-body">
-                    <strong>Puntuación A:</strong> {{ $reba->puntuacion_a }}
-                </div></div>
+                <div class="card">
+                    <div class="card-body">
+                        <strong>Puntuación A:</strong> {{ $reba->puntuacion_a }}
+                    </div>
+                </div>
             </div>
+
             <div class="col-md-3">
-                <div class="card"><div class="card-body">
-                    <strong>Puntuación B:</strong> {{ $reba->puntuacion_b }}
-                </div></div>
+                <div class="card">
+                    <div class="card-body">
+                        <strong>Puntuación B:</strong> {{ $reba->puntuacion_b }}
+                    </div>
+                </div>
             </div>
+
             <div class="col-md-3">
-                <div class="card"><div class="card-body">
-                    <strong>Puntuación C:</strong> {{ $reba->puntuacion_c }}
-                </div></div>
+                <div class="card">
+                    <div class="card-body">
+                        <strong>Puntuación C:</strong> {{ $reba->puntuacion_c }}
+                    </div>
+                </div>
             </div>
+
             <div class="col-md-3">
-                <div class="card"><div class="card-body">
-                    <strong>Puntuación Final:</strong> {{ $reba->puntuacion_final }}
-                </div></div>
+                <div class="card">
+                    <div class="card-body">
+                        <strong>Puntuación Final:</strong> {{ $reba->puntuacion_final }}
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -62,6 +73,14 @@
             </tbody>
         </table>
 
-        <a href="{{ route('reba.index') }}" class="btn btn-secondary">Volver</a>
+        <div class="mt-4 d-flex gap-2">
+            <a href="{{ route('reba.pdf', $reba->id) }}" class="btn btn-danger">
+                Descargar PDF
+            </a>
+
+            <a href="{{ route('reba.index') }}" class="btn btn-secondary">
+                Volver
+            </a>
+        </div>
     </div>
 </x-app-layout>

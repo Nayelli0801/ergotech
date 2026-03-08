@@ -9,6 +9,7 @@ use App\Models\RebaEvaluacion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class RebaController extends Controller
 {
@@ -436,4 +437,23 @@ class RebaController extends Controller
             default => 'No definido',
         };
     }
+
+    public function pdf($id)
+     {
+    $reba = RebaEvaluacion::with([
+        'evaluacion.empresa',
+        'evaluacion.sucursal',
+        'evaluacion.puesto',
+        'evaluacion.trabajador',
+        'evaluacion.usuario',
+        'detalles'
+    ])->findOrFail($id);
+
+    $pdf = Pdf::loadView('reba.pdf', compact('reba'))
+        ->setPaper('a4', 'portrait');
+
+    $nombreArchivo = 'reba_' . $reba->id . '.pdf';
+
+    return $pdf->download($nombreArchivo);
+     }
 }

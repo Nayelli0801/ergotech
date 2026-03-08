@@ -72,6 +72,7 @@ Route::middleware(['auth', 'rol:admin'])->group(function () {
     Route::get('/reba/{id}', [RebaController::class, 'show'])->name('reba.show');
 
     Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
+    Route::get('/reba/{id}/pdf', [RebaController::class, 'pdf'])->name('reba.pdf');
 });
 
 /*
