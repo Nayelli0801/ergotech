@@ -66,6 +66,7 @@ class EmpresaController extends Controller
             'telefono' => 'nullable|string|max:20',
             'correo' => 'nullable|email|max:255',
             'direccion' => 'nullable|string',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $empresa->update([
