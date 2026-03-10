@@ -61,4 +61,9 @@ class Evaluacion extends Model
     {
         return $this->hasOne(RebaEvaluacion::class, 'evaluacion_id');
     }
+
+    public function rulaEvaluacion()
+     {
+    return $this->hasOne(\App\Models\RulaEvaluacion::class, 'evaluacion_id');
+     }
 }

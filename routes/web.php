@@ -14,6 +14,8 @@ use App\Http\Controllers\TrabajadorController;
 use App\Http\Controllers\EvaluacionController;
 use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\RebaController;
+use App\Http\Controllers\RulaController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -74,6 +76,23 @@ Route::middleware(['auth', 'rol:admin'])->group(function () {
     Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
     Route::get('/reba/{id}/pdf', [RebaController::class, 'pdf'])->name('reba.pdf');
 });
+
+/*
+|--------------------------------------------------------------------------
+| Metodo RULA (en desarrollo)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth'])->group(function () {
+    Route::get('/rula', [RulaController::class, 'index'])->name('rula.index');
+    Route::get('/rula/create', [RulaController::class, 'create'])->name('rula.create');
+    Route::post('/rula/calcular', [RulaController::class, 'calcular'])->name('rula.calcular');
+    Route::post('/rula/store', [RulaController::class, 'store'])->name('rula.store');
+    Route::get('/rula/{id}', [RulaController::class, 'show'])->name('rula.show');
+    Route::get('/rula/{id}/pdf', [RulaController::class, 'pdf'])->name('rula.pdf');
+});
+
+
+
 
 /*
 |--------------------------------------------------------------------------

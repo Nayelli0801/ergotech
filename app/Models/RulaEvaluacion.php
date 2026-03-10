@@ -34,4 +34,9 @@ class RulaEvaluacion extends Model
     {
         return $this->belongsTo(Evaluacion::class, 'evaluacion_id');
     }
+
+    public function detalles()
+    {
+        return $this->hasMany(RulaDetalle::class, 'rula_evaluacion_id');
+    }
 }

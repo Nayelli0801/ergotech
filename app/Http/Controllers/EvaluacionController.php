@@ -65,7 +65,7 @@ class EvaluacionController extends Controller
                 return redirect()->route('reba.create', $datos);
 
             case 'RULA':
-                return back()->withInput()->with('error', 'RULA aún no está implementado.');
+             return redirect()->route('rula.create', $datos);
 
             case 'OWAS':
                 return back()->withInput()->with('error', 'OWAS aún no está implementado.');
