@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="text-xl font-semibold">Panel Administrador</h2>
+        <h2 class="bg-blue-700 text-white text-xl font-semibold">Panel Administrador</h2>
     </x-slot>
 
     <div class="py-6 px-6">

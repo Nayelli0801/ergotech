@@ -7,9 +7,9 @@
         + Nuevo Usuario
     </a>
 
-    <div class="bg-gray-900 rounded-xl shadow-lg overflow-hidden">
+    <div class="bg-white-900 rounded-xl shadow-lg overflow-hidden">
         <table class="w-full text-left">
-            <thead class="bg-gray-800 text-gray-300">
+            <thead class="bg-blue-800 text-gray-300">
                 <tr>
                     <th class="p-3">ID</th>
                     <th class="p-3">Nombre</th>
@@ -21,7 +21,7 @@
 
             <tbody>
                 @foreach($usuarios as $user)
-                <tr class="border-b border-gray-800 hover:bg-gray-800">
+                <tr class="border-b border-blue-800 hover:bg-white-800">
                     <td class="p-3">{{ $user->id }}</td>
                     <td class="p-3">{{ $user->name }}</td>
                     <td class="p-3">{{ $user->email }}</td>
