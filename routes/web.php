@@ -15,6 +15,7 @@ use App\Http\Controllers\EvaluacionController;
 use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\RebaController;
 use App\Http\Controllers\RulaController;
+use App\Http\Controllers\OwasController;
 
 
 /*
@@ -91,7 +92,17 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/rula/{id}/pdf', [RulaController::class, 'pdf'])->name('rula.pdf');
 });
 
+/*
+|--------------------------------------------------------------------------
+| Metodo owas (en desarrollo)
+|--------------------------------------------------------------------------
+*/
 
+Route::get('/owas', [OwasController::class, 'index'])->name('owas.index');
+Route::get('/owas/create', [OwasController::class, 'create'])->name('owas.create');
+Route::post('/owas', [OwasController::class, 'store'])->name('owas.store');
+Route::get('/owas/{id}', [OwasController::class, 'show'])->name('owas.show');
+Route::get('/owas/{id}/pdf', [OwasController::class, 'pdf'])->name('owas.pdf');
 
 
 /*
