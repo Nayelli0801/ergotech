@@ -63,11 +63,13 @@ class UserController extends Controller
             'password' => 'nullable|min:6',
         ]);
 
+        // Actualizar datos básicos
         $user->name = $request->name;
         $user->last_name = $request->last_name;
         $user->email = $request->email;
         $user->rol_id = $request->rol_id;
 
+        // Solo cambia contraseña si se escribe una nueva
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);
         }
@@ -76,5 +78,15 @@ class UserController extends Controller
 
         return redirect()->route('usuarios.index')
             ->with('success', 'Usuario actualizado correctamente');
+    }
+
+    public function destroy($id)
+    {
+        $user = User::findOrFail($id);
+
+        $user->delete();
+
+        return redirect()->route('usuarios.index')
+            ->with('success', 'Usuario eliminado correctamente');
     }
 }

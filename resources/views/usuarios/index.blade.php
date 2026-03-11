@@ -1,34 +1,63 @@
 <x-app-layout>
 
-    <h2 class="text-2xl font-bold mb-6">Usuarios</h2>
+<div class="max-w-6xl mx-auto mt-6">
 
-    <a href="{{ route('usuarios.create') }}"
-       class="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg text-white mb-4 inline-block">
-        + Nuevo Usuario
-    </a>
+```
+<div class="bg-white rounded-xl shadow-lg overflow-hidden">
 
-    <div class="bg-white-900 rounded-xl shadow-lg overflow-hidden">
+    <!-- Encabezado -->
+    <div class="bg-blue-700 text-white px-6 py-4 flex justify-between items-center">
+
+        <div>
+            <h2 class="text-xl font-bold">Usuarios</h2>
+            <p class="text-sm text-blue-100">Listado de usuarios registrados.</p>
+        </div>
+
+        <a href="{{ route('usuarios.create') }}"
+           class="bg-white text-blue-700 font-semibold px-4 py-2 rounded-lg shadow hover:bg-gray-100 transition">
+            Nuevo usuario
+        </a>
+
+    </div>
+
+    <!-- Tabla -->
+    <div class="overflow-x-auto">
+
         <table class="w-full text-left">
-            <thead class="bg-blue-800 text-gray-300">
+
+            <thead class="bg-gray-100 text-gray-600 text-sm uppercase">
                 <tr>
-                    <th class="p-3">ID</th>
-                    <th class="p-3">Nombre</th>
-                    <th class="p-3">Email</th>
-                    <th class="p-3">Rol</th>
-                    <th class="p-3">Acciones</th>
+                    <th class="p-4">ID</th>
+                    <th class="p-4">Nombre</th>
+                    <th class="p-4">Correo electrónico</th>
+                    <th class="p-4">Rol</th>
+                    <th class="p-4">Acciones</th>
                 </tr>
             </thead>
 
-            <tbody>
-                @foreach($usuarios as $user)
-                <tr class="border-b border-blue-800 hover:bg-white-800">
-                    <td class="p-3">{{ $user->id }}</td>
-                    <td class="p-3">{{ $user->name }}</td>
-                    <td class="p-3">{{ $user->email }}</td>
-                    <td class="p-3">
-                        {{ optional($user->rol)->nombre ?? 'Sin rol' }}
+            <tbody class="divide-y">
+
+                @forelse($usuarios as $user)
+
+                <tr class="hover:bg-gray-50 transition">
+
+                    <td class="p-4">{{ $user->id }}</td>
+
+                    <td class="p-4 font-medium text-gray-800">
+                        {{ $user->name }}
                     </td>
-                    <td class="p-3 space-x-2">
+
+                    <td class="p-4 text-gray-600">
+                        {{ $user->email }}
+                    </td>
+
+                    <td class="p-4">
+                        <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-semibold">
+                            {{ ucfirst(strtolower(optional($user->rol)->nombre ?? 'sin rol')) }}
+                        </span>
+                    </td>
+
+                    <td class="p-4 flex gap-2">
 
                         <a href="{{ route('usuarios.edit', $user->id) }}"
                            class="bg-yellow-500 hover:bg-yellow-600 px-3 py-1 rounded text-white text-sm">
@@ -36,20 +65,40 @@
                         </a>
 
                         <form action="{{ route('usuarios.destroy', $user->id) }}"
-                              method="POST"
-                              class="inline">
+                              method="POST">
                             @csrf
                             @method('DELETE')
+
                             <button class="bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-white text-sm">
                                 Eliminar
                             </button>
                         </form>
 
                     </td>
+
                 </tr>
-                @endforeach
+
+                @empty
+
+                <tr>
+                    <td colspan="5" class="text-center text-gray-500 py-6">
+                        No hay usuarios registrados.
+                    </td>
+                </tr>
+
+                @endforelse
+
             </tbody>
+
         </table>
+
     </div>
 
+</div>
+```
+
+</div>
+
 </x-app-layout>
+
+
