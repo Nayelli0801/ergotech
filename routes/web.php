@@ -67,6 +67,7 @@ Route::middleware(['auth', 'rol:admin'])->group(function () {
     Route::get('/nom036/{evaluacion}/create', [Nom036Controller::class, 'create'])->name('nom036.create');
     Route::post('/nom036/{evaluacion}/store', [Nom036Controller::class, 'store'])->name('nom036.store');
     Route::get('/nom036/{id}', [Nom036Controller::class, 'show'])->name('nom036.show');
+    Route::get('/nom036/{id}/pdf', [Nom036Controller::class, 'pdf'])->name('nom036.pdf');
 
     Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
 });

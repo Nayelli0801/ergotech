@@ -96,15 +96,16 @@
                             </div>
 
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Método</label>
-                                <select name="metodo" class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500" required>
-                                    <option value="">Seleccione un método</option>
-                                    <option value="REBA" {{ old('metodo') == 'REBA' ? 'selected' : '' }}>REBA</option>
-                                    <option value="RULA" {{ old('metodo') == 'RULA' ? 'selected' : '' }}>RULA</option>
-                                    <option value="OWAS" {{ old('metodo') == 'OWAS' ? 'selected' : '' }}>OWAS</option>
-                                    <option value="NIOSH" {{ old('metodo') == 'NIOSH' ? 'selected' : '' }}>NIOSH</option>
-                                </select>
-                            </div>
+    <label class="block text-sm font-medium text-gray-700 mb-1">Método</label>
+    <select name="metodo" class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500" required>
+        <option value="">Seleccione un método</option>
+        <option value="REBA" {{ old('metodo') == 'REBA' ? 'selected' : '' }}>REBA</option>
+        <option value="RULA" {{ old('metodo') == 'RULA' ? 'selected' : '' }}>RULA</option>
+        <option value="OWAS" {{ old('metodo') == 'OWAS' ? 'selected' : '' }}>OWAS</option>
+        <option value="NIOSH" {{ old('metodo') == 'NIOSH' ? 'selected' : '' }}>NIOSH</option>
+        <option value="NOM-036" {{ old('metodo') == 'NOM-036' ? 'selected' : '' }}>NOM-036</option>
+    </select>
+</div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Área evaluada</label>

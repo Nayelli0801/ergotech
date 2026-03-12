@@ -2,25 +2,25 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class OwasDetalle extends Model
+class Nom036Detalle extends Model
 {
     use HasFactory;
 
-    protected $table = 'owas_detalle';
+    protected $table = 'nom036_detalles';
 
     protected $fillable = [
-        'owas_evaluacion_id',
+        'nom036_evaluacion_id',
         'seccion',
         'concepto',
         'valor',
-        'puntaje',
+        'resultado',
     ];
 
-    public function owasEvaluacion()
+    public function nom036Evaluacion()
     {
-        return $this->belongsTo(OwasEvaluacion::class, 'owas_evaluacion_id');
+        return $this->belongsTo(Nom036Evaluacion::class, 'nom036_evaluacion_id');
     }
 }
