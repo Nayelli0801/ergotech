@@ -23,38 +23,30 @@
             </div>
         @endif
 
-        <form action="{{ route('reba.store') }}" method="POST" id="rebaForm" class="space-y-5">
+        <form action="{{ route('reba.store', $evaluacion->id) }}" method="POST" id="rebaForm" class="space-y-5">
             @csrf
 
-            <input type="hidden" name="empresa_id" value="{{ $datosBase['empresa_id'] }}">
-            <input type="hidden" name="sucursal_id" value="{{ $datosBase['sucursal_id'] }}">
-            <input type="hidden" name="puesto_id" value="{{ $datosBase['puesto_id'] }}">
-            <input type="hidden" name="trabajador_id" value="{{ $datosBase['trabajador_id'] }}">
-            <input type="hidden" name="fecha_evaluacion" value="{{ $datosBase['fecha_evaluacion'] }}">
-            <input type="hidden" name="area_evaluada" value="{{ $datosBase['area_evaluada'] }}">
-            <input type="hidden" name="actividad_general" value="{{ $datosBase['actividad_general'] }}">
-            <input type="hidden" name="observaciones" value="{{ $datosBase['observaciones'] }}">
             <input type="hidden" name="actividad_reba" id="actividad_reba" value="0">
 
             <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Fecha</label>
-                    <div class="text-sm text-gray-700">{{ $datosBase['fecha_evaluacion'] }}</div>
+                    <div class="text-sm text-gray-700">{{ $evaluacion->fecha_evaluacion }}</div>
                 </div>
 
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Área evaluada</label>
-                    <div class="text-sm text-gray-700">{{ $datosBase['area_evaluada'] ?: 'No especificada' }}</div>
+                    <div class="text-sm text-gray-700">{{ $evaluacion->area_evaluada ?: 'No especificada' }}</div>
                 </div>
 
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Actividad general</label>
-                    <div class="text-sm text-gray-700">{{ $datosBase['actividad_general'] ?: 'No especificada' }}</div>
+                    <div class="text-sm text-gray-700">{{ $evaluacion->actividad ?: 'No especificada' }}</div>
                 </div>
 
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Observaciones</label>
-                    <div class="text-sm text-gray-700">{{ $datosBase['observaciones'] ?: 'Sin observaciones' }}</div>
+                    <div class="text-sm text-gray-700">{{ $evaluacion->observaciones ?: 'Sin observaciones' }}</div>
                 </div>
             </div>
 
@@ -78,7 +70,6 @@
             </div>
 
             <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
-                <!-- Grupo A -->
                 <section class="bg-slate-50 border border-slate-200 rounded-2xl shadow-sm p-4 sm:p-5">
                     <div class="mb-4">
                         <h3 class="text-lg sm:text-xl font-bold text-blue-700">Grupo A</h3>
@@ -88,18 +79,9 @@
                         <div>
                             <h4 class="text-base font-semibold text-gray-900 mb-2">Cuello</h4>
                             <div class="space-y-2 text-sm">
-                                <label class="flex items-start gap-2">
-                                    <input type="radio" name="cuello" value="1" required class="mt-1">
-                                    <span>1 - Postura: Neutral</span>
-                                </label>
-                                <label class="flex items-start gap-2">
-                                    <input type="radio" name="cuello" value="2" class="mt-1">
-                                    <span>2 - Postura: Flexión 20° / Extensión > 20°</span>
-                                </label>
-                                <label class="flex items-start gap-2">
-                                    <input type="radio" name="cuello" value="3" class="mt-1">
-                                    <span>3 - Postura: Flexión/Extensión con mayor compromiso</span>
-                                </label>
+                                <label class="flex items-start gap-2"><input type="radio" name="cuello" value="1" required class="mt-1"><span>1 - Postura: Neutral</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="cuello" value="2" class="mt-1"><span>2 - Postura: Flexión 20° / Extensión > 20°</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="cuello" value="3" class="mt-1"><span>3 - Postura: Flexión/Extensión con mayor compromiso</span></label>
                             </div>
 
                             <label class="flex items-center gap-2 mt-3 text-sm text-gray-700">
@@ -112,26 +94,11 @@
                         <div>
                             <h4 class="text-base font-semibold text-gray-900 mb-2">Tronco</h4>
                             <div class="space-y-2 text-sm">
-                                <label class="flex items-start gap-2">
-                                    <input type="radio" name="tronco" value="1" required class="mt-1">
-                                    <span>1 - Postura: Neutral</span>
-                                </label>
-                                <label class="flex items-start gap-2">
-                                    <input type="radio" name="tronco" value="2" class="mt-1">
-                                    <span>2 - Postura: Flexión (0–20°)</span>
-                                </label>
-                                <label class="flex items-start gap-2">
-                                    <input type="radio" name="tronco" value="3" class="mt-1">
-                                    <span>3 - Postura: Flexión (20–60°)</span>
-                                </label>
-                                <label class="flex items-start gap-2">
-                                    <input type="radio" name="tronco" value="4" class="mt-1">
-                                    <span>4 - Postura: Flexión &gt; 60°</span>
-                                </label>
-                                <label class="flex items-start gap-2">
-                                    <input type="radio" name="tronco" value="5" class="mt-1">
-                                    <span>5 - Postura severamente comprometida</span>
-                                </label>
+                                <label class="flex items-start gap-2"><input type="radio" name="tronco" value="1" required class="mt-1"><span>1 - Postura: Neutral</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="tronco" value="2" class="mt-1"><span>2 - Postura: Flexión (0–20°)</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="tronco" value="3" class="mt-1"><span>3 - Postura: Flexión (20–60°)</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="tronco" value="4" class="mt-1"><span>4 - Postura: Flexión &gt; 60°</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="tronco" value="5" class="mt-1"><span>5 - Postura severamente comprometida</span></label>
                             </div>
 
                             <label class="flex items-center gap-2 mt-3 text-sm text-gray-700">
@@ -144,46 +111,24 @@
                         <div>
                             <h4 class="text-base font-semibold text-gray-900 mb-2">Piernas</h4>
                             <div class="space-y-2 text-sm">
-                                <label class="flex items-start gap-2">
-                                    <input type="radio" name="piernas" value="1" required class="mt-1">
-                                    <span>1 - Postura: Andar, sentado, de pie sin plano inclinado</span>
-                                </label>
-                                <label class="flex items-start gap-2">
-                                    <input type="radio" name="piernas" value="2" class="mt-1">
-                                    <span>2 - Postura: Peso desigual o apoyo asimétrico</span>
-                                </label>
-                                <label class="flex items-start gap-2">
-                                    <input type="radio" name="piernas" value="3" class="mt-1">
-                                    <span>3 - Postura: En cuclillas / rodillas flexionadas</span>
-                                </label>
-                                <label class="flex items-start gap-2">
-                                    <input type="radio" name="piernas" value="4" class="mt-1">
-                                    <span>4 - Postura: Apoyo inestable</span>
-                                </label>
+                                <label class="flex items-start gap-2"><input type="radio" name="piernas" value="1" required class="mt-1"><span>1 - Postura: Andar, sentado, de pie sin plano inclinado</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="piernas" value="2" class="mt-1"><span>2 - Postura: Peso desigual o apoyo asimétrico</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="piernas" value="3" class="mt-1"><span>3 - Postura: En cuclillas / rodillas flexionadas</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="piernas" value="4" class="mt-1"><span>4 - Postura: Apoyo inestable</span></label>
                             </div>
                         </div>
 
                         <div>
                             <h4 class="text-base font-semibold text-gray-900 mb-2">Carga / Fuerza</h4>
                             <div class="space-y-2 text-sm">
-                                <label class="flex items-start gap-2">
-                                    <input type="radio" name="carga" value="0" required class="mt-1">
-                                    <span>0 - Carga: Si la carga es &lt; 5 Kg</span>
-                                </label>
-                                <label class="flex items-start gap-2">
-                                    <input type="radio" name="carga" value="1" class="mt-1">
-                                    <span>1 - Carga: Si la carga está entre 5 y 10 Kg</span>
-                                </label>
-                                <label class="flex items-start gap-2">
-                                    <input type="radio" name="carga" value="2" class="mt-1">
-                                    <span>2 - Carga: Si la carga es &gt; 10 Kg</span>
-                                </label>
+                                <label class="flex items-start gap-2"><input type="radio" name="carga" value="0" required class="mt-1"><span>0 - Carga: Si la carga es &lt; 5 Kg</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="carga" value="1" class="mt-1"><span>1 - Carga: Si la carga está entre 5 y 10 Kg</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="carga" value="2" class="mt-1"><span>2 - Carga: Si la carga es &gt; 10 Kg</span></label>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                <!-- Grupo B -->
                 <section class="bg-green-50 border border-green-100 rounded-2xl shadow-sm p-4 sm:p-5">
                     <div class="mb-4">
                         <h3 class="text-lg sm:text-xl font-bold text-green-700">Grupo B</h3>
@@ -193,62 +138,29 @@
                         <div>
                             <h4 class="text-base font-semibold text-gray-900 mb-2"><span id="lblBrazo">Brazo izquierdo</span></h4>
                             <div class="space-y-2 text-sm">
-                                <label class="flex items-start gap-2">
-                                    <input type="radio" name="brazo" value="1" required class="mt-1">
-                                    <span>1 - Postura: Flexión o extensión (0–20°)</span>
-                                </label>
-                                <label class="flex items-start gap-2">
-                                    <input type="radio" name="brazo" value="2" class="mt-1">
-                                    <span>2 - Postura: Flexión (20–45°)</span>
-                                </label>
-                                <label class="flex items-start gap-2">
-                                    <input type="radio" name="brazo" value="3" class="mt-1">
-                                    <span>3 - Postura: Flexión (45–90°)</span>
-                                </label>
-                                <label class="flex items-start gap-2">
-                                    <input type="radio" name="brazo" value="4" class="mt-1">
-                                    <span>4 - Postura: Flexión &gt; 90°</span>
-                                </label>
-                                <label class="flex items-start gap-2">
-                                    <input type="radio" name="brazo" value="5" class="mt-1">
-                                    <span>5 - Elevado con ajuste adicional</span>
-                                </label>
-                                <label class="flex items-start gap-2">
-                                    <input type="radio" name="brazo" value="6" class="mt-1">
-                                    <span>6 - Muy elevado con ajuste adicional</span>
-                                </label>
+                                <label class="flex items-start gap-2"><input type="radio" name="brazo" value="1" required class="mt-1"><span>1 - Postura: Flexión o extensión (0–20°)</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="brazo" value="2" class="mt-1"><span>2 - Postura: Flexión (20–45°)</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="brazo" value="3" class="mt-1"><span>3 - Postura: Flexión (45–90°)</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="brazo" value="4" class="mt-1"><span>4 - Postura: Flexión &gt; 90°</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="brazo" value="5" class="mt-1"><span>5 - Elevado con ajuste adicional</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="brazo" value="6" class="mt-1"><span>6 - Muy elevado con ajuste adicional</span></label>
                             </div>
                         </div>
 
                         <div>
                             <h4 class="text-base font-semibold text-gray-900 mb-2"><span id="lblAntebrazo">Antebrazo izquierdo</span></h4>
                             <div class="space-y-2 text-sm">
-                                <label class="flex items-start gap-2">
-                                    <input type="radio" name="antebrazo" value="1" required class="mt-1">
-                                    <span>1 - Postura: Flexión (60–100°)</span>
-                                </label>
-                                <label class="flex items-start gap-2">
-                                    <input type="radio" name="antebrazo" value="2" class="mt-1">
-                                    <span>2 - Postura: Fuera de rango</span>
-                                </label>
+                                <label class="flex items-start gap-2"><input type="radio" name="antebrazo" value="1" required class="mt-1"><span>1 - Postura: Flexión (60–100°)</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="antebrazo" value="2" class="mt-1"><span>2 - Postura: Fuera de rango</span></label>
                             </div>
                         </div>
 
                         <div>
                             <h4 class="text-base font-semibold text-gray-900 mb-2"><span id="lblMuneca">Muñeca izquierda</span></h4>
                             <div class="space-y-2 text-sm">
-                                <label class="flex items-start gap-2">
-                                    <input type="radio" name="muneca" value="1" required class="mt-1">
-                                    <span>1 - Postura: Neutral</span>
-                                </label>
-                                <label class="flex items-start gap-2">
-                                    <input type="radio" name="muneca" value="2" class="mt-1">
-                                    <span>2 - Postura: Flexión o extensión 15°</span>
-                                </label>
-                                <label class="flex items-start gap-2">
-                                    <input type="radio" name="muneca" value="3" class="mt-1">
-                                    <span>3 - Postura: Flexión/Extensión mayor con compromiso</span>
-                                </label>
+                                <label class="flex items-start gap-2"><input type="radio" name="muneca" value="1" required class="mt-1"><span>1 - Postura: Neutral</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="muneca" value="2" class="mt-1"><span>2 - Postura: Flexión o extensión 15°</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="muneca" value="3" class="mt-1"><span>3 - Postura: Flexión/Extensión mayor con compromiso</span></label>
                             </div>
 
                             <label class="flex items-center gap-2 mt-3 text-sm text-gray-700">
@@ -261,96 +173,45 @@
                         <div>
                             <h4 class="text-base font-semibold text-gray-900 mb-2">Agarre</h4>
                             <div class="space-y-2 text-sm">
-                                <label class="flex items-start gap-2">
-                                    <input type="radio" name="tipo_agarre" value="0" required class="mt-1">
-                                    <span>0 - Bueno</span>
-                                </label>
-                                <label class="flex items-start gap-2">
-                                    <input type="radio" name="tipo_agarre" value="1" class="mt-1">
-                                    <span>1 - Regular</span>
-                                </label>
-                                <label class="flex items-start gap-2">
-                                    <input type="radio" name="tipo_agarre" value="2" class="mt-1">
-                                    <span>2 - Malo</span>
-                                </label>
-                                <label class="flex items-start gap-2">
-                                    <input type="radio" name="tipo_agarre" value="3" class="mt-1">
-                                    <span>3 - Muy malo</span>
-                                </label>
+                                <label class="flex items-start gap-2"><input type="radio" name="tipo_agarre" value="0" required class="mt-1"><span>0 - Bueno</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="tipo_agarre" value="1" class="mt-1"><span>1 - Regular</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="tipo_agarre" value="2" class="mt-1"><span>2 - Malo</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="tipo_agarre" value="3" class="mt-1"><span>3 - Muy malo</span></label>
                             </div>
                         </div>
 
                         <div>
                             <h4 class="text-base font-semibold text-gray-900 mb-2">Actividad</h4>
                             <div class="space-y-2 text-sm">
-                                <label class="flex items-center gap-2">
-                                    <input type="checkbox" class="actividad-check rounded border-gray-300" value="1">
-                                    <span>Una o más partes del cuerpo permanecen en postura estática por más de 1 min</span>
-                                </label>
-                                <label class="flex items-center gap-2">
-                                    <input type="checkbox" class="actividad-check rounded border-gray-300" value="1">
-                                    <span>Se repiten acciones a intervalos cortos</span>
-                                </label>
-                                <label class="flex items-center gap-2">
-                                    <input type="checkbox" class="actividad-check rounded border-gray-300" value="1">
-                                    <span>La actividad implica cambios bruscos o inestabilidad postural</span>
-                                </label>
+                                <label class="flex items-center gap-2"><input type="checkbox" class="actividad-check rounded border-gray-300" value="1"><span>Una o más partes del cuerpo permanecen en postura estática por más de 1 min</span></label>
+                                <label class="flex items-center gap-2"><input type="checkbox" class="actividad-check rounded border-gray-300" value="1"><span>Se repiten acciones a intervalos cortos</span></label>
+                                <label class="flex items-center gap-2"><input type="checkbox" class="actividad-check rounded border-gray-300" value="1"><span>La actividad implica cambios bruscos o inestabilidad postural</span></label>
                             </div>
-                            <p class="text-xs text-gray-500 mt-2">
-                                El sistema suma estas condiciones y limita el valor máximo a 3.
-                            </p>
+                            <p class="text-xs text-gray-500 mt-2">El sistema suma estas condiciones y limita el valor máximo a 3.</p>
                         </div>
                     </div>
                 </section>
             </div>
 
             <div class="flex flex-wrap gap-3">
-                <button type="button" id="btnCalcularManual"
-                    class="bg-blue-700 hover:bg-blue-800 text-white text-sm font-semibold px-5 py-2.5 rounded-lg shadow-sm">
-                    Calcular
-                </button>
-
-                <button type="submit" id="btnGuardar"
-                    class="bg-green-600 text-white text-sm font-semibold px-5 py-2.5 rounded-lg shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled>
-                    Guardar evaluación
-                </button>
-
-                <a href="{{ route('evaluaciones.index') }}"
-                    class="bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-semibold px-5 py-2.5 rounded-lg">
-                    Cancelar
-                </a>
+                <button type="button" id="btnCalcularManual" class="bg-blue-700 hover:bg-blue-800 text-white text-sm font-semibold px-5 py-2.5 rounded-lg shadow-sm">Calcular</button>
+                <button type="submit" id="btnGuardar" class="bg-green-600 text-white text-sm font-semibold px-5 py-2.5 rounded-lg shadow-sm disabled:opacity-50 disabled:cursor-not-allowed" disabled>Guardar evaluación</button>
+                <a href="{{ route('evaluaciones.index') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-semibold px-5 py-2.5 rounded-lg">Cancelar</a>
             </div>
 
             <div id="resultadoReba" class="hidden bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-5">
                 <h3 class="text-lg sm:text-xl font-bold text-blue-700 mb-4">Resultado previo</h3>
 
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
-                    <div class="bg-slate-50 border rounded-xl p-3">
-                        <p class="text-xs uppercase tracking-wide text-gray-500">Puntuación A</p>
-                        <p id="prevA" class="text-xl font-bold text-slate-700 mt-1">0</p>
-                    </div>
-                    <div class="bg-green-50 border rounded-xl p-3">
-                        <p class="text-xs uppercase tracking-wide text-gray-500">Puntuación B</p>
-                        <p id="prevB" class="text-xl font-bold text-green-700 mt-1">0</p>
-                    </div>
-                    <div class="bg-yellow-50 border rounded-xl p-3">
-                        <p class="text-xs uppercase tracking-wide text-gray-500">Puntuación C</p>
-                        <p id="prevC" class="text-xl font-bold text-yellow-700 mt-1">0</p>
-                    </div>
-                    <div class="bg-purple-50 border rounded-xl p-3">
-                        <p class="text-xs uppercase tracking-wide text-gray-500">Puntuación Final</p>
-                        <p id="prevFinal" class="text-xl font-bold text-purple-700 mt-1">0</p>
-                    </div>
+                    <div class="bg-slate-50 border rounded-xl p-3"><p class="text-xs uppercase tracking-wide text-gray-500">Puntuación A</p><p id="prevA" class="text-xl font-bold text-slate-700 mt-1">0</p></div>
+                    <div class="bg-green-50 border rounded-xl p-3"><p class="text-xs uppercase tracking-wide text-gray-500">Puntuación B</p><p id="prevB" class="text-xl font-bold text-green-700 mt-1">0</p></div>
+                    <div class="bg-yellow-50 border rounded-xl p-3"><p class="text-xs uppercase tracking-wide text-gray-500">Puntuación C</p><p id="prevC" class="text-xl font-bold text-yellow-700 mt-1">0</p></div>
+                    <div class="bg-purple-50 border rounded-xl p-3"><p class="text-xs uppercase tracking-wide text-gray-500">Puntuación Final</p><p id="prevFinal" class="text-xl font-bold text-purple-700 mt-1">0</p></div>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5">
-                    <div class="rounded-xl bg-blue-50 border border-blue-100 p-4">
-                        <p class="text-sm"><span class="font-semibold">Nivel de riesgo:</span> <span id="prevNivel">-</span></p>
-                    </div>
-                    <div class="rounded-xl bg-amber-50 border border-amber-100 p-4">
-                        <p class="text-sm"><span class="font-semibold">Acción requerida:</span> <span id="prevAccion">-</span></p>
-                    </div>
+                    <div class="rounded-xl bg-blue-50 border border-blue-100 p-4"><p class="text-sm"><span class="font-semibold">Nivel de riesgo:</span> <span id="prevNivel">-</span></p></div>
+                    <div class="rounded-xl bg-amber-50 border border-amber-100 p-4"><p class="text-sm"><span class="font-semibold">Acción requerida:</span> <span id="prevAccion">-</span></p></div>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -384,13 +245,10 @@
         </form>
     </div>
 
-    <script type="application/json" id="reba-matrices">
-@json($matrices)
-    </script>
+    <script type="application/json" id="reba-matrices">@json($matrices)</script>
 
     <script>
         const rebaMatrices = JSON.parse(document.getElementById('reba-matrices').textContent);
-
         const riskLevels = [
             { max: 1, nivel: 'Inapreciable', accion: 'No requiere acción.' },
             { max: 3, nivel: 'Bajo', accion: 'Puede ser necesaria alguna acción.' },
@@ -407,24 +265,17 @@
         function updateSideLabels() {
             const lado = ladoEvaluado.value.toLowerCase();
             let texto = 'izquierdo';
-
             if (lado === 'derecho') texto = 'derecho';
             if (lado === 'ambos') texto = 'evaluado';
-
             document.getElementById('lblBrazo').textContent = `Brazo ${texto}`;
             document.getElementById('lblAntebrazo').textContent = `Antebrazo ${texto}`;
             document.getElementById('lblMuneca').textContent = `Muñeca ${texto}`;
         }
 
         function syncAjustes() {
-            document.getElementById('ajuste_cuello').value =
-                document.getElementById('ajuste_cuello_check').checked ? 1 : 0;
-
-            document.getElementById('ajuste_tronco').value =
-                document.getElementById('ajuste_tronco_check').checked ? 1 : 0;
-
-            document.getElementById('ajuste_muneca').value =
-                document.getElementById('ajuste_muneca_check').checked ? 1 : 0;
+            document.getElementById('ajuste_cuello').value = document.getElementById('ajuste_cuello_check').checked ? 1 : 0;
+            document.getElementById('ajuste_tronco').value = document.getElementById('ajuste_tronco_check').checked ? 1 : 0;
+            document.getElementById('ajuste_muneca').value = document.getElementById('ajuste_muneca_check').checked ? 1 : 0;
         }
 
         function syncActividad() {
@@ -456,10 +307,8 @@
         }
 
         function allComplete() {
-            return [
-                'cuello', 'tronco', 'piernas', 'carga',
-                'brazo', 'antebrazo', 'muneca', 'tipo_agarre'
-            ].every(name => getRadioValue(name) !== null);
+            return ['cuello', 'tronco', 'piernas', 'carga', 'brazo', 'antebrazo', 'muneca', 'tipo_agarre']
+                .every(name => getRadioValue(name) !== null);
         }
 
         function calcularReba() {

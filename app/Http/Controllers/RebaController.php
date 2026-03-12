@@ -3,11 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Evaluacion;
-use App\Models\Metodo;
 use App\Models\RebaDetalle;
 use App\Models\RebaEvaluacion;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 
@@ -25,49 +23,35 @@ class RebaController extends Controller
         return view('reba.index', compact('rebas'));
     }
 
-    public function create(Request $request)
+    public function create($evaluacionId)
     {
-        $datosBase = [
-            'empresa_id' => $request->empresa_id,
-            'sucursal_id' => $request->sucursal_id,
-            'puesto_id' => $request->puesto_id,
-            'trabajador_id' => $request->trabajador_id,
-            'fecha_evaluacion' => $request->fecha_evaluacion,
-            'area_evaluada' => $request->area_evaluada,
-            'actividad_general' => $request->actividad_general,
-            'observaciones' => $request->observaciones,
-        ];
+        $evaluacion = Evaluacion::with([
+            'empresa',
+            'sucursal',
+            'puesto',
+            'trabajador',
+            'metodo'
+        ])->findOrFail($evaluacionId);
 
         $matrices = $this->getRebaMatrices();
 
-        return view('reba.create', compact('datosBase', 'matrices'));
+        return view('reba.create', compact('evaluacion', 'matrices'));
     }
 
-    public function store(Request $request)
+    public function store(Request $request, $evaluacionId)
     {
+        $evaluacion = Evaluacion::findOrFail($evaluacionId);
+
         $request->validate([
-            'empresa_id' => 'required|exists:empresas,id',
-            'sucursal_id' => 'required|exists:sucursales,id',
-            'puesto_id' => 'required|exists:puestos,id',
-            'trabajador_id' => 'required|exists:trabajadores,id',
-            'fecha_evaluacion' => 'required|date',
-
-            'area_evaluada' => 'nullable|string|max:255',
-            'actividad_general' => 'nullable|string|max:255',
-            'observaciones' => 'nullable|string',
-
             'cuello' => 'required|integer|min:1|max:3',
             'tronco' => 'required|integer|min:1|max:5',
             'piernas' => 'required|integer|min:1|max:4',
             'carga' => 'required|integer|min:0|max:2',
-
             'brazo' => 'required|integer|min:1|max:6',
             'antebrazo' => 'required|integer|min:1|max:2',
             'muneca' => 'required|integer|min:1|max:3',
             'tipo_agarre' => 'required|integer|min:0|max:3',
-
             'actividad_reba' => 'required|integer|min:0|max:3',
-
             'ajuste_cuello' => 'nullable|integer|min:0|max:1',
             'ajuste_tronco' => 'nullable|integer|min:0|max:1',
             'ajuste_muneca' => 'nullable|integer|min:0|max:1',
@@ -78,12 +62,6 @@ class RebaController extends Controller
         DB::beginTransaction();
 
         try {
-            $metodo = Metodo::whereRaw('LOWER(nombre) = ?', ['reba'])->first();
-
-            if (!$metodo) {
-                return back()->withInput()->with('error', 'No existe el método REBA en la tabla metodos.');
-            }
-
             $resultado = $this->calcularRebaOficial(
                 (int) $request->cuello,
                 (int) ($request->ajuste_cuello ?? 0),
@@ -98,22 +76,6 @@ class RebaController extends Controller
                 (int) $request->tipo_agarre,
                 (int) $request->actividad_reba
             );
-
-            $evaluacion = Evaluacion::create([
-                'empresa_id' => $request->empresa_id,
-                'sucursal_id' => $request->sucursal_id,
-                'puesto_id' => $request->puesto_id,
-                'trabajador_id' => $request->trabajador_id,
-                'metodo_id' => $metodo->id,
-                'user_id' => Auth::id(),
-                'fecha_evaluacion' => $request->fecha_evaluacion,
-                'area_evaluada' => $request->area_evaluada,
-                'actividad' => $request->actividad_general,
-                'observaciones' => $request->observaciones,
-                'resultado_final' => $resultado['puntuacion_final'],
-                'nivel_riesgo' => $resultado['nivel_riesgo'],
-                'recomendaciones' => $resultado['accion_requerida'],
-            ]);
 
             $reba = RebaEvaluacion::create([
                 'evaluacion_id' => $evaluacion->id,
@@ -134,6 +96,12 @@ class RebaController extends Controller
                 'accion_requerida' => $resultado['accion_requerida'],
             ]);
 
+            $evaluacion->update([
+                'resultado_final' => $resultado['puntuacion_final'],
+                'nivel_riesgo' => $resultado['nivel_riesgo'],
+                'recomendaciones' => $resultado['accion_requerida'],
+            ]);
+
             $detalles = [
                 ['seccion' => 'A', 'concepto' => 'cuello', 'valor' => $this->textoCuello($request->cuello), 'puntaje' => $request->cuello],
                 ['seccion' => 'A', 'concepto' => 'ajuste_cuello', 'valor' => $this->textoAjusteCuello($request->ajuste_cuello), 'puntaje' => $request->ajuste_cuello ?? 0],
@@ -151,8 +119,8 @@ class RebaController extends Controller
                 ['seccion' => 'C', 'concepto' => 'actividad_reba', 'valor' => $this->textoActividad($request->actividad_reba), 'puntaje' => $request->actividad_reba],
                 ['seccion' => 'GENERAL', 'concepto' => 'lado_evaluado', 'valor' => $request->lado_evaluado ?? 'No especificado', 'puntaje' => 0],
                 ['seccion' => 'GENERAL', 'concepto' => 'tarea', 'valor' => $request->tarea ?? 'No especificada', 'puntaje' => 0],
-                ['seccion' => 'GENERAL', 'concepto' => 'area_evaluada', 'valor' => $request->area_evaluada ?? 'No especificada', 'puntaje' => 0],
-                ['seccion' => 'GENERAL', 'concepto' => 'actividad_general', 'valor' => $request->actividad_general ?? 'No especificada', 'puntaje' => 0],
+                ['seccion' => 'GENERAL', 'concepto' => 'area_evaluada', 'valor' => $evaluacion->area_evaluada ?? 'No especificada', 'puntaje' => 0],
+                ['seccion' => 'GENERAL', 'concepto' => 'actividad_general', 'valor' => $evaluacion->actividad ?? 'No especificada', 'puntaje' => 0],
 
                 ['seccion' => 'RESULTADO', 'concepto' => 'puntuacion_a', 'valor' => 'Resultado Grupo A', 'puntaje' => $resultado['puntuacion_a']],
                 ['seccion' => 'RESULTADO', 'concepto' => 'puntuacion_b', 'valor' => 'Resultado Grupo B', 'puntaje' => $resultado['puntuacion_b']],
@@ -238,18 +206,10 @@ class RebaController extends Controller
 
     private function clasificarRiesgo(int $puntaje): array
     {
-        if ($puntaje <= 1) {
-            return ['nivel' => 'Inapreciable', 'accion' => 'No requiere acción.'];
-        }
-        if ($puntaje <= 3) {
-            return ['nivel' => 'Bajo', 'accion' => 'Puede ser necesaria alguna acción.'];
-        }
-        if ($puntaje <= 7) {
-            return ['nivel' => 'Medio', 'accion' => 'Se requiere acción.'];
-        }
-        if ($puntaje <= 10) {
-            return ['nivel' => 'Alto', 'accion' => 'Se requiere acción pronto.'];
-        }
+        if ($puntaje <= 1) return ['nivel' => 'Inapreciable', 'accion' => 'No requiere acción.'];
+        if ($puntaje <= 3) return ['nivel' => 'Bajo', 'accion' => 'Puede ser necesaria alguna acción.'];
+        if ($puntaje <= 7) return ['nivel' => 'Medio', 'accion' => 'Se requiere acción.'];
+        if ($puntaje <= 10) return ['nivel' => 'Alto', 'accion' => 'Se requiere acción pronto.'];
         return ['nivel' => 'Muy alto', 'accion' => 'Se requiere actuación inmediata.'];
     }
 
@@ -257,57 +217,19 @@ class RebaController extends Controller
     {
         return [
             'tablaA' => [
-                1 => [
-                    1 => [1 => 1, 2 => 2, 3 => 3, 4 => 4],
-                    2 => [1 => 1, 2 => 2, 3 => 3, 4 => 4],
-                    3 => [1 => 3, 2 => 3, 3 => 5, 4 => 6],
-                ],
-                2 => [
-                    1 => [1 => 2, 2 => 3, 3 => 4, 4 => 5],
-                    2 => [1 => 3, 2 => 4, 3 => 5, 4 => 6],
-                    3 => [1 => 4, 2 => 5, 3 => 6, 4 => 7],
-                ],
-                3 => [
-                    1 => [1 => 2, 2 => 4, 3 => 5, 4 => 6],
-                    2 => [1 => 4, 2 => 5, 3 => 6, 4 => 7],
-                    3 => [1 => 5, 2 => 6, 3 => 7, 4 => 8],
-                ],
-                4 => [
-                    1 => [1 => 3, 2 => 5, 3 => 6, 4 => 7],
-                    2 => [1 => 5, 2 => 6, 3 => 7, 4 => 8],
-                    3 => [1 => 6, 2 => 7, 3 => 8, 4 => 9],
-                ],
-                5 => [
-                    1 => [1 => 4, 2 => 6, 3 => 7, 4 => 8],
-                    2 => [1 => 6, 2 => 7, 3 => 8, 4 => 9],
-                    3 => [1 => 7, 2 => 8, 3 => 9, 4 => 9],
-                ],
+                1 => [1 => [1 => 1, 2 => 2, 3 => 3, 4 => 4], 2 => [1 => 1, 2 => 2, 3 => 3, 4 => 4], 3 => [1 => 3, 2 => 3, 3 => 5, 4 => 6]],
+                2 => [1 => [1 => 2, 2 => 3, 3 => 4, 4 => 5], 2 => [1 => 3, 2 => 4, 3 => 5, 4 => 6], 3 => [1 => 4, 2 => 5, 3 => 6, 4 => 7]],
+                3 => [1 => [1 => 2, 2 => 4, 3 => 5, 4 => 6], 2 => [1 => 4, 2 => 5, 3 => 6, 4 => 7], 3 => [1 => 5, 2 => 6, 3 => 7, 4 => 8]],
+                4 => [1 => [1 => 3, 2 => 5, 3 => 6, 4 => 7], 2 => [1 => 5, 2 => 6, 3 => 7, 4 => 8], 3 => [1 => 6, 2 => 7, 3 => 8, 4 => 9]],
+                5 => [1 => [1 => 4, 2 => 6, 3 => 7, 4 => 8], 2 => [1 => 6, 2 => 7, 3 => 8, 4 => 9], 3 => [1 => 7, 2 => 8, 3 => 9, 4 => 9]],
             ],
             'tablaB' => [
-                1 => [
-                    1 => [1 => 1, 2 => 2, 3 => 2],
-                    2 => [1 => 1, 2 => 2, 3 => 3],
-                ],
-                2 => [
-                    1 => [1 => 1, 2 => 2, 3 => 3],
-                    2 => [1 => 2, 2 => 3, 3 => 4],
-                ],
-                3 => [
-                    1 => [1 => 3, 2 => 4, 3 => 5],
-                    2 => [1 => 4, 2 => 5, 3 => 5],
-                ],
-                4 => [
-                    1 => [1 => 4, 2 => 5, 3 => 5],
-                    2 => [1 => 5, 2 => 6, 3 => 7],
-                ],
-                5 => [
-                    1 => [1 => 6, 2 => 7, 3 => 8],
-                    2 => [1 => 7, 2 => 8, 3 => 8],
-                ],
-                6 => [
-                    1 => [1 => 7, 2 => 8, 3 => 8],
-                    2 => [1 => 8, 2 => 9, 3 => 9],
-                ],
+                1 => [1 => [1 => 1, 2 => 2, 3 => 2], 2 => [1 => 1, 2 => 2, 3 => 3]],
+                2 => [1 => [1 => 1, 2 => 2, 3 => 3], 2 => [1 => 2, 2 => 3, 3 => 4]],
+                3 => [1 => [1 => 3, 2 => 4, 3 => 5], 2 => [1 => 4, 2 => 5, 3 => 5]],
+                4 => [1 => [1 => 4, 2 => 5, 3 => 5], 2 => [1 => 5, 2 => 6, 3 => 7]],
+                5 => [1 => [1 => 6, 2 => 7, 3 => 8], 2 => [1 => 7, 2 => 8, 3 => 8]],
+                6 => [1 => [1 => 7, 2 => 8, 3 => 8], 2 => [1 => 8, 2 => 9, 3 => 9]],
             ],
             'tablaC' => [
                 1  => [1 => 1, 2 => 1, 3 => 1, 4 => 2, 5 => 3, 6 => 3, 7 => 4, 8 => 5, 9 => 6, 10 => 7, 11 => 7, 12 => 7],
@@ -439,21 +361,18 @@ class RebaController extends Controller
     }
 
     public function pdf($id)
-     {
-    $reba = RebaEvaluacion::with([
-        'evaluacion.empresa',
-        'evaluacion.sucursal',
-        'evaluacion.puesto',
-        'evaluacion.trabajador',
-        'evaluacion.usuario',
-        'detalles'
-    ])->findOrFail($id);
+    {
+        $reba = RebaEvaluacion::with([
+            'evaluacion.empresa',
+            'evaluacion.sucursal',
+            'evaluacion.puesto',
+            'evaluacion.trabajador',
+            'evaluacion.usuario',
+            'detalles'
+        ])->findOrFail($id);
 
-    $pdf = Pdf::loadView('reba.pdf', compact('reba'))
-        ->setPaper('a4', 'portrait');
+        $pdf = Pdf::loadView('reba.pdf', compact('reba'))->setPaper('a4', 'portrait');
 
-    $nombreArchivo = 'reba_' . $reba->id . '.pdf';
-
-    return $pdf->download($nombreArchivo);
-     }
+        return $pdf->download('reba_' . $reba->id . '.pdf');
+    }
 }

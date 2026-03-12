@@ -23,132 +23,29 @@
         @endif
 
         <style>
-            .rula-card {
-                border: 1px solid #e9ecef;
-                border-radius: 16px;
-                background: #fff;
-                box-shadow: 0 2px 8px rgba(0,0,0,.04);
-                margin-bottom: 1.25rem;
-                overflow: hidden;
-            }
-
-            .rula-card-header {
-                padding: 14px 18px;
-                font-weight: 700;
-                font-size: 1rem;
-                border-bottom: 1px solid #edf2f7;
-            }
-
-            .rula-card-body {
-                padding: 18px;
-            }
-
-            .rula-header-main {
-                background: #0d6efd;
-                color: #fff;
-            }
-
-            .rula-header-a {
-                background: #d9f2ff;
-                color: #0b4f6c;
-            }
-
-            .rula-header-b {
-                background: #fff3cd;
-                color: #7a5a00;
-            }
-
-            .rula-header-extra {
-                background: #e8f7ee;
-                color: #146c43;
-            }
-
-            .rula-subblock {
-                border: 1px solid #eef2f7;
-                border-radius: 12px;
-                padding: 16px;
-                background: #fafcff;
-                margin-bottom: 14px;
-            }
-
-            .rula-subblock:last-child {
-                margin-bottom: 0;
-            }
-
-            .rula-title {
-                font-weight: 700;
-                font-size: 1rem;
-                margin-bottom: .25rem;
-            }
-
-            .rula-help {
-                font-size: .88rem;
-                color: #6c757d;
-                margin-bottom: .9rem;
-            }
-
-            .rula-data-label {
-                font-size: .85rem;
-                color: #6b7280;
-                margin-bottom: 2px;
-            }
-
-            .rula-data-value {
-                font-weight: 600;
-                color: #111827;
-            }
-
-            .rula-result-card {
-                position: sticky;
-                top: 20px;
-            }
-
-            .rula-result-box {
-                border: 1px solid #dbeafe;
-                border-radius: 12px;
-                background: #f8fbff;
-                text-align: center;
-                padding: 12px;
-                margin-bottom: 12px;
-            }
-
-            .rula-result-label {
-                font-size: .82rem;
-                color: #6b7280;
-                margin-bottom: 4px;
-            }
-
-            .rula-result-value {
-                font-size: 1.2rem;
-                font-weight: 700;
-                color: #111827;
-            }
-
-            .rula-summary {
-                border: 1px solid #d1fae5;
-                border-radius: 12px;
-                background: #f0fdf4;
-                padding: 14px;
-            }
-
-            .rula-actions {
-                border-top: 1px solid #eef2f7;
-                margin-top: 1rem;
-                padding-top: 1rem;
-            }
+            .rula-card { border:1px solid #e9ecef; border-radius:16px; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,.04); margin-bottom:1.25rem; overflow:hidden; }
+            .rula-card-header { padding:14px 18px; font-weight:700; font-size:1rem; border-bottom:1px solid #edf2f7; }
+            .rula-card-body { padding:18px; }
+            .rula-header-main { background:#0d6efd; color:#fff; }
+            .rula-header-a { background:#d9f2ff; color:#0b4f6c; }
+            .rula-header-b { background:#fff3cd; color:#7a5a00; }
+            .rula-header-extra { background:#e8f7ee; color:#146c43; }
+            .rula-subblock { border:1px solid #eef2f7; border-radius:12px; padding:16px; background:#fafcff; margin-bottom:14px; }
+            .rula-subblock:last-child { margin-bottom:0; }
+            .rula-title { font-weight:700; font-size:1rem; margin-bottom:.25rem; }
+            .rula-help { font-size:.88rem; color:#6c757d; margin-bottom:.9rem; }
+            .rula-data-label { font-size:.85rem; color:#6b7280; margin-bottom:2px; }
+            .rula-data-value { font-weight:600; color:#111827; }
+            .rula-result-card { position:sticky; top:20px; }
+            .rula-result-box { border:1px solid #dbeafe; border-radius:12px; background:#f8fbff; text-align:center; padding:12px; margin-bottom:12px; }
+            .rula-result-label { font-size:.82rem; color:#6b7280; margin-bottom:4px; }
+            .rula-result-value { font-size:1.2rem; font-weight:700; color:#111827; }
+            .rula-summary { border:1px solid #d1fae5; border-radius:12px; background:#f0fdf4; padding:14px; }
+            .rula-actions { border-top:1px solid #eef2f7; margin-top:1rem; padding-top:1rem; }
         </style>
 
-        <form id="rulaForm" method="POST" action="{{ route('rula.store') }}">
+        <form id="rulaForm" method="POST" action="{{ route('rula.store', $evaluacion->id) }}">
             @csrf
-
-            <input type="hidden" name="empresa_id" value="{{ $datosBase['empresa_id'] }}">
-            <input type="hidden" name="sucursal_id" value="{{ $datosBase['sucursal_id'] }}">
-            <input type="hidden" name="puesto_id" value="{{ $datosBase['puesto_id'] }}">
-            <input type="hidden" name="trabajador_id" value="{{ $datosBase['trabajador_id'] }}">
-            <input type="hidden" name="fecha_evaluacion" value="{{ $datosBase['fecha_evaluacion'] }}">
-            <input type="hidden" name="area_evaluada" value="{{ $datosBase['area_evaluada'] }}">
-            <input type="hidden" name="actividad_general" value="{{ $datosBase['actividad_general'] }}">
-            <input type="hidden" name="observaciones" value="{{ $datosBase['observaciones'] }}">
 
             <div class="row">
                 <div class="col-lg-8">
@@ -157,36 +54,36 @@
                         <div class="rula-card-body">
                             <div class="row">
                                 <div class="col-md-3 mb-3">
-                                    <div class="rula-data-label">Empresa ID</div>
-                                    <div class="rula-data-value">{{ $datosBase['empresa_id'] }}</div>
+                                    <div class="rula-data-label">Empresa</div>
+                                    <div class="rula-data-value">{{ $evaluacion->empresa->nombre ?? 'N/A' }}</div>
                                 </div>
                                 <div class="col-md-3 mb-3">
-                                    <div class="rula-data-label">Sucursal ID</div>
-                                    <div class="rula-data-value">{{ $datosBase['sucursal_id'] }}</div>
+                                    <div class="rula-data-label">Sucursal</div>
+                                    <div class="rula-data-value">{{ $evaluacion->sucursal->nombre ?? 'N/A' }}</div>
                                 </div>
                                 <div class="col-md-3 mb-3">
-                                    <div class="rula-data-label">Puesto ID</div>
-                                    <div class="rula-data-value">{{ $datosBase['puesto_id'] }}</div>
+                                    <div class="rula-data-label">Puesto</div>
+                                    <div class="rula-data-value">{{ $evaluacion->puesto->nombre ?? 'N/A' }}</div>
                                 </div>
                                 <div class="col-md-3 mb-3">
-                                    <div class="rula-data-label">Trabajador ID</div>
-                                    <div class="rula-data-value">{{ $datosBase['trabajador_id'] }}</div>
+                                    <div class="rula-data-label">Trabajador</div>
+                                    <div class="rula-data-value">{{ $evaluacion->trabajador->nombre ?? 'N/A' }}</div>
                                 </div>
                                 <div class="col-md-3 mb-3">
                                     <div class="rula-data-label">Fecha</div>
-                                    <div class="rula-data-value">{{ $datosBase['fecha_evaluacion'] }}</div>
+                                    <div class="rula-data-value">{{ $evaluacion->fecha_evaluacion }}</div>
                                 </div>
                                 <div class="col-md-3 mb-3">
                                     <div class="rula-data-label">Área evaluada</div>
-                                    <div class="rula-data-value">{{ $datosBase['area_evaluada'] ?: 'No especificada' }}</div>
+                                    <div class="rula-data-value">{{ $evaluacion->area_evaluada ?: 'No especificada' }}</div>
                                 </div>
                                 <div class="col-md-3 mb-3">
                                     <div class="rula-data-label">Actividad general</div>
-                                    <div class="rula-data-value">{{ $datosBase['actividad_general'] ?: 'No especificada' }}</div>
+                                    <div class="rula-data-value">{{ $evaluacion->actividad ?: 'No especificada' }}</div>
                                 </div>
                                 <div class="col-md-3 mb-3">
                                     <div class="rula-data-label">Observaciones</div>
-                                    <div class="rula-data-value">{{ $datosBase['observaciones'] ?: 'Sin observaciones' }}</div>
+                                    <div class="rula-data-value">{{ $evaluacion->observaciones ?: 'Sin observaciones' }}</div>
                                 </div>
                             </div>
                         </div>
@@ -415,12 +312,8 @@
                             </div>
 
                             <div class="rula-actions d-flex justify-content-end gap-2">
-                                <a href="{{ route('evaluaciones.index') }}" class="btn btn-outline-secondary">
-                                    Cancelar
-                                </a>
-                                <button type="submit" class="btn btn-primary px-4">
-                                    Guardar evaluación RULA
-                                </button>
+                                <a href="{{ route('evaluaciones.index') }}" class="btn btn-outline-secondary">Cancelar</a>
+                                <button type="submit" class="btn btn-primary px-4">Guardar evaluación RULA</button>
                             </div>
                         </div>
                     </div>
@@ -432,86 +325,27 @@
                             <div class="rula-card-header rula-header-main">Resultado en tiempo real</div>
                             <div class="rula-card-body">
                                 <div class="row">
-                                    <div class="col-4">
-                                        <div class="rula-result-box">
-                                            <div class="rula-result-label">Brazo</div>
-                                            <div class="rula-result-value" id="resBrazo">-</div>
-                                        </div>
-                                    </div>
-                                    <div class="col-4">
-                                        <div class="rula-result-box">
-                                            <div class="rula-result-label">Antebrazo</div>
-                                            <div class="rula-result-value" id="resAntebrazo">-</div>
-                                        </div>
-                                    </div>
-                                    <div class="col-4">
-                                        <div class="rula-result-box">
-                                            <div class="rula-result-label">Muñeca</div>
-                                            <div class="rula-result-value" id="resMuneca">-</div>
-                                        </div>
-                                    </div>
-                                    <div class="col-4">
-                                        <div class="rula-result-box">
-                                            <div class="rula-result-label">Cuello</div>
-                                            <div class="rula-result-value" id="resCuello">-</div>
-                                        </div>
-                                    </div>
-                                    <div class="col-4">
-                                        <div class="rula-result-box">
-                                            <div class="rula-result-label">Tronco</div>
-                                            <div class="rula-result-value" id="resTronco">-</div>
-                                        </div>
-                                    </div>
-                                    <div class="col-4">
-                                        <div class="rula-result-box">
-                                            <div class="rula-result-label">Piernas</div>
-                                            <div class="rula-result-value" id="resPiernas">-</div>
-                                        </div>
-                                    </div>
+                                    <div class="col-4"><div class="rula-result-box"><div class="rula-result-label">Brazo</div><div class="rula-result-value" id="resBrazo">-</div></div></div>
+                                    <div class="col-4"><div class="rula-result-box"><div class="rula-result-label">Antebrazo</div><div class="rula-result-value" id="resAntebrazo">-</div></div></div>
+                                    <div class="col-4"><div class="rula-result-box"><div class="rula-result-label">Muñeca</div><div class="rula-result-value" id="resMuneca">-</div></div></div>
+                                    <div class="col-4"><div class="rula-result-box"><div class="rula-result-label">Cuello</div><div class="rula-result-value" id="resCuello">-</div></div></div>
+                                    <div class="col-4"><div class="rula-result-box"><div class="rula-result-label">Tronco</div><div class="rula-result-value" id="resTronco">-</div></div></div>
+                                    <div class="col-4"><div class="rula-result-box"><div class="rula-result-label">Piernas</div><div class="rula-result-value" id="resPiernas">-</div></div></div>
                                 </div>
 
                                 <hr>
 
                                 <div class="row">
-                                    <div class="col-3">
-                                        <div class="rula-result-box">
-                                            <div class="rula-result-label">A</div>
-                                            <div class="rula-result-value" id="resA">-</div>
-                                        </div>
-                                    </div>
-                                    <div class="col-3">
-                                        <div class="rula-result-box">
-                                            <div class="rula-result-label">B</div>
-                                            <div class="rula-result-value" id="resB">-</div>
-                                        </div>
-                                    </div>
-                                    <div class="col-3">
-                                        <div class="rula-result-box">
-                                            <div class="rula-result-label">C</div>
-                                            <div class="rula-result-value" id="resC">-</div>
-                                        </div>
-                                    </div>
-                                    <div class="col-3">
-                                        <div class="rula-result-box">
-                                            <div class="rula-result-label">D</div>
-                                            <div class="rula-result-value" id="resD">-</div>
-                                        </div>
-                                    </div>
+                                    <div class="col-3"><div class="rula-result-box"><div class="rula-result-label">A</div><div class="rula-result-value" id="resA">-</div></div></div>
+                                    <div class="col-3"><div class="rula-result-box"><div class="rula-result-label">B</div><div class="rula-result-value" id="resB">-</div></div></div>
+                                    <div class="col-3"><div class="rula-result-box"><div class="rula-result-label">C</div><div class="rula-result-value" id="resC">-</div></div></div>
+                                    <div class="col-3"><div class="rula-result-box"><div class="rula-result-label">D</div><div class="rula-result-value" id="resD">-</div></div></div>
                                 </div>
 
                                 <div class="rula-summary mt-2">
-                                    <div class="mb-2">
-                                        <strong>Puntuación final:</strong>
-                                        <span id="resFinal">-</span>
-                                    </div>
-                                    <div class="mb-2">
-                                        <strong>Nivel de riesgo:</strong><br>
-                                        <span id="resNivel" class="text-muted">-</span>
-                                    </div>
-                                    <div>
-                                        <strong>Acción requerida:</strong><br>
-                                        <span id="resAccion" class="text-muted">-</span>
-                                    </div>
+                                    <div class="mb-2"><strong>Puntuación final:</strong> <span id="resFinal">-</span></div>
+                                    <div class="mb-2"><strong>Nivel de riesgo:</strong><br><span id="resNivel" class="text-muted">-</span></div>
+                                    <div><strong>Acción requerida:</strong><br><span id="resAccion" class="text-muted">-</span></div>
                                 </div>
                             </div>
                         </div>

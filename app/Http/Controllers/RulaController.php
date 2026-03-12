@@ -3,11 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Evaluacion;
-use App\Models\Metodo;
 use App\Models\RulaDetalle;
 use App\Models\RulaEvaluacion;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 
@@ -25,43 +23,30 @@ class RulaController extends Controller
         return view('rula.index', compact('rulas'));
     }
 
-    public function create(Request $request)
+    public function create($evaluacionId)
     {
-        $datosBase = [
-            'empresa_id' => $request->empresa_id,
-            'sucursal_id' => $request->sucursal_id,
-            'puesto_id' => $request->puesto_id,
-            'trabajador_id' => $request->trabajador_id,
-            'fecha_evaluacion' => $request->fecha_evaluacion,
-            'area_evaluada' => $request->area_evaluada,
-            'actividad_general' => $request->actividad_general,
-            'observaciones' => $request->observaciones,
-        ];
+        $evaluacion = Evaluacion::with([
+            'empresa',
+            'sucursal',
+            'puesto',
+            'trabajador',
+            'metodo'
+        ])->findOrFail($evaluacionId);
 
-        return view('rula.create', compact('datosBase'));
+        return view('rula.create', compact('evaluacion'));
     }
 
     public function calcular(Request $request)
     {
-        $datos = $request->all();
-
-        $resultado = $this->calcularRulaDesdeFormulario($datos);
-
+        $resultado = $this->calcularRulaDesdeFormulario($request->all());
         return response()->json($resultado);
     }
 
-    public function store(Request $request)
+    public function store(Request $request, $evaluacionId)
     {
-        $request->validate([
-            'empresa_id' => 'required|exists:empresas,id',
-            'sucursal_id' => 'required|exists:sucursales,id',
-            'puesto_id' => 'required|exists:puestos,id',
-            'trabajador_id' => 'required|exists:trabajadores,id',
-            'fecha_evaluacion' => 'required|date',
+        $evaluacion = Evaluacion::findOrFail($evaluacionId);
 
-            'area_evaluada' => 'nullable|string|max:255',
-            'actividad_general' => 'nullable|string|max:255',
-            'observaciones' => 'nullable|string',
+        $request->validate([
             'lado_evaluado' => 'required|string|max:50',
             'tarea' => 'nullable|string|max:255',
 
@@ -88,7 +73,6 @@ class RulaController extends Controller
             'tronco_inclinado' => 'nullable|integer|min:0|max:1',
 
             'piernas' => 'required|integer|min:1|max:2',
-
             'uso_muscular' => 'required|integer|min:0|max:1',
             'carga_fuerza' => 'required|integer|min:0|max:3',
         ]);
@@ -96,29 +80,7 @@ class RulaController extends Controller
         DB::beginTransaction();
 
         try {
-            $metodo = Metodo::whereRaw('LOWER(nombre) = ?', ['rula'])->first();
-
-            if (!$metodo) {
-                return back()->withInput()->with('error', 'No existe el método RULA en la tabla metodos.');
-            }
-
             $resultado = $this->calcularRulaDesdeFormulario($request->all());
-
-            $evaluacion = Evaluacion::create([
-                'empresa_id' => $request->empresa_id,
-                'sucursal_id' => $request->sucursal_id,
-                'puesto_id' => $request->puesto_id,
-                'trabajador_id' => $request->trabajador_id,
-                'metodo_id' => $metodo->id,
-                'user_id' => Auth::id(),
-                'fecha_evaluacion' => $request->fecha_evaluacion,
-                'area_evaluada' => $request->area_evaluada,
-                'actividad' => $request->actividad_general,
-                'observaciones' => $request->observaciones,
-                'resultado_final' => $resultado['puntuacion_final'],
-                'nivel_riesgo' => $resultado['nivel_riesgo'],
-                'recomendaciones' => $resultado['accion_requerida'],
-            ]);
 
             $rula = RulaEvaluacion::create([
                 'evaluacion_id' => $evaluacion->id,
@@ -139,11 +101,17 @@ class RulaController extends Controller
                 'nivel_accion' => $resultado['nivel_accion'],
             ]);
 
+            $evaluacion->update([
+                'resultado_final' => $resultado['puntuacion_final'],
+                'nivel_riesgo' => $resultado['nivel_riesgo'],
+                'recomendaciones' => $resultado['accion_requerida'],
+            ]);
+
             $detalles = [
                 ['GENERAL', 'lado_evaluado', $request->lado_evaluado, 0],
                 ['GENERAL', 'tarea', $request->tarea ?? 'No especificada', 0],
-                ['GENERAL', 'area_evaluada', $request->area_evaluada ?? 'No especificada', 0],
-                ['GENERAL', 'actividad_general', $request->actividad_general ?? 'No especificada', 0],
+                ['GENERAL', 'area_evaluada', $evaluacion->area_evaluada ?? 'No especificada', 0],
+                ['GENERAL', 'actividad_general', $evaluacion->actividad ?? 'No especificada', 0],
 
                 ['A', 'brazo_base', $this->textoBrazoBase($request->brazo_base), (int)$request->brazo_base],
                 ['A', 'brazo_hombro_elevado', $this->textoBool($request->brazo_hombro_elevado, 'Hombro elevado o brazo rotado'), (int)($request->brazo_hombro_elevado ?? 0)],
@@ -229,8 +197,7 @@ class RulaController extends Controller
             'detalles'
         ])->findOrFail($id);
 
-        $pdf = Pdf::loadView('rula.pdf', compact('rula'))
-            ->setPaper('a4', 'portrait');
+        $pdf = Pdf::loadView('rula.pdf', compact('rula'))->setPaper('a4', 'portrait');
 
         return $pdf->download('rula_' . $rula->id . '.pdf');
     }
@@ -275,7 +242,6 @@ class RulaController extends Controller
 
         $puntuacionC = min(8, $puntuacionA + $usoMuscular);
         $puntuacionD = min(7, $puntuacionB + $cargaFuerza);
-
         $puntuacionFinal = $matrices['tablaFinal'][$puntuacionC][$puntuacionD];
 
         $clasificacion = $this->clasificarRiesgo($puntuacionFinal);
@@ -304,34 +270,15 @@ class RulaController extends Controller
     private function clasificarRiesgo(int $puntaje): array
     {
         if ($puntaje <= 2) {
-            return [
-                'nivel_accion' => 1,
-                'nivel' => 'Bajo',
-                'accion' => 'La postura es aceptable si no se mantiene o repite durante largos periodos.'
-            ];
+            return ['nivel_accion' => 1, 'nivel' => 'Bajo', 'accion' => 'La postura es aceptable si no se mantiene o repite durante largos periodos.'];
         }
-
         if ($puntaje <= 4) {
-            return [
-                'nivel_accion' => 2,
-                'nivel' => 'Medio',
-                'accion' => 'Es necesaria una investigación adicional y pueden requerirse cambios.'
-            ];
+            return ['nivel_accion' => 2, 'nivel' => 'Medio', 'accion' => 'Es necesaria una investigación adicional y pueden requerirse cambios.'];
         }
-
         if ($puntaje <= 6) {
-            return [
-                'nivel_accion' => 3,
-                'nivel' => 'Alto',
-                'accion' => 'Se requiere investigar y realizar cambios pronto.'
-            ];
+            return ['nivel_accion' => 3, 'nivel' => 'Alto', 'accion' => 'Se requiere investigar y realizar cambios pronto.'];
         }
-
-        return [
-            'nivel_accion' => 4,
-            'nivel' => 'Muy alto',
-            'accion' => 'Se requieren cambios inmediatos.'
-        ];
+        return ['nivel_accion' => 4, 'nivel' => 'Muy alto', 'accion' => 'Se requieren cambios inmediatos.'];
     }
 
     private function getRulaMatrices(): array
@@ -369,7 +316,6 @@ class RulaController extends Controller
                     3 => [1 => [1 => 9, 2 => 9], 2 => [1 => 9, 2 => 9], 3 => [1 => 9, 2 => 9], 4 => [1 => 9, 2 => 9]],
                 ],
             ],
-
             'tablaB' => [
                 1 => [1 => [1 => 1, 2 => 3], 2 => [1 => 2, 2 => 3], 3 => [1 => 3, 2 => 4], 4 => [1 => 5, 2 => 5], 5 => [1 => 6, 2 => 6], 6 => [1 => 7, 2 => 7]],
                 2 => [1 => [1 => 2, 2 => 3], 2 => [1 => 2, 2 => 3], 3 => [1 => 4, 2 => 5], 4 => [1 => 5, 2 => 5], 5 => [1 => 6, 2 => 7], 6 => [1 => 7, 2 => 7]],
@@ -378,7 +324,6 @@ class RulaController extends Controller
                 5 => [1 => [1 => 7, 2 => 7], 2 => [1 => 7, 2 => 7], 3 => [1 => 7, 2 => 8], 4 => [1 => 8, 2 => 8], 5 => [1 => 8, 2 => 8], 6 => [1 => 8, 2 => 8]],
                 6 => [1 => [1 => 8, 2 => 8], 2 => [1 => 8, 2 => 8], 3 => [1 => 8, 2 => 8], 4 => [1 => 8, 2 => 9], 5 => [1 => 9, 2 => 9], 6 => [1 => 9, 2 => 9]],
             ],
-
             'tablaFinal' => [
                 1 => [1 => 1, 2 => 2, 3 => 3, 4 => 3, 5 => 4, 6 => 5, 7 => 5],
                 2 => [1 => 2, 2 => 2, 3 => 3, 4 => 4, 5 => 4, 6 => 5, 7 => 5],
@@ -474,9 +419,7 @@ class RulaController extends Controller
 
     private function textoUsoMuscular($valor): string
     {
-        return (int)$valor === 1
-            ? 'Postura estática o repetida frecuentemente (+1)'
-            : 'Sin incremento por uso muscular';
+        return (int)$valor === 1 ? 'Postura estática o repetida frecuentemente (+1)' : 'Sin incremento por uso muscular';
     }
 
     private function textoCargaFuerza($valor): string

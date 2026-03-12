@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Empresa;
 use App\Models\Evaluacion;
+use App\Models\Metodo;
 use App\Models\Puesto;
 use App\Models\Sucursal;
 use App\Models\Trabajador;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class EvaluacionController extends Controller
 {
@@ -19,7 +21,9 @@ class EvaluacionController extends Controller
             'puesto',
             'trabajador',
             'metodo',
-            'rebaEvaluacion'
+            'rebaEvaluacion',
+            'rulaEvaluacion',
+            'nom036'
         ])->latest()->get();
 
         return view('evaluaciones.index', compact('evaluaciones'));
@@ -49,29 +53,42 @@ class EvaluacionController extends Controller
             'observaciones' => 'nullable|string',
         ]);
 
-        $datos = [
+        $metodo = Metodo::whereRaw('UPPER(nombre) = ?', [strtoupper($request->metodo)])->first();
+
+        if (!$metodo) {
+            return back()->withInput()->with('error', 'El método seleccionado no existe en la base de datos.');
+        }
+
+        $evaluacion = Evaluacion::create([
             'empresa_id' => $request->empresa_id,
             'sucursal_id' => $request->sucursal_id,
             'puesto_id' => $request->puesto_id,
             'trabajador_id' => $request->trabajador_id,
+            'metodo_id' => $metodo->id,
+            'user_id' => Auth::id(),
             'fecha_evaluacion' => $request->fecha_evaluacion,
             'area_evaluada' => $request->area_evaluada,
-            'actividad_general' => $request->actividad_general,
+            'actividad' => $request->actividad_general,
             'observaciones' => $request->observaciones,
-        ];
+        ]);
 
         switch (strtoupper($request->metodo)) {
             case 'REBA':
-                return redirect()->route('reba.create', $datos);
+                return redirect()->route('reba.create', $evaluacion->id);
 
             case 'RULA':
-             return redirect()->route('rula.create', $datos);
+                return redirect()->route('rula.create', $evaluacion->id);
 
-             case 'OWAS':
-             return redirect()->route('owas.create', $datos);
+            case 'OWAS':
+                return redirect()->route('owas.create', $evaluacion->id);
 
             case 'NIOSH':
                 return back()->withInput()->with('error', 'NIOSH aún no está implementado.');
+
+            case 'NOM-036':
+            case 'NOM036':
+            case 'NOM 036':
+                return redirect()->route('nom036.create', $evaluacion->id);
 
             default:
                 return back()->withInput()->with('error', 'Método no válido.');
