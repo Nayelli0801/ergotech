@@ -59,26 +59,26 @@ class Evaluacion extends Model
 
     public function rebaEvaluacion()
     {
-        return $this->hasOne(\App\Models\RebaEvaluacion::class, 'evaluacion_id');
+        return $this->hasOne(RebaEvaluacion::class, 'evaluacion_id');
     }
 
     public function rulaEvaluacion()
     {
-        return $this->hasOne(\App\Models\RulaEvaluacion::class, 'evaluacion_id');
+        return $this->hasOne(RulaEvaluacion::class, 'evaluacion_id');
     }
 
     public function owasEvaluacion()
     {
-        return $this->hasOne(\App\Models\OwasEvaluacion::class, 'evaluacion_id');
+        return $this->hasOne(OwasEvaluacion::class, 'evaluacion_id');
     }
 
     public function nioshEvaluacion()
     {
-        return $this->hasOne(\App\Models\NioshEvaluacion::class, 'evaluacion_id');
+        return $this->hasOne(NioshEvaluacion::class, 'evaluacion_id');
     }
 
     public function nom036()
     {
-        return $this->hasOne(\App\Models\Nom036Evaluacion::class, 'evaluacion_id');
+        return $this->hasOne(Nom036Evaluacion::class, 'evaluacion_id');
     }
 }

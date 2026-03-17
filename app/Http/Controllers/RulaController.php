@@ -17,7 +17,8 @@ class RulaController extends Controller
             'evaluacion.empresa',
             'evaluacion.sucursal',
             'evaluacion.puesto',
-            'evaluacion.trabajador'
+            'evaluacion.trabajador',
+            'evaluacion.usuario'
         ])->latest()->paginate(10);
 
         return view('rula.index', compact('rulas'));
@@ -30,7 +31,8 @@ class RulaController extends Controller
             'sucursal',
             'puesto',
             'trabajador',
-            'metodo'
+            'metodo',
+            'usuario'
         ])->findOrFail($evaluacionId);
 
         return view('rula.create', compact('evaluacion'));

@@ -4,85 +4,18 @@
     <meta charset="UTF-8">
     <title>Reporte NOM-036</title>
     <style>
-        body {
-            font-family: DejaVu Sans, sans-serif;
-            font-size: 12px;
-            color: #1f2937;
-            margin: 28px;
-        }
-
-        .header {
-            border-bottom: 3px solid #1d4ed8;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-
-        .header h1 {
-            margin: 0;
-            color: #1d4ed8;
-            font-size: 22px;
-        }
-
-        .header p {
-            margin: 5px 0 0 0;
-            color: #6b7280;
-            font-size: 12px;
-        }
-
-        .section {
-            margin-bottom: 18px;
-        }
-
-        .section-title {
-            background: #eff6ff;
-            color: #1d4ed8;
-            padding: 8px 10px;
-            font-weight: bold;
-            border: 1px solid #bfdbfe;
-            margin-bottom: 10px;
-            font-size: 13px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .grid td, .grid th {
-            border: 1px solid #d1d5db;
-            padding: 7px 8px;
-            vertical-align: top;
-        }
-
-        .grid th {
-            background: #f9fafb;
-            text-align: left;
-            width: 180px;
-        }
-
-        .detalle th,
-        .detalle td {
-            border: 1px solid #d1d5db;
-            padding: 8px;
-            font-size: 11px;
-            text-align: left;
-        }
-
-        .detalle th {
-            background: #f3f4f6;
-        }
-
-        .risk {
-            color: #b91c1c;
-            font-weight: bold;
-        }
-
-        .footer {
-            margin-top: 25px;
-            font-size: 10px;
-            text-align: right;
-            color: #666;
-        }
+        @page { margin: 24px 24px 34px 24px; }
+        body { font-family: DejaVu Sans, sans-serif; font-size: 11px; color: #1f2937; }
+        .header { border-bottom: 3px solid #1d4ed8; padding-bottom: 10px; margin-bottom: 18px; }
+        .header h1 { margin: 0; color: #1d4ed8; font-size: 22px; }
+        .header p { margin: 4px 0 0 0; color: #6b7280; font-size: 11px; }
+        .section { margin-bottom: 18px; }
+        .section-title { background: #eff6ff; color: #1d4ed8; padding: 8px 10px; font-weight: bold; border: 1px solid #bfdbfe; margin-bottom: 10px; font-size: 13px; }
+        table { width: 100%; border-collapse: collapse; }
+        .grid th, .grid td, .detail th, .detail td { border: 1px solid #d1d5db; padding: 7px 8px; vertical-align: top; }
+        .grid th, .detail th { background: #f3f4f6; text-align: left; }
+        .risk { color: #b91c1c; font-weight: bold; }
+        .footer { margin-top: 20px; font-size: 10px; color: #6b7280; text-align: right; }
     </style>
 </head>
 <body>
@@ -138,38 +71,24 @@
     <div class="section">
         <div class="section-title">Datos de la actividad</div>
         <table class="grid">
-            <tr>
-                <th>Tareas seleccionadas</th>
-                <td>{{ $tareasSeleccionadas }}</td>
-            </tr>
-            <tr>
-                <th>Tarea observada</th>
-                <td>{{ $tareaObservada }}</td>
-            </tr>
-            <tr>
-                <th>Medio de ayuda utilizado</th>
-                <td>{{ $medioAyuda }}</td>
-            </tr>
-            <tr>
-                <th>Descripción del apoyo o equipo</th>
-                <td>{{ $descripcionApoyo }}</td>
-            </tr>
+            <tr><th>Tareas seleccionadas</th><td>{{ $tareasSeleccionadas }}</td></tr>
+            <tr><th>Tarea observada</th><td>{{ $tareaObservada }}</td></tr>
+            <tr><th>Medio de ayuda utilizado</th><td>{{ $medioAyuda }}</td></tr>
+            <tr><th>Descripción del apoyo o equipo</th><td>{{ $descripcionApoyo }}</td></tr>
         </table>
     </div>
 
     <div class="section">
         <div class="section-title">Observaciones</div>
         <table class="grid">
-            <tr>
-                <td>{{ $nom036->observaciones ?? 'Sin observaciones.' }}</td>
-            </tr>
+            <tr><td>{{ $nom036->observaciones ?? 'Sin observaciones.' }}</td></tr>
         </table>
     </div>
 
     @foreach($secciones as $nombreSeccion => $items)
         <div class="section">
             <div class="section-title">{{ $nombreSeccion }}</div>
-            <table class="detalle">
+            <table class="detail">
                 <thead>
                     <tr>
                         <th>Concepto</th>
@@ -192,7 +111,7 @@
 
     <div class="section">
         <div class="section-title">Resultado final</div>
-        <table class="detalle">
+        <table class="detail">
             <thead>
                 <tr>
                     <th>Concepto</th>
@@ -212,8 +131,6 @@
         </table>
     </div>
 
-    <div class="footer">
-        Reporte generado por ErgoTech
-    </div>
+    <div class="footer">Reporte generado por ErgoTech</div>
 </body>
 </html>

@@ -17,7 +17,8 @@ class RebaController extends Controller
             'evaluacion.empresa',
             'evaluacion.sucursal',
             'evaluacion.puesto',
-            'evaluacion.trabajador'
+            'evaluacion.trabajador',
+            'evaluacion.usuario',
         ])->latest()->paginate(10);
 
         return view('reba.index', compact('rebas'));
@@ -30,7 +31,8 @@ class RebaController extends Controller
             'sucursal',
             'puesto',
             'trabajador',
-            'metodo'
+            'metodo',
+            'usuario',
         ])->findOrFail($evaluacionId);
 
         $matrices = $this->getRebaMatrices();
@@ -155,10 +157,27 @@ class RebaController extends Controller
             'evaluacion.sucursal',
             'evaluacion.puesto',
             'evaluacion.trabajador',
+            'evaluacion.usuario',
             'detalles'
         ])->findOrFail($id);
 
         return view('reba.show', compact('reba'));
+    }
+
+    public function pdf($id)
+    {
+        $reba = RebaEvaluacion::with([
+            'evaluacion.empresa',
+            'evaluacion.sucursal',
+            'evaluacion.puesto',
+            'evaluacion.trabajador',
+            'evaluacion.usuario',
+            'detalles'
+        ])->findOrFail($id);
+
+        $pdf = Pdf::loadView('reba.pdf', compact('reba'))->setPaper('a4', 'portrait');
+
+        return $pdf->download('reba_' . $reba->id . '.pdf');
     }
 
     private function calcularRebaOficial(
@@ -358,21 +377,5 @@ class RebaController extends Controller
             3 => 'Repetitiva intensa / cambios bruscos',
             default => 'No definido',
         };
-    }
-
-    public function pdf($id)
-    {
-        $reba = RebaEvaluacion::with([
-            'evaluacion.empresa',
-            'evaluacion.sucursal',
-            'evaluacion.puesto',
-            'evaluacion.trabajador',
-            'evaluacion.usuario',
-            'detalles'
-        ])->findOrFail($id);
-
-        $pdf = Pdf::loadView('reba.pdf', compact('reba'))->setPaper('a4', 'portrait');
-
-        return $pdf->download('reba_' . $reba->id . '.pdf');
     }
 }

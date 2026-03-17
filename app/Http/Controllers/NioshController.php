@@ -17,6 +17,7 @@ class NioshController extends Controller
             'evaluacion.sucursal',
             'evaluacion.puesto',
             'evaluacion.trabajador',
+            'evaluacion.usuario',
         ])->latest()->paginate(10);
 
         return view('niosh.index', compact('nioshEvaluaciones'));
@@ -29,7 +30,8 @@ class NioshController extends Controller
             'sucursal',
             'puesto',
             'trabajador',
-            'metodo'
+            'metodo',
+            'usuario',
         ])->findOrFail($evaluacion);
 
         return view('niosh.create', compact('evaluacion'));
@@ -42,7 +44,8 @@ class NioshController extends Controller
             'sucursal',
             'puesto',
             'trabajador',
-            'metodo'
+            'metodo',
+            'usuario',
         ])->findOrFail($evaluacion);
 
         $request->validate([
@@ -75,7 +78,7 @@ class NioshController extends Controller
         $CM = $this->calcularCM($agarre, $V);
 
         $RWL = round($LC * $HM * $VM * $DM * $AM * $FM * $CM, 2);
-        $IL = $RWL > 0 ? round($peso / $RWL, 2) : 0;
+        $IL = $RWL > 0 ? round($peso / $RWL, 2) : 0.00;
         $nivelRiesgo = $this->clasificarRiesgo($IL);
 
         $niosh = NioshEvaluacion::create([
@@ -105,31 +108,31 @@ class NioshController extends Controller
                 'seccion' => 'Datos de entrada',
                 'concepto' => 'Distancia horizontal (H)',
                 'valor' => $H . ' cm',
-                'resultado' => $HM,
+                'resultado' => (string) $HM,
             ],
             [
                 'seccion' => 'Datos de entrada',
                 'concepto' => 'Altura inicial (V)',
                 'valor' => $V . ' cm',
-                'resultado' => $VM,
+                'resultado' => (string) $VM,
             ],
             [
                 'seccion' => 'Datos de entrada',
                 'concepto' => 'Desplazamiento vertical (D)',
                 'valor' => $D . ' cm',
-                'resultado' => $DM,
+                'resultado' => (string) $DM,
             ],
             [
                 'seccion' => 'Datos de entrada',
                 'concepto' => 'Ángulo de asimetría (A)',
                 'valor' => $A . '°',
-                'resultado' => $AM,
+                'resultado' => (string) $AM,
             ],
             [
                 'seccion' => 'Datos de entrada',
                 'concepto' => 'Frecuencia de levantamiento',
                 'valor' => $F . ' lev/min',
-                'resultado' => $FM,
+                'resultado' => (string) $FM,
             ],
             [
                 'seccion' => 'Datos de entrada',
@@ -141,19 +144,19 @@ class NioshController extends Controller
                 'seccion' => 'Datos de entrada',
                 'concepto' => 'Calidad de agarre',
                 'valor' => ucfirst($agarre),
-                'resultado' => $CM,
+                'resultado' => (string) $CM,
             ],
             [
                 'seccion' => 'Resultado',
                 'concepto' => 'Constante de carga (LC)',
                 'valor' => '23 kg',
-                'resultado' => $LC,
+                'resultado' => '23',
             ],
             [
                 'seccion' => 'Resultado',
                 'concepto' => 'Peso del objeto',
                 'valor' => $peso . ' kg',
-                'resultado' => $peso,
+                'resultado' => (string) $peso,
             ],
             [
                 'seccion' => 'Resultado',
@@ -164,8 +167,8 @@ class NioshController extends Controller
             [
                 'seccion' => 'Resultado',
                 'concepto' => 'Índice de levantamiento (IL)',
-                'valor' => $peso . ' / ' . $RWL,
-                'resultado' => $IL,
+                'valor' => $peso . ' / ' . ($RWL > 0 ? $RWL : '0'),
+                'resultado' => (string) $IL,
             ],
             [
                 'seccion' => 'Resultado',
@@ -178,10 +181,10 @@ class NioshController extends Controller
         foreach ($detalles as $detalle) {
             NioshDetalle::create([
                 'niosh_evaluacion_id' => $niosh->id,
-                'seccion' => $detalle['seccion'],
-                'concepto' => $detalle['concepto'],
-                'valor' => $detalle['valor'],
-                'resultado' => (string) $detalle['resultado'],
+                'seccion' => $detalle['seccion'] ?? '',
+                'concepto' => $detalle['concepto'] ?? '',
+                'valor' => isset($detalle['valor']) ? (string) $detalle['valor'] : null,
+                'resultado' => isset($detalle['resultado']) ? (string) $detalle['resultado'] : null,
             ]);
         }
 
@@ -196,6 +199,7 @@ class NioshController extends Controller
             'evaluacion.sucursal',
             'evaluacion.puesto',
             'evaluacion.trabajador',
+            'evaluacion.usuario',
             'detalles'
         ])->findOrFail($id);
 
@@ -209,6 +213,7 @@ class NioshController extends Controller
             'evaluacion.sucursal',
             'evaluacion.puesto',
             'evaluacion.trabajador',
+            'evaluacion.usuario',
             'detalles'
         ])->findOrFail($id);
 
@@ -290,7 +295,6 @@ class NioshController extends Controller
             if ($frecuencia <= 10) return 0.26;
             if ($frecuencia <= 11) return 0.23;
             if ($frecuencia <= 12) return 0.21;
-            if ($frecuencia <= 13) return 0.00;
             return 0.00;
         }
 
@@ -305,7 +309,6 @@ class NioshController extends Controller
             if ($frecuencia <= 6) return 0.27;
             if ($frecuencia <= 7) return 0.22;
             if ($frecuencia <= 8) return 0.18;
-            if ($frecuencia <= 9) return 0.00;
             return 0.00;
         }
 

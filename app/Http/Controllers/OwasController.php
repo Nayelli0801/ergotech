@@ -19,7 +19,8 @@ class OwasController extends Controller
             'evaluacion.empresa',
             'evaluacion.sucursal',
             'evaluacion.puesto',
-            'evaluacion.trabajador'
+            'evaluacion.trabajador',
+            'evaluacion.usuario'
         ])->latest()->paginate(10);
 
         return view('owas.index', compact('owas'));

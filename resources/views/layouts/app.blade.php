@@ -22,8 +22,7 @@
         {{-- Sidebar --}}
         <aside
             class="fixed inset-y-0 left-0 z-40 w-64 bg-blue-700 text-white flex flex-col transform transition-transform duration-300
-                   lg:translate-x-0 lg:static lg:flex
-                   "
+                   lg:translate-x-0 lg:static lg:flex"
             :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
         >
             <div class="p-6 text-2xl font-bold border-b border-blue-600 flex items-center justify-between">
@@ -117,8 +116,22 @@
                         ☰
                     </button>
 
+                    @php
+                        $tituloPanel = 'Panel de Control';
+
+                        if (Auth::check()) {
+                            if (Auth::user()->isAdmin()) {
+                                $tituloPanel = 'Panel Administrador';
+                            } elseif (Auth::user()->isEvaluador()) {
+                                $tituloPanel = 'Panel Evaluador';
+                            } else {
+                                $tituloPanel = 'Panel Visitante';
+                            }
+                        }
+                    @endphp
+
                     <h1 class="text-lg sm:text-xl font-semibold text-gray-800">
-                        Panel Administrador
+                        {{ $tituloPanel }}
                     </h1>
                 </div>
 

@@ -4,81 +4,23 @@
     <meta charset="UTF-8">
     <title>Reporte OWAS</title>
     <style>
-        body {
-            font-family: DejaVu Sans, sans-serif;
-            font-size: 11px;
-            color: #1f2937;
-            margin: 24px;
-        }
-
-        .header {
-            border-bottom: 3px solid #1d4ed8;
-            padding-bottom: 10px;
-            margin-bottom: 18px;
-        }
-
-        .header h1 {
-            margin: 0;
-            color: #1d4ed8;
-            font-size: 21px;
-        }
-
-        .header p {
-            margin: 5px 0 0 0;
-            color: #6b7280;
-            font-size: 11px;
-        }
-
-        .section-title {
-            background: #eff6ff;
-            color: #1d4ed8;
-            padding: 8px 10px;
-            font-weight: bold;
-            border: 1px solid #bfdbfe;
-            margin: 16px 0 8px 0;
-            font-size: 13px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 12px;
-        }
-
-        th, td {
-            border: 1px solid #d1d5db;
-            padding: 6px;
-            vertical-align: top;
-            text-align: left;
-        }
-
-        th {
-            background: #f3f4f6;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 3px 7px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 10px;
-        }
-
+        @page { margin: 24px 24px 34px 24px; }
+        body { font-family: DejaVu Sans, sans-serif; font-size: 11px; color: #1f2937; }
+        .header { border-bottom: 3px solid #1d4ed8; padding-bottom: 10px; margin-bottom: 18px; }
+        .header h1 { margin: 0; color: #1d4ed8; font-size: 22px; }
+        .header p { margin: 4px 0 0 0; color: #6b7280; font-size: 11px; }
+        .section-title { background: #eff6ff; color: #1d4ed8; padding: 8px 10px; font-weight: bold; border: 1px solid #bfdbfe; margin: 16px 0 8px 0; font-size: 13px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+        th, td { border: 1px solid #d1d5db; padding: 6px; vertical-align: top; text-align: left; }
+        th { background: #f3f4f6; }
+        .badge { display: inline-block; padding: 3px 7px; border-radius: 4px; font-weight: bold; font-size: 10px; }
         .success { background: #dcfce7; color: #166534; }
         .warning { background: #fef3c7; color: #92400e; }
         .danger  { background: #fee2e2; color: #991b1b; }
         .dark    { background: #1f2937; color: #ffffff; }
-
-        .summary-box {
-            border: 1px solid #dbeafe;
-            background: #f8fbff;
-            padding: 10px;
-            margin-top: 8px;
-        }
-
-        .summary-box p {
-            margin: 4px 0;
-        }
+        .summary-box { border: 1px solid #dbeafe; background: #f8fbff; padding: 10px; margin-top: 8px; }
+        .summary-box p { margin: 4px 0; }
+        .footer { margin-top: 20px; font-size: 10px; color: #6b7280; text-align: right; }
     </style>
 </head>
 <body>
@@ -219,5 +161,7 @@
             @endforeach
         </tbody>
     </table>
+
+    <div class="footer">Reporte generado por ErgoTech</div>
 </body>
 </html>

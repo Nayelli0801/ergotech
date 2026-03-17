@@ -1,24 +1,33 @@
 <x-app-layout>
-    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 space-y-5">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+    <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-6">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
-                <h2 class="text-2xl font-bold text-blue-700">Evaluaciones REBA</h2>
-                <p class="text-sm text-gray-500 mt-1">
+                <h1 class="text-2xl font-bold text-slate-800">Evaluaciones REBA</h1>
+                <p class="text-sm text-slate-500 mt-1">
                     Consulta los resultados registrados del método REBA.
                 </p>
+            </div>
+
+            <div class="bg-white border border-slate-200 rounded-2xl px-4 py-3 shadow-sm">
+                <p class="text-xs uppercase tracking-wide text-slate-500">Total</p>
+                <p class="text-xl font-bold text-slate-800">{{ $rebas->total() }}</p>
             </div>
         </div>
 
         @if(session('success'))
-            <div class="rounded-lg bg-green-50 border border-green-200 text-green-700 px-4 py-3 text-sm">
+            <div class="rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 text-sm shadow-sm">
                 {{ session('success') }}
             </div>
         @endif
 
-        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
+                <h2 class="text-lg font-semibold text-slate-800">Listado de evaluaciones</h2>
+            </div>
+
             <div class="overflow-x-auto">
                 <table class="min-w-full text-sm text-left">
-                    <thead class="bg-gray-50 text-gray-700">
+                    <thead class="bg-slate-100 text-slate-700">
                         <tr>
                             <th class="px-4 py-3 font-semibold">ID</th>
                             <th class="px-4 py-3 font-semibold">Trabajador</th>
@@ -29,29 +38,47 @@
                             <th class="px-4 py-3 font-semibold">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100">
+                    <tbody class="divide-y divide-slate-200">
                         @forelse($rebas as $reba)
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-4 py-3 font-medium text-gray-800">{{ $reba->id }}</td>
-                                <td class="px-4 py-3">{{ $reba->evaluacion->trabajador->nombre ?? 'N/A' }}</td>
-                                <td class="px-4 py-3">{{ $reba->evaluacion->puesto->nombre ?? 'N/A' }}</td>
-                                <td class="px-4 py-3">{{ $reba->evaluacion->fecha_evaluacion ?? 'N/A' }}</td>
-                                <td class="px-4 py-3">{{ $reba->puntuacion_final }}</td>
+                            <tr class="hover:bg-slate-50">
+                                <td class="px-4 py-3 font-semibold text-slate-800">#{{ $reba->id }}</td>
+                                <td class="px-4 py-3 text-slate-700">
+                                    {{ trim(($reba->evaluacion->trabajador->nombre ?? '') . ' ' . ($reba->evaluacion->trabajador->apellido_paterno ?? '') . ' ' . ($reba->evaluacion->trabajador->apellido_materno ?? '')) ?: 'N/A' }}
+                                </td>
+                                <td class="px-4 py-3 text-slate-700">{{ $reba->evaluacion->puesto->nombre ?? 'N/A' }}</td>
+                                <td class="px-4 py-3 text-slate-700">{{ $reba->evaluacion->fecha_evaluacion ?? 'N/A' }}</td>
+                                <td class="px-4 py-3 font-medium text-slate-800">{{ $reba->puntuacion_final }}</td>
                                 <td class="px-4 py-3">
-                                    <span class="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
+                                    @php
+                                        $riesgo = strtolower($reba->nivel_riesgo ?? '');
+                                        $riesgoClass = match($riesgo) {
+                                            'inapreciable' => 'bg-slate-100 text-slate-700',
+                                            'bajo' => 'bg-emerald-100 text-emerald-700',
+                                            'medio' => 'bg-amber-100 text-amber-700',
+                                            'alto' => 'bg-red-100 text-red-700',
+                                            default => 'bg-slate-200 text-slate-700',
+                                        };
+                                    @endphp
+                                    <span class="inline-flex px-3 py-1 rounded-full text-xs font-semibold {{ $riesgoClass }}">
                                         {{ $reba->nivel_riesgo }}
                                     </span>
                                 </td>
                                 <td class="px-4 py-3">
-                                    <a href="{{ route('reba.show', $reba->id) }}"
-                                       class="bg-blue-700 hover:bg-blue-800 text-white text-xs font-semibold px-3 py-2 rounded-lg">
-                                        Ver
-                                    </a>
+                                    <div class="flex flex-wrap gap-2">
+                                        <a href="{{ route('reba.show', $reba->id) }}"
+                                           class="inline-flex items-center px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition">
+                                            Ver
+                                        </a>
+                                        <a href="{{ route('reba.pdf', $reba->id) }}"
+                                           class="inline-flex items-center px-3 py-2 rounded-lg bg-slate-700 hover:bg-slate-800 text-white text-xs font-semibold transition">
+                                            PDF
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="px-4 py-6 text-center text-gray-500">
+                                <td colspan="7" class="px-4 py-8 text-center text-slate-500">
                                     No hay evaluaciones registradas.
                                 </td>
                             </tr>
@@ -60,7 +87,7 @@
                 </table>
             </div>
 
-            <div class="px-4 py-4 border-t border-gray-100">
+            <div class="px-4 py-4 border-t border-slate-200 bg-white">
                 {{ $rebas->links() }}
             </div>
         </div>

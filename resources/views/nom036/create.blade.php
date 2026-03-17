@@ -1,20 +1,20 @@
 <x-app-layout>
-    <div class="max-w-6xl mx-auto py-6 px-4 sm:px-6">
-        <div class="mb-5">
-            <h2 class="text-2xl font-bold text-blue-700">Evaluación NOM-036</h2>
-            <p class="text-sm text-gray-500 mt-1">
+    <div class="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-slate-800">Evaluación NOM-036</h1>
+            <p class="text-sm text-slate-500 mt-1">
                 Selecciona una o varias tareas realizadas y captura las condiciones observadas. El sistema calculará el riesgo automáticamente.
             </p>
         </div>
 
         @if(session('error'))
-            <div class="mb-4 rounded-lg bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm">
+            <div class="mb-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm shadow-sm">
                 {{ session('error') }}
             </div>
         @endif
 
         @if($errors->any())
-            <div class="mb-4 rounded-lg bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm">
+            <div class="mb-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm shadow-sm">
                 <ul class="list-disc pl-5 space-y-1">
                     @foreach($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -23,78 +23,75 @@
             </div>
         @endif
 
-        <form action="{{ route('nom036.store', $evaluacion->id) }}" method="POST" class="space-y-5" id="nom036Form">
+        <form action="{{ route('nom036.store', $evaluacion->id) }}" method="POST" class="space-y-6" id="nom036Form">
             @csrf
 
-            <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Empresa</label>
-                    <div class="text-sm text-gray-700">{{ $evaluacion->empresa->nombre ?? 'N/A' }}</div>
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="px-6 py-4 bg-slate-50 border-b border-slate-200">
+                    <h2 class="text-lg font-semibold text-slate-800">Información general</h2>
                 </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Sucursal</label>
-                    <div class="text-sm text-gray-700">{{ $evaluacion->sucursal->nombre ?? 'N/A' }}</div>
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Puesto</label>
-                    <div class="text-sm text-gray-700">{{ $evaluacion->puesto->nombre ?? 'N/A' }}</div>
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Trabajador</label>
-                    <div class="text-sm text-gray-700">{{ $evaluacion->trabajador->nombre ?? 'N/A' }}</div>
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Fecha</label>
-                    <div class="text-sm text-gray-700">{{ $evaluacion->fecha_evaluacion ?? 'N/A' }}</div>
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Actividad general</label>
-                    <div class="text-sm text-gray-700">{{ $evaluacion->actividad ?? 'No especificada' }}</div>
+
+                <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <div>
+                        <label class="block text-xs uppercase tracking-wide text-slate-500 mb-1">Empresa</label>
+                        <div class="text-sm font-semibold text-slate-800">{{ $evaluacion->empresa->nombre ?? 'N/A' }}</div>
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase tracking-wide text-slate-500 mb-1">Sucursal</label>
+                        <div class="text-sm font-semibold text-slate-800">{{ $evaluacion->sucursal->nombre ?? 'N/A' }}</div>
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase tracking-wide text-slate-500 mb-1">Puesto</label>
+                        <div class="text-sm font-semibold text-slate-800">{{ $evaluacion->puesto->nombre ?? 'N/A' }}</div>
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase tracking-wide text-slate-500 mb-1">Trabajador</label>
+                        <div class="text-sm font-semibold text-slate-800">
+                            {{ trim(($evaluacion->trabajador->nombre ?? '') . ' ' . ($evaluacion->trabajador->apellido_paterno ?? '') . ' ' . ($evaluacion->trabajador->apellido_materno ?? '')) ?: 'N/A' }}
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase tracking-wide text-slate-500 mb-1">Fecha</label>
+                        <div class="text-sm font-semibold text-slate-800">{{ $evaluacion->fecha_evaluacion ?? 'N/A' }}</div>
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase tracking-wide text-slate-500 mb-1">Actividad general</label>
+                        <div class="text-sm font-semibold text-slate-800">{{ $evaluacion->actividad ?? 'No especificada' }}</div>
+                    </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
-                <h3 class="text-lg font-bold text-blue-700 mb-4">1. Configuración de la evaluación</h3>
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="px-6 py-4 bg-slate-50 border-b border-slate-200">
+                    <h2 class="text-lg font-semibold text-slate-800">1. Configuración de la evaluación</h2>
+                </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="p-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Tareas realizadas</label>
+                        <label class="block text-sm font-semibold text-slate-700 mb-3">Tareas realizadas</label>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <label class="flex items-center gap-2 text-sm text-gray-700">
-                                <input type="checkbox" name="tareas[]" value="levantar" class="tarea-check rounded border-gray-300">
-                                <span>Levantar</span>
-                            </label>
-
-                            <label class="flex items-center gap-2 text-sm text-gray-700">
-                                <input type="checkbox" name="tareas[]" value="bajar" class="tarea-check rounded border-gray-300">
-                                <span>Bajar</span>
-                            </label>
-
-                            <label class="flex items-center gap-2 text-sm text-gray-700">
-                                <input type="checkbox" name="tareas[]" value="transportar" class="tarea-check rounded border-gray-300">
-                                <span>Transportar</span>
-                            </label>
-
-                            <label class="flex items-center gap-2 text-sm text-gray-700">
-                                <input type="checkbox" name="tareas[]" value="empujar" class="tarea-check rounded border-gray-300">
-                                <span>Empujar</span>
-                            </label>
-
-                            <label class="flex items-center gap-2 text-sm text-gray-700">
-                                <input type="checkbox" name="tareas[]" value="jalar" class="tarea-check rounded border-gray-300">
-                                <span>Jalar</span>
-                            </label>
+                            @foreach([
+                                'levantar' => 'Levantar',
+                                'bajar' => 'Bajar',
+                                'transportar' => 'Transportar',
+                                'empujar' => 'Empujar',
+                                'jalar' => 'Jalar',
+                            ] as $value => $label)
+                                <label class="flex items-center gap-3 rounded-xl border border-slate-200 px-4 py-3 bg-slate-50 hover:bg-slate-100 transition cursor-pointer">
+                                    <input type="checkbox" name="tareas[]" value="{{ $value }}" class="tarea-check rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                                    <span class="text-sm font-medium text-slate-700">{{ $label }}</span>
+                                </label>
+                            @endforeach
                         </div>
-                        <p class="text-xs text-gray-500 mt-2">
+                        <p class="text-xs text-slate-500 mt-3">
                             Marca todas las tareas que realmente se realizan en la actividad observada.
                         </p>
                     </div>
 
                     <div class="space-y-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Medio de ayuda utilizado</label>
-                            <select name="medio_ayuda"
-                                class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Medio de ayuda utilizado</label>
+                            <select name="medio_ayuda" class="w-full rounded-xl border-slate-300 focus:ring-blue-500 focus:border-blue-500">
                                 <option value="">Seleccione</option>
                                 <option value="Sin ayuda">Sin ayuda</option>
                                 <option value="Con equipo auxiliar manual">Con equipo auxiliar manual</option>
@@ -105,16 +102,16 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre de la tarea</label>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Nombre de la tarea</label>
                             <input type="text" name="tarea_nombre"
-                                class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                                class="w-full rounded-xl border-slate-300 focus:ring-blue-500 focus:border-blue-500"
                                 placeholder="Ej. Levantar caja y transportarla al área de empaque">
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Descripción del apoyo o equipo utilizado</label>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Descripción del apoyo o equipo utilizado</label>
                             <input type="text" name="descripcion_apoyo"
-                                class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                                class="w-full rounded-xl border-slate-300 focus:ring-blue-500 focus:border-blue-500"
                                 placeholder="Ej. Diablito, carrito, mesa elevadora, apoyo de compañero">
                         </div>
                     </div>
@@ -122,13 +119,14 @@
             </div>
 
             {{-- LEVANTAR --}}
-            <div id="bloque_levantar" class="hidden bg-white rounded-xl border border-gray-200 shadow-sm p-5">
-                <h3 class="text-lg font-bold text-blue-700 mb-4">2. Cuestionario: Levantar</h3>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div id="bloque_levantar" class="hidden bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="px-6 py-4 bg-slate-50 border-b border-slate-200">
+                    <h2 class="text-lg font-semibold text-slate-800">2. Cuestionario: Levantar</h2>
+                </div>
+                <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Peso y frecuencia de la carga</label>
-                        <select name="lev_peso_frecuencia" class="w-full rounded-lg border-gray-300">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Peso y frecuencia de la carga</label>
+                        <select name="lev_peso_frecuencia" class="w-full rounded-xl border-slate-300">
                             <option value="">Seleccione</option>
                             <option value="0|Carga ligera y frecuencia baja">Carga ligera y frecuencia baja</option>
                             <option value="1|Carga moderada o frecuencia media">Carga moderada o frecuencia media</option>
@@ -138,8 +136,8 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Distancia horizontal entre las manos y la espalda baja</label>
-                        <select name="lev_distancia_horizontal" class="w-full rounded-lg border-gray-300">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Distancia horizontal entre las manos y la espalda baja</label>
+                        <select name="lev_distancia_horizontal" class="w-full rounded-xl border-slate-300">
                             <option value="">Seleccione</option>
                             <option value="0|Manos muy cercanas a la espalda baja">Manos muy cercanas a la espalda baja</option>
                             <option value="1|Manos cercanas a la espalda baja">Manos cercanas a la espalda baja</option>
@@ -149,8 +147,8 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Asimetría de la espalda o la carga</label>
-                        <select name="lev_asimetria" class="w-full rounded-lg border-gray-300">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Asimetría de la espalda o la carga</label>
+                        <select name="lev_asimetria" class="w-full rounded-xl border-slate-300">
                             <option value="">Seleccione</option>
                             <option value="0|No hay asimetría">No hay asimetría</option>
                             <option value="1|Asimetría leve">Asimetría leve</option>
@@ -160,8 +158,8 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Restricciones posturales por espacio disponible</label>
-                        <select name="lev_restricciones_posturales" class="w-full rounded-lg border-gray-300">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Restricciones posturales por espacio disponible</label>
+                        <select name="lev_restricciones_posturales" class="w-full rounded-xl border-slate-300">
                             <option value="">Seleccione</option>
                             <option value="0|No existen restricciones posturales">No existen restricciones posturales</option>
                             <option value="1|Restricciones leves">Restricciones leves</option>
@@ -171,8 +169,8 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Agarre de la carga</label>
-                        <select name="lev_agarre_carga" class="w-full rounded-lg border-gray-300">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Agarre de la carga</label>
+                        <select name="lev_agarre_carga" class="w-full rounded-xl border-slate-300">
                             <option value="">Seleccione</option>
                             <option value="0|Buen agarre">Buen agarre</option>
                             <option value="1|Agarre aceptable">Agarre aceptable</option>
@@ -182,8 +180,8 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Superficie del suelo</label>
-                        <select name="lev_superficie_suelo" class="w-full rounded-lg border-gray-300">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Superficie del suelo</label>
+                        <select name="lev_superficie_suelo" class="w-full rounded-xl border-slate-300">
                             <option value="">Seleccione</option>
                             <option value="0|Buen estado, seca, limpia, firme y nivelada">Buen estado, seca, limpia, firme y nivelada</option>
                             <option value="1|Aceptable">Aceptable</option>
@@ -193,8 +191,8 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Factores ambientales</label>
-                        <select name="lev_factores_ambientales" class="w-full rounded-lg border-gray-300">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Factores ambientales</label>
+                        <select name="lev_factores_ambientales" class="w-full rounded-xl border-slate-300">
                             <option value="">Seleccione</option>
                             <option value="0|No existen">No existen</option>
                             <option value="1|Leves">Leves</option>
@@ -206,13 +204,14 @@
             </div>
 
             {{-- BAJAR --}}
-            <div id="bloque_bajar" class="hidden bg-white rounded-xl border border-gray-200 shadow-sm p-5">
-                <h3 class="text-lg font-bold text-blue-700 mb-4">2. Cuestionario: Bajar</h3>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div id="bloque_bajar" class="hidden bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="px-6 py-4 bg-slate-50 border-b border-slate-200">
+                    <h2 class="text-lg font-semibold text-slate-800">2. Cuestionario: Bajar</h2>
+                </div>
+                <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Peso y frecuencia de la carga</label>
-                        <select name="baj_peso_frecuencia" class="w-full rounded-lg border-gray-300">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Peso y frecuencia de la carga</label>
+                        <select name="baj_peso_frecuencia" class="w-full rounded-xl border-slate-300">
                             <option value="">Seleccione</option>
                             <option value="0|Carga ligera y frecuencia baja">Carga ligera y frecuencia baja</option>
                             <option value="1|Carga moderada o frecuencia media">Carga moderada o frecuencia media</option>
@@ -222,8 +221,8 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Control de descenso</label>
-                        <select name="baj_control_descenso" class="w-full rounded-lg border-gray-300">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Control de descenso</label>
+                        <select name="baj_control_descenso" class="w-full rounded-xl border-slate-300">
                             <option value="">Seleccione</option>
                             <option value="0|Totalmente controlado">Totalmente controlado</option>
                             <option value="1|Ligera dificultad">Ligera dificultad</option>
@@ -233,8 +232,8 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Asimetría</label>
-                        <select name="baj_asimetria" class="w-full rounded-lg border-gray-300">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Asimetría</label>
+                        <select name="baj_asimetria" class="w-full rounded-xl border-slate-300">
                             <option value="">Seleccione</option>
                             <option value="0|Sin asimetría">Sin asimetría</option>
                             <option value="1|Leve">Leve</option>
@@ -244,8 +243,8 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Restricciones posturales</label>
-                        <select name="baj_restricciones_posturales" class="w-full rounded-lg border-gray-300">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Restricciones posturales</label>
+                        <select name="baj_restricciones_posturales" class="w-full rounded-xl border-slate-300">
                             <option value="">Seleccione</option>
                             <option value="0|No existen">No existen</option>
                             <option value="1|Leves">Leves</option>
@@ -255,8 +254,8 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Agarre de la carga</label>
-                        <select name="baj_agarre_carga" class="w-full rounded-lg border-gray-300">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Agarre de la carga</label>
+                        <select name="baj_agarre_carga" class="w-full rounded-xl border-slate-300">
                             <option value="">Seleccione</option>
                             <option value="0|Buen agarre">Buen agarre</option>
                             <option value="1|Agarre aceptable">Agarre aceptable</option>
@@ -266,8 +265,8 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Superficie del suelo</label>
-                        <select name="baj_superficie_suelo" class="w-full rounded-lg border-gray-300">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Superficie del suelo</label>
+                        <select name="baj_superficie_suelo" class="w-full rounded-xl border-slate-300">
                             <option value="">Seleccione</option>
                             <option value="0|Buen estado, seca, limpia, firme y nivelada">Buen estado, seca, limpia, firme y nivelada</option>
                             <option value="1|Aceptable">Aceptable</option>
@@ -279,13 +278,14 @@
             </div>
 
             {{-- TRANSPORTAR --}}
-            <div id="bloque_transportar" class="hidden bg-white rounded-xl border border-gray-200 shadow-sm p-5">
-                <h3 class="text-lg font-bold text-blue-700 mb-4">2. Cuestionario: Transportar</h3>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div id="bloque_transportar" class="hidden bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="px-6 py-4 bg-slate-50 border-b border-slate-200">
+                    <h2 class="text-lg font-semibold text-slate-800">2. Cuestionario: Transportar</h2>
+                </div>
+                <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Peso y frecuencia de la carga</label>
-                        <select name="tra_peso_frecuencia" class="w-full rounded-lg border-gray-300">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Peso y frecuencia de la carga</label>
+                        <select name="tra_peso_frecuencia" class="w-full rounded-xl border-slate-300">
                             <option value="">Seleccione</option>
                             <option value="0|Carga ligera y frecuencia baja">Carga ligera y frecuencia baja</option>
                             <option value="1|Carga moderada o frecuencia media">Carga moderada o frecuencia media</option>
@@ -295,8 +295,8 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Distancia de transporte</label>
-                        <select name="tra_distancia_transporte" class="w-full rounded-lg border-gray-300">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Distancia de transporte</label>
+                        <select name="tra_distancia_transporte" class="w-full rounded-xl border-slate-300">
                             <option value="">Seleccione</option>
                             <option value="0|Entre 0 y 4 m">Entre 0 y 4 m</option>
                             <option value="1|Entre 4 y 10 m">Entre 4 y 10 m</option>
@@ -306,8 +306,8 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Asimetría de la carga</label>
-                        <select name="tra_asimetria" class="w-full rounded-lg border-gray-300">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Asimetría de la carga</label>
+                        <select name="tra_asimetria" class="w-full rounded-xl border-slate-300">
                             <option value="">Seleccione</option>
                             <option value="0|No hay asimetría">No hay asimetría</option>
                             <option value="1|Leve">Leve</option>
@@ -317,8 +317,8 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Agarre de la carga</label>
-                        <select name="tra_agarre_carga" class="w-full rounded-lg border-gray-300">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Agarre de la carga</label>
+                        <select name="tra_agarre_carga" class="w-full rounded-xl border-slate-300">
                             <option value="">Seleccione</option>
                             <option value="0|Buen agarre">Buen agarre</option>
                             <option value="1|Agarre aceptable">Agarre aceptable</option>
@@ -328,8 +328,8 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Superficie del suelo</label>
-                        <select name="tra_superficie_suelo" class="w-full rounded-lg border-gray-300">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Superficie del suelo</label>
+                        <select name="tra_superficie_suelo" class="w-full rounded-xl border-slate-300">
                             <option value="">Seleccione</option>
                             <option value="0|Buen estado, seca, limpia, firme y nivelada">Buen estado, seca, limpia, firme y nivelada</option>
                             <option value="1|Aceptable">Aceptable</option>
@@ -339,8 +339,8 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Obstáculos en la ruta</label>
-                        <select name="tra_obstaculos" class="w-full rounded-lg border-gray-300">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Obstáculos en la ruta</label>
+                        <select name="tra_obstaculos" class="w-full rounded-xl border-slate-300">
                             <option value="">Seleccione</option>
                             <option value="0|No hay obstáculos">No hay obstáculos</option>
                             <option value="1|Obstáculos menores">Obstáculos menores</option>
@@ -350,8 +350,8 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Factores ambientales</label>
-                        <select name="tra_factores_ambientales" class="w-full rounded-lg border-gray-300">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Factores ambientales</label>
+                        <select name="tra_factores_ambientales" class="w-full rounded-xl border-slate-300">
                             <option value="">Seleccione</option>
                             <option value="0|No existen">No existen</option>
                             <option value="1|Leves">Leves</option>
@@ -363,13 +363,14 @@
             </div>
 
             {{-- EMPUJAR --}}
-            <div id="bloque_empujar" class="hidden bg-white rounded-xl border border-gray-200 shadow-sm p-5">
-                <h3 class="text-lg font-bold text-blue-700 mb-4">2. Cuestionario: Empujar</h3>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div id="bloque_empujar" class="hidden bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="px-6 py-4 bg-slate-50 border-b border-slate-200">
+                    <h2 class="text-lg font-semibold text-slate-800">2. Cuestionario: Empujar</h2>
+                </div>
+                <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Peso de la carga</label>
-                        <select name="emp_peso_carga" class="w-full rounded-lg border-gray-300">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Peso de la carga</label>
+                        <select name="emp_peso_carga" class="w-full rounded-xl border-slate-300">
                             <option value="">Seleccione</option>
                             <option value="0|Menor a 50 kg">Menor a 50 kg</option>
                             <option value="1|Entre 50 y 100 kg">Entre 50 y 100 kg</option>
@@ -379,8 +380,8 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Postura</label>
-                        <select name="emp_postura" class="w-full rounded-lg border-gray-300">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Postura</label>
+                        <select name="emp_postura" class="w-full rounded-xl border-slate-300">
                             <option value="">Seleccione</option>
                             <option value="0|Postura adecuada">Postura adecuada</option>
                             <option value="1|Ligera inclinación">Ligera inclinación</option>
@@ -390,8 +391,8 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Agarre de la mano</label>
-                        <select name="emp_agarre_mano" class="w-full rounded-lg border-gray-300">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Agarre de la mano</label>
+                        <select name="emp_agarre_mano" class="w-full rounded-xl border-slate-300">
                             <option value="">Seleccione</option>
                             <option value="0|Buen agarre">Buen agarre</option>
                             <option value="1|Agarre parcial">Agarre parcial</option>
@@ -401,8 +402,8 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Patrón de trabajo</label>
-                        <select name="emp_patron_trabajo" class="w-full rounded-lg border-gray-300">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Patrón de trabajo</label>
+                        <select name="emp_patron_trabajo" class="w-full rounded-xl border-slate-300">
                             <option value="">Seleccione</option>
                             <option value="0|No repetitivo o con amplia recuperación">No repetitivo o con amplia recuperación</option>
                             <option value="1|Repetitivo con pausas">Repetitivo con pausas</option>
@@ -412,8 +413,8 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Distancia por viaje</label>
-                        <select name="emp_distancia_viaje" class="w-full rounded-lg border-gray-300">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Distancia por viaje</label>
+                        <select name="emp_distancia_viaje" class="w-full rounded-xl border-slate-300">
                             <option value="">Seleccione</option>
                             <option value="0|Menor a 10 m">Menor a 10 m</option>
                             <option value="1|Entre 10 y 20 m">Entre 10 y 20 m</option>
@@ -423,8 +424,8 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Condición del equipo auxiliar</label>
-                        <select name="emp_condicion_equipo" class="w-full rounded-lg border-gray-300">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Condición del equipo auxiliar</label>
+                        <select name="emp_condicion_equipo" class="w-full rounded-xl border-slate-300">
                             <option value="">Seleccione</option>
                             <option value="0|Buen mantenimiento">Buen mantenimiento</option>
                             <option value="1|Aceptable">Aceptable</option>
@@ -436,13 +437,14 @@
             </div>
 
             {{-- JALAR --}}
-            <div id="bloque_jalar" class="hidden bg-white rounded-xl border border-gray-200 shadow-sm p-5">
-                <h3 class="text-lg font-bold text-blue-700 mb-4">2. Cuestionario: Jalar</h3>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div id="bloque_jalar" class="hidden bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="px-6 py-4 bg-slate-50 border-b border-slate-200">
+                    <h2 class="text-lg font-semibold text-slate-800">2. Cuestionario: Jalar</h2>
+                </div>
+                <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Peso de la carga</label>
-                        <select name="jal_peso_carga" class="w-full rounded-lg border-gray-300">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Peso de la carga</label>
+                        <select name="jal_peso_carga" class="w-full rounded-xl border-slate-300">
                             <option value="">Seleccione</option>
                             <option value="0|Menor a 50 kg">Menor a 50 kg</option>
                             <option value="1|Entre 50 y 100 kg">Entre 50 y 100 kg</option>
@@ -452,8 +454,8 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Postura</label>
-                        <select name="jal_postura" class="w-full rounded-lg border-gray-300">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Postura</label>
+                        <select name="jal_postura" class="w-full rounded-xl border-slate-300">
                             <option value="">Seleccione</option>
                             <option value="0|Postura adecuada">Postura adecuada</option>
                             <option value="1|Ligera inclinación">Ligera inclinación</option>
@@ -463,8 +465,8 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Agarre de la mano</label>
-                        <select name="jal_agarre_mano" class="w-full rounded-lg border-gray-300">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Agarre de la mano</label>
+                        <select name="jal_agarre_mano" class="w-full rounded-xl border-slate-300">
                             <option value="">Seleccione</option>
                             <option value="0|Buen agarre">Buen agarre</option>
                             <option value="1|Agarre parcial">Agarre parcial</option>
@@ -474,8 +476,8 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Patrón de trabajo</label>
-                        <select name="jal_patron_trabajo" class="w-full rounded-lg border-gray-300">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Patrón de trabajo</label>
+                        <select name="jal_patron_trabajo" class="w-full rounded-xl border-slate-300">
                             <option value="">Seleccione</option>
                             <option value="0|No repetitivo o con amplia recuperación">No repetitivo o con amplia recuperación</option>
                             <option value="1|Repetitivo con pausas">Repetitivo con pausas</option>
@@ -485,8 +487,8 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Distancia por viaje</label>
-                        <select name="jal_distancia_viaje" class="w-full rounded-lg border-gray-300">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Distancia por viaje</label>
+                        <select name="jal_distancia_viaje" class="w-full rounded-xl border-slate-300">
                             <option value="">Seleccione</option>
                             <option value="0|Menor a 10 m">Menor a 10 m</option>
                             <option value="1|Entre 10 y 20 m">Entre 10 y 20 m</option>
@@ -496,8 +498,8 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Condición del equipo auxiliar</label>
-                        <select name="jal_condicion_equipo" class="w-full rounded-lg border-gray-300">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Condición del equipo auxiliar</label>
+                        <select name="jal_condicion_equipo" class="w-full rounded-xl border-slate-300">
                             <option value="">Seleccione</option>
                             <option value="0|Buen mantenimiento">Buen mantenimiento</option>
                             <option value="1|Aceptable">Aceptable</option>
@@ -508,23 +510,26 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
-                <h3 class="text-lg font-bold text-blue-700 mb-4">3. Observaciones</h3>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones específicas NOM-036</label>
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="px-6 py-4 bg-slate-50 border-b border-slate-200">
+                    <h2 class="text-lg font-semibold text-slate-800">3. Observaciones</h2>
+                </div>
+                <div class="p-6">
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Observaciones específicas NOM-036</label>
                     <textarea name="observaciones" rows="4"
-                        class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                        class="w-full rounded-xl border-slate-300 focus:ring-blue-500 focus:border-blue-500"
                         placeholder="Describe hallazgos, condiciones y comentarios relevantes...">{{ old('observaciones') }}</textarea>
                 </div>
             </div>
 
-            <div class="flex gap-3">
-                <button type="submit" class="bg-blue-700 hover:bg-blue-800 text-white font-semibold px-5 py-2.5 rounded-lg shadow">
+            <div class="flex flex-wrap gap-3 pt-2">
+                <button type="submit"
+                    class="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2.5 rounded-xl shadow-sm transition">
                     Guardar evaluación NOM-036
                 </button>
 
                 <a href="{{ route('evaluaciones.index') }}"
-                    class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold px-5 py-2.5 rounded-lg">
+                    class="inline-flex items-center bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold px-5 py-2.5 rounded-xl transition">
                     Cancelar
                 </a>
             </div>

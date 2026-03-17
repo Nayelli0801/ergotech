@@ -18,7 +18,8 @@ class Nom036Controller extends Controller
             'sucursal',
             'puesto',
             'trabajador',
-            'metodo'
+            'metodo',
+            'usuario',
         ])->findOrFail($evaluacionId);
 
         return view('nom036.create', compact('evaluacion'));
@@ -279,6 +280,7 @@ class Nom036Controller extends Controller
             'evaluacion.sucursal',
             'evaluacion.puesto',
             'evaluacion.trabajador',
+            'evaluacion.usuario',
             'detalles'
         ])->findOrFail($id);
 
