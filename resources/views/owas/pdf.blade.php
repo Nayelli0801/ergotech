@@ -4,17 +4,81 @@
     <meta charset="UTF-8">
     <title>Reporte OWAS</title>
     <style>
-        body { font-family: DejaVu Sans, sans-serif; font-size: 11px; color: #222; }
-        .titulo { background: #29a3e1; color: #fff; padding: 8px 10px; font-size: 16px; font-weight: bold; margin-bottom: 12px; }
-        .subtitulo { color: #29a3e1; font-size: 14px; font-weight: bold; margin: 16px 0 8px 0; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
-        th, td { border: 1px solid #cfcfcf; padding: 6px; vertical-align: top; }
-        th { background: #29a3e1; color: white; text-align: left; }
-        .badge { display: inline-block; padding: 2px 6px; border-radius: 3px; color: white; font-weight: bold; font-size: 10px; }
-        .success { background: #16a34a; }
-        .warning { background: #ca8a04; }
-        .danger { background: #dc2626; }
-        .dark { background: #111827; }
+        body {
+            font-family: DejaVu Sans, sans-serif;
+            font-size: 11px;
+            color: #1f2937;
+            margin: 24px;
+        }
+
+        .header {
+            border-bottom: 3px solid #1d4ed8;
+            padding-bottom: 10px;
+            margin-bottom: 18px;
+        }
+
+        .header h1 {
+            margin: 0;
+            color: #1d4ed8;
+            font-size: 21px;
+        }
+
+        .header p {
+            margin: 5px 0 0 0;
+            color: #6b7280;
+            font-size: 11px;
+        }
+
+        .section-title {
+            background: #eff6ff;
+            color: #1d4ed8;
+            padding: 8px 10px;
+            font-weight: bold;
+            border: 1px solid #bfdbfe;
+            margin: 16px 0 8px 0;
+            font-size: 13px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 12px;
+        }
+
+        th, td {
+            border: 1px solid #d1d5db;
+            padding: 6px;
+            vertical-align: top;
+            text-align: left;
+        }
+
+        th {
+            background: #f3f4f6;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 7px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 10px;
+        }
+
+        .success { background: #dcfce7; color: #166534; }
+        .warning { background: #fef3c7; color: #92400e; }
+        .danger  { background: #fee2e2; color: #991b1b; }
+        .dark    { background: #1f2937; color: #ffffff; }
+
+        .summary-box {
+            border: 1px solid #dbeafe;
+            background: #f8fbff;
+            padding: 10px;
+            margin-top: 8px;
+        }
+
+        .summary-box p {
+            margin: 4px 0;
+        }
     </style>
 </head>
 <body>
@@ -51,31 +115,29 @@
         }
     @endphp
 
-    <div class="titulo">REPORTE DE EVALUACIÓN ERGONÓMICA - OWAS</div>
+    <div class="header">
+        <h1>Reporte de Evaluación OWAS</h1>
+        <p>Resultado ergonómico generado por ErgoTech</p>
+    </div>
 
-    <div class="subtitulo">Información de la evaluación</div>
+    <div class="section-title">Información de la evaluación</div>
     <table>
-        <tr><td><strong>ID</strong></td><td>{{ $owas->id }}</td></tr>
-        <tr><td><strong>Fecha</strong></td><td>{{ $owas->evaluacion->fecha_evaluacion ?? 'N/A' }}</td></tr>
-        <tr><td><strong>Empresa</strong></td><td>{{ $owas->evaluacion->empresa->nombre ?? 'N/A' }}</td></tr>
-        <tr><td><strong>Sucursal</strong></td><td>{{ $owas->evaluacion->sucursal->nombre ?? 'N/A' }}</td></tr>
-        <tr><td><strong>Puesto</strong></td><td>{{ $owas->evaluacion->puesto->nombre ?? 'N/A' }}</td></tr>
-        <tr><td><strong>Trabajador</strong></td><td>{{ $owas->evaluacion->trabajador->nombre ?? 'N/A' }}</td></tr>
-        <tr><td><strong>Evaluador</strong></td><td>{{ $owas->evaluacion->usuario->name ?? 'N/A' }}</td></tr>
-        <tr><td><strong>Área</strong></td><td>{{ $owas->evaluacion->area_evaluada ?? 'N/A' }}</td></tr>
-        <tr><td><strong>Actividad</strong></td><td>{{ $owas->evaluacion->actividad ?? 'N/A' }}</td></tr>
-        <tr><td><strong>Observaciones</strong></td><td>{{ $owas->evaluacion->observaciones ?? 'Sin observaciones' }}</td></tr>
+        <tr><th>ID</th><td>{{ $owas->id }}</td><th>Fecha</th><td>{{ $owas->evaluacion->fecha_evaluacion ?? 'N/A' }}</td></tr>
+        <tr><th>Empresa</th><td>{{ $owas->evaluacion->empresa->nombre ?? 'N/A' }}</td><th>Sucursal</th><td>{{ $owas->evaluacion->sucursal->nombre ?? 'N/A' }}</td></tr>
+        <tr><th>Puesto</th><td>{{ $owas->evaluacion->puesto->nombre ?? 'N/A' }}</td><th>Trabajador</th><td>{{ $owas->evaluacion->trabajador->nombre ?? 'N/A' }}</td></tr>
+        <tr><th>Evaluador</th><td>{{ $owas->evaluacion->usuario->name ?? 'N/A' }}</td><th>Área</th><td>{{ $owas->evaluacion->area_evaluada ?? 'N/A' }}</td></tr>
+        <tr><th>Actividad</th><td>{{ $owas->evaluacion->actividad ?? 'N/A' }}</td><th>Observaciones</th><td>{{ $owas->evaluacion->observaciones ?? 'Sin observaciones' }}</td></tr>
     </table>
 
-    <div class="subtitulo">Resultado de la evaluación</div>
-    <table>
-        <tr><td><strong>Código de postura crítica</strong></td><td>{{ $owas->codigo_postura }}</td></tr>
-        <tr><td><strong>Categoría final</strong></td><td><span class="badge {{ badgeColorPdf($categoriaFinal) }}">{{ $categoriaFinal }}</span></td></tr>
-        <tr><td><strong>Nivel de riesgo</strong></td><td>{{ $nivelFinal }}</td></tr>
-        <tr><td><strong>Acción correctiva</strong></td><td>{{ $owas->accion_correctiva }}</td></tr>
-    </table>
+    <div class="section-title">Resultado de la evaluación</div>
+    <div class="summary-box">
+        <p><strong>Código de postura crítica:</strong> {{ $owas->codigo_postura }}</p>
+        <p><strong>Categoría final:</strong> <span class="badge {{ badgeColorPdf($categoriaFinal) }}">{{ $categoriaFinal }}</span></p>
+        <p><strong>Nivel de riesgo:</strong> {{ $nivelFinal }}</p>
+        <p><strong>Acción correctiva:</strong> {{ $owas->accion_correctiva }}</p>
+    </div>
 
-    <div class="subtitulo">Análisis por parte del cuerpo</div>
+    <div class="section-title">Análisis por parte del cuerpo</div>
     @foreach($partes as $nombreParte => $grupoParte)
         <table>
             <thead>
@@ -113,7 +175,7 @@
         </table>
     @endforeach
 
-    <div class="subtitulo">Análisis por posturas</div>
+    <div class="section-title">Análisis por posturas</div>
     <table>
         <thead>
             <tr>

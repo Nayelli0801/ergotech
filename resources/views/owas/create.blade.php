@@ -1,333 +1,317 @@
 <x-app-layout>
-    <div class="container-fluid py-4">
-        <div class="row justify-content-center">
-            <div class="col-12 col-xl-11">
-                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
-                    <div>
-                        <h2 class="fw-bold mb-1">Nueva evaluación OWAS</h2>
-                        <p class="text-muted mb-0">
-                            Registra una observación por vez. Puedes agregar, editar, duplicar o eliminar observaciones antes de guardar.
-                        </p>
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 mb-5">
+            <div>
+                <h2 class="text-2xl font-bold text-blue-700">Nueva evaluación OWAS</h2>
+                <p class="text-sm text-gray-500 mt-1">
+                    Registra una observación por vez. Puedes agregar, editar, duplicar o eliminar observaciones antes de guardar.
+                </p>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+                <a href="{{ route('owas.index') }}"
+                   class="bg-white border border-blue-300 text-blue-700 hover:bg-blue-50 font-semibold px-4 py-2 rounded-lg">
+                    Ver evaluaciones OWAS
+                </a>
+                <a href="{{ route('evaluaciones.index') }}"
+                   class="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold px-4 py-2 rounded-lg">
+                    Volver a evaluaciones
+                </a>
+            </div>
+        </div>
+
+        @if(session('error'))
+            <div class="mb-4 rounded-lg bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        @if($errors->any())
+            <div class="mb-4 rounded-lg bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm">
+                <strong>Corrige los siguientes errores:</strong>
+                <ul class="mb-0 mt-2 list-disc pl-5 space-y-1">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <form action="{{ route('owas.store') }}" method="POST" id="form-owas">
+            @csrf
+
+            <input type="hidden" name="empresa_id" value="{{ $datosBase['empresa_id'] }}">
+            <input type="hidden" name="sucursal_id" value="{{ $datosBase['sucursal_id'] }}">
+            <input type="hidden" name="puesto_id" value="{{ $datosBase['puesto_id'] }}">
+            <input type="hidden" name="trabajador_id" value="{{ $datosBase['trabajador_id'] }}">
+            <input type="hidden" name="fecha_evaluacion" value="{{ $datosBase['fecha_evaluacion'] }}">
+            <input type="hidden" name="area_evaluada" value="{{ $datosBase['area_evaluada'] }}">
+            <input type="hidden" name="actividad_general" value="{{ $datosBase['actividad_general'] }}">
+            <input type="hidden" name="observaciones" value="{{ $datosBase['observaciones'] }}">
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                <div class="lg:col-span-2 space-y-5">
+                    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                        <div class="px-5 pt-5">
+                            <h3 class="text-lg font-bold text-gray-900">Datos generales de la evaluación</h3>
+                        </div>
+                        <div class="p-5">
+                            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                                <div class="bg-gray-50 rounded-2xl p-4 border">
+                                    <div class="text-gray-500 text-sm">Fecha</div>
+                                    <div class="font-semibold text-gray-800">{{ $datosBase['fecha_evaluacion'] }}</div>
+                                </div>
+
+                                <div class="bg-gray-50 rounded-2xl p-4 border">
+                                    <div class="text-gray-500 text-sm">Área evaluada</div>
+                                    <div class="font-semibold text-gray-800">{{ $datosBase['area_evaluada'] ?? 'No especificada' }}</div>
+                                </div>
+
+                                <div class="bg-gray-50 rounded-2xl p-4 border">
+                                    <div class="text-gray-500 text-sm">Actividad</div>
+                                    <div class="font-semibold text-gray-800">{{ $datosBase['actividad_general'] ?? 'No especificada' }}</div>
+                                </div>
+
+                                <div class="bg-gray-50 rounded-2xl p-4 border">
+                                    <div class="text-gray-500 text-sm">Observaciones</div>
+                                    <div class="font-semibold text-gray-800">{{ $datosBase['observaciones'] ?? 'Sin observaciones' }}</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="d-flex flex-wrap gap-2">
-                        <a href="{{ route('owas.index') }}" class="btn btn-outline-primary">
-                            Ver evaluaciones OWAS
-                        </a>
-                        <a href="{{ route('evaluaciones.index') }}" class="btn btn-outline-secondary">
-                            Volver a evaluaciones
-                        </a>
+                    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                        <div class="px-5 py-4 text-white bg-gradient-to-r from-blue-700 to-blue-600">
+                            <div class="flex justify-between items-center flex-wrap gap-2">
+                                <h3 class="text-lg font-bold">Bloque de observación</h3>
+                                <span id="modo-edicion-badge" class="hidden inline-flex items-center px-3 py-1 rounded-full bg-yellow-300 text-yellow-900 text-sm font-semibold">
+                                    Editando observación
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="p-5">
+                            <div class="rounded-2xl bg-blue-50 border border-blue-100 text-blue-900 px-4 py-3 text-sm mb-5">
+                                <strong>Instrucción:</strong>
+                                Observa una postura y selecciona la opción que mejor la describa en cada apartado.
+                            </div>
+
+                            <input type="hidden" id="editando-index" value="">
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">1. Posición de la espalda</label>
+                                    <select id="espalda" class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500" onchange="actualizarVistaPrevia()">
+                                        <option value="1">Recta</option>
+                                        <option value="2">Flexionada o extendida</option>
+                                        <option value="3">Girada o flexionada lateralmente</option>
+                                        <option value="4">Flexionada y girada</option>
+                                    </select>
+                                    <div class="text-xs text-gray-500 mt-1">Selecciona cómo se observa el tronco del trabajador.</div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">2. Posición de los brazos</label>
+                                    <select id="brazos" class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500" onchange="actualizarVistaPrevia()">
+                                        <option value="1">Ambos brazos por debajo del nivel de los hombros</option>
+                                        <option value="2">Un brazo al nivel o por encima del hombro</option>
+                                        <option value="3">Ambos brazos al nivel o por encima del hombro</option>
+                                    </select>
+                                    <div class="text-xs text-gray-500 mt-1">Selecciona la posición general de los brazos.</div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">3. Posición de las piernas</label>
+                                    <select id="piernas" class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500" onchange="actualizarVistaPrevia()">
+                                        <option value="1">Sentado</option>
+                                        <option value="2">Parado sobre las dos piernas rectas</option>
+                                        <option value="3">Parado sobre una pierna recta</option>
+                                        <option value="4">Parado o en cuclillas sobre ambos pies</option>
+                                        <option value="5">Parado o en cuclillas sobre un pie</option>
+                                        <option value="6">Arrodillado sobre una o ambas rodillas</option>
+                                        <option value="7">Caminando</option>
+                                    </select>
+                                    <div class="text-xs text-gray-500 mt-1">Selecciona la forma de apoyo o desplazamiento.</div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">4. Carga manipulada</label>
+                                    <select id="carga" class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500" onchange="actualizarVistaPrevia()">
+                                        <option value="1">Menos de 10 kg</option>
+                                        <option value="2">Entre 10 y 20 kg</option>
+                                        <option value="3">Más de 20 kg</option>
+                                    </select>
+                                    <div class="text-xs text-gray-500 mt-1">Peso aproximado.</div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">5. Frecuencia observada</label>
+                                    <select id="frecuencia" class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500" onchange="actualizarVistaPrevia()">
+                                        <option value="1">1 vez</option>
+                                        <option value="2">2 veces</option>
+                                        <option value="3">3 veces</option>
+                                        <option value="4">4 veces</option>
+                                        <option value="5">5 veces</option>
+                                        <option value="6">6 veces</option>
+                                        <option value="7">7 veces</option>
+                                        <option value="8">8 veces</option>
+                                        <option value="9">9 veces</option>
+                                        <option value="10">10 veces</option>
+                                    </select>
+                                    <div class="text-xs text-gray-500 mt-1">Veces observadas.</div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-5">
+                                <div class="border rounded-2xl p-4 bg-gray-50">
+                                    <div class="text-gray-500 text-sm mb-1">Código de postura</div>
+                                    <div class="text-2xl font-bold text-gray-800" id="preview-codigo">1111</div>
+                                </div>
+
+                                <div class="border rounded-2xl p-4 bg-gray-50">
+                                    <div class="text-gray-500 text-sm mb-1">Categoría</div>
+                                    <span id="preview-categoria" class="inline-flex px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-semibold">1</span>
+                                </div>
+
+                                <div class="border rounded-2xl p-4 bg-gray-50">
+                                    <div class="text-gray-500 text-sm mb-1">Nivel de riesgo</div>
+                                    <div class="text-lg font-bold text-gray-800" id="preview-nivel">Bajo</div>
+                                </div>
+
+                                <div class="border rounded-2xl p-4 bg-gray-50">
+                                    <div class="text-gray-500 text-sm mb-1">Acción requerida</div>
+                                    <div class="font-semibold text-gray-800" id="preview-accion">No requiere acción.</div>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-wrap gap-3 mt-5">
+                                <button type="button"
+                                        class="bg-green-600 hover:bg-green-700 text-white font-semibold px-5 py-2.5 rounded-lg shadow-sm"
+                                        id="btn-agregar"
+                                        onclick="guardarObservacion()">
+                                    Agregar observación
+                                </button>
+
+                                <button type="button"
+                                        class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold px-5 py-2.5 rounded-lg"
+                                        onclick="limpiarCaptura()">
+                                    Limpiar selección
+                                </button>
+
+                                <button type="button"
+                                        class="hidden bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-semibold px-5 py-2.5 rounded-lg"
+                                        id="btn-cancelar-edicion"
+                                        onclick="cancelarEdicion()">
+                                    Cancelar edición
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                        <div class="px-5 pt-5">
+                            <h3 class="text-lg font-bold text-gray-900">Observaciones registradas</h3>
+                        </div>
+
+                        <div class="p-5">
+                            <div class="rounded-2xl bg-gray-50 border border-gray-200 px-4 py-3 text-sm mb-4">
+                                Puedes <strong>editar</strong>, <strong>duplicar</strong> o <strong>eliminar</strong> cualquier observación antes de guardar.
+                            </div>
+
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full text-sm text-left border border-gray-200 rounded-lg overflow-hidden">
+                                    <thead class="bg-gray-50 text-gray-700">
+                                        <tr>
+                                            <th class="px-4 py-3 font-semibold">#</th>
+                                            <th class="px-4 py-3 font-semibold">Espalda</th>
+                                            <th class="px-4 py-3 font-semibold">Brazos</th>
+                                            <th class="px-4 py-3 font-semibold">Piernas</th>
+                                            <th class="px-4 py-3 font-semibold">Carga</th>
+                                            <th class="px-4 py-3 font-semibold">Frecuencia</th>
+                                            <th class="px-4 py-3 font-semibold">Código</th>
+                                            <th class="px-4 py-3 font-semibold">Categoría</th>
+                                            <th class="px-4 py-3 font-semibold">Nivel</th>
+                                            <th class="px-4 py-3 font-semibold">Acción</th>
+                                            <th class="px-4 py-3 font-semibold">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbody-observaciones" class="divide-y divide-gray-100">
+                                        <tr id="fila-vacia">
+                                            <td colspan="11" class="text-center text-gray-500 py-6">
+                                                Aún no hay observaciones registradas.
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div id="inputs-ocultos"></div>
+                        </div>
                     </div>
                 </div>
 
-                @if(session('error'))
-                    <div class="alert alert-danger shadow-sm border-0">
-                        {{ session('error') }}
-                    </div>
-                @endif
-
-                @if($errors->any())
-                    <div class="alert alert-danger shadow-sm border-0">
-                        <strong>Corrige los siguientes errores:</strong>
-                        <ul class="mb-0 mt-2">
-                            @foreach($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-
-                <form action="{{ route('owas.store') }}" method="POST" id="form-owas">
-                    @csrf
-
-                    <input type="hidden" name="empresa_id" value="{{ $datosBase['empresa_id'] }}">
-                    <input type="hidden" name="sucursal_id" value="{{ $datosBase['sucursal_id'] }}">
-                    <input type="hidden" name="puesto_id" value="{{ $datosBase['puesto_id'] }}">
-                    <input type="hidden" name="trabajador_id" value="{{ $datosBase['trabajador_id'] }}">
-                    <input type="hidden" name="fecha_evaluacion" value="{{ $datosBase['fecha_evaluacion'] }}">
-                    <input type="hidden" name="area_evaluada" value="{{ $datosBase['area_evaluada'] }}">
-                    <input type="hidden" name="actividad_general" value="{{ $datosBase['actividad_general'] }}">
-                    <input type="hidden" name="observaciones" value="{{ $datosBase['observaciones'] }}">
-
-                    <div class="row g-4">
-                        <!-- COLUMNA IZQUIERDA -->
-                        <div class="col-12 col-lg-8">
-                            <!-- DATOS GENERALES -->
-                            <div class="card border-0 shadow-sm rounded-4 mb-4">
-                                <div class="card-header bg-white border-0 pt-4 px-4">
-                                    <h5 class="fw-bold mb-0">Datos generales de la evaluación</h5>
-                                </div>
-                                <div class="card-body px-4 pb-4">
-                                    <div class="row g-3">
-                                        <div class="col-12 col-md-6 col-xl-3">
-                                            <div class="bg-light rounded-4 p-3 h-100 border">
-                                                <div class="text-muted small">Fecha</div>
-                                                <div class="fw-semibold">{{ $datosBase['fecha_evaluacion'] }}</div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12 col-md-6 col-xl-3">
-                                            <div class="bg-light rounded-4 p-3 h-100 border">
-                                                <div class="text-muted small">Área evaluada</div>
-                                                <div class="fw-semibold">{{ $datosBase['area_evaluada'] ?? 'No especificada' }}</div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12 col-md-6 col-xl-3">
-                                            <div class="bg-light rounded-4 p-3 h-100 border">
-                                                <div class="text-muted small">Actividad</div>
-                                                <div class="fw-semibold">{{ $datosBase['actividad_general'] ?? 'No especificada' }}</div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12 col-md-6 col-xl-3">
-                                            <div class="bg-light rounded-4 p-3 h-100 border">
-                                                <div class="text-muted small">Observaciones</div>
-                                                <div class="fw-semibold">{{ $datosBase['observaciones'] ?? 'Sin observaciones' }}</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                <div class="lg:col-span-1">
+                    <div class="sticky top-5 space-y-5">
+                        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                            <div class="px-5 py-4 text-white bg-gradient-to-r from-green-600 to-green-700">
+                                <h3 class="text-lg font-bold">Resumen automático</h3>
                             </div>
 
-                            <!-- BLOQUE DE OBSERVACIÓN -->
-                            <div class="card border-0 shadow-sm rounded-4 mb-4">
-                                <div class="card-header text-white border-0 rounded-top-4 px-4 py-3" style="background: linear-gradient(90deg, #0d6efd, #0b5ed7);">
-                                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                                        <h5 class="fw-bold mb-0">Bloque de observación</h5>
-                                        <span id="modo-edicion-badge" class="badge bg-warning text-dark d-none">
-                                            Editando observación
-                                        </span>
+                            <div class="p-5">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="border rounded-2xl p-4 text-center bg-gray-50">
+                                        <div class="text-gray-500 text-sm">Observaciones</div>
+                                        <div class="text-3xl font-bold text-gray-800" id="total-posturas">0</div>
+                                    </div>
+
+                                    <div class="border rounded-2xl p-4 text-center bg-gray-50">
+                                        <div class="text-gray-500 text-sm">Frecuencia total</div>
+                                        <div class="text-3xl font-bold text-gray-800" id="frecuencia-total">0</div>
+                                    </div>
+
+                                    <div class="border rounded-2xl p-4 text-center bg-gray-50">
+                                        <div class="text-gray-500 text-sm">Categoría máxima</div>
+                                        <div class="text-3xl font-bold text-gray-800" id="categoria-maxima">-</div>
+                                    </div>
+
+                                    <div class="border rounded-2xl p-4 text-center bg-gray-50">
+                                        <div class="text-gray-500 text-sm">Nivel global</div>
+                                        <div class="text-base font-bold text-gray-800" id="nivel-riesgo">-</div>
                                     </div>
                                 </div>
 
-                                <div class="card-body px-4 py-4">
-                                    <div class="alert alert-info border-0 rounded-4 mb-4">
-                                        <strong>Instrucción:</strong>
-                                        Observa una postura y selecciona la opción que mejor la describa en cada apartado.
-                                    </div>
-
-                                    <input type="hidden" id="editando-index" value="">
-
-                                    <div class="row g-4">
-                                        <div class="col-12 col-md-6">
-                                            <label class="form-label fw-semibold">1. Posición de la espalda</label>
-                                            <select id="espalda" class="form-select form-select-lg rounded-3" onchange="actualizarVistaPrevia()">
-                                                <option value="1">Recta</option>
-                                                <option value="2">Flexionada o extendida</option>
-                                                <option value="3">Girada o flexionada lateralmente</option>
-                                                <option value="4">Flexionada y girada</option>
-                                            </select>
-                                            <div class="form-text">Selecciona cómo se observa el tronco del trabajador.</div>
-                                        </div>
-
-                                        <div class="col-12 col-md-6">
-                                            <label class="form-label fw-semibold">2. Posición de los brazos</label>
-                                            <select id="brazos" class="form-select form-select-lg rounded-3" onchange="actualizarVistaPrevia()">
-                                                <option value="1">Ambos brazos por debajo del nivel de los hombros</option>
-                                                <option value="2">Un brazo al nivel o por encima del hombro</option>
-                                                <option value="3">Ambos brazos al nivel o por encima del hombro</option>
-                                            </select>
-                                            <div class="form-text">Selecciona la posición general de los brazos.</div>
-                                        </div>
-
-                                        <div class="col-12 col-md-6">
-                                            <label class="form-label fw-semibold">3. Posición de las piernas</label>
-                                            <select id="piernas" class="form-select form-select-lg rounded-3" onchange="actualizarVistaPrevia()">
-                                                <option value="1">Sentado</option>
-                                                <option value="2">Parado sobre las dos piernas rectas</option>
-                                                <option value="3">Parado sobre una pierna recta</option>
-                                                <option value="4">Parado o en cuclillas sobre ambos pies</option>
-                                                <option value="5">Parado o en cuclillas sobre un pie</option>
-                                                <option value="6">Arrodillado sobre una o ambas rodillas</option>
-                                                <option value="7">Caminando</option>
-                                            </select>
-                                            <div class="form-text">Selecciona la forma de apoyo o desplazamiento.</div>
-                                        </div>
-
-                                        <div class="col-12 col-md-3">
-                                            <label class="form-label fw-semibold">4. Carga manipulada</label>
-                                            <select id="carga" class="form-select form-select-lg rounded-3" onchange="actualizarVistaPrevia()">
-                                                <option value="1">Menos de 10 kg</option>
-                                                <option value="2">Entre 10 y 20 kg</option>
-                                                <option value="3">Más de 20 kg</option>
-                                            </select>
-                                            <div class="form-text">Peso aproximado.</div>
-                                        </div>
-
-                                        <div class="col-12 col-md-3">
-                                            <label class="form-label fw-semibold">5. Frecuencia observada</label>
-                                            <select id="frecuencia" class="form-select form-select-lg rounded-3" onchange="actualizarVistaPrevia()">
-                                                <option value="1">1 vez</option>
-                                                <option value="2">2 veces</option>
-                                                <option value="3">3 veces</option>
-                                                <option value="4">4 veces</option>
-                                                <option value="5">5 veces</option>
-                                                <option value="6">6 veces</option>
-                                                <option value="7">7 veces</option>
-                                                <option value="8">8 veces</option>
-                                                <option value="9">9 veces</option>
-                                                <option value="10">10 veces</option>
-                                            </select>
-                                            <div class="form-text">Veces observadas.</div>
-                                        </div>
-                                    </div>
-
-                                    <div class="row g-3 mt-2">
-                                        <div class="col-12 col-md-3">
-                                            <div class="border rounded-4 p-3 bg-light h-100">
-                                                <div class="text-muted small mb-1">Código de postura</div>
-                                                <div class="fs-4 fw-bold" id="preview-codigo">1111</div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12 col-md-2">
-                                            <div class="border rounded-4 p-3 bg-light h-100">
-                                                <div class="text-muted small mb-1">Categoría</div>
-                                                <span id="preview-categoria" class="badge bg-success fs-6">1</span>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12 col-md-3">
-                                            <div class="border rounded-4 p-3 bg-light h-100">
-                                                <div class="text-muted small mb-1">Nivel de riesgo</div>
-                                                <div class="fs-5 fw-bold" id="preview-nivel">Bajo</div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12 col-md-4">
-                                            <div class="border rounded-4 p-3 bg-light h-100">
-                                                <div class="text-muted small mb-1">Acción requerida</div>
-                                                <div class="fw-semibold" id="preview-accion">No requiere acción.</div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="d-flex flex-wrap gap-2 mt-4">
-                                        <button type="button" class="btn btn-success btn-lg px-4" id="btn-agregar" onclick="guardarObservacion()">
-                                            Agregar observación
-                                        </button>
-                                        <button type="button" class="btn btn-outline-secondary btn-lg px-4" onclick="limpiarCaptura()">
-                                            Limpiar selección
-                                        </button>
-                                        <button type="button" class="btn btn-outline-danger btn-lg px-4 d-none" id="btn-cancelar-edicion" onclick="cancelarEdicion()">
-                                            Cancelar edición
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- TABLA DE OBSERVACIONES -->
-                            <div class="card border-0 shadow-sm rounded-4 mb-4">
-                                <div class="card-header bg-white border-0 px-4 pt-4">
-                                    <h5 class="fw-bold mb-0">Observaciones registradas</h5>
-                                </div>
-                                <div class="card-body px-4 pb-4">
-                                    <div class="alert alert-light border rounded-4 mb-3">
-                                        Puedes <strong>editar</strong>, <strong>duplicar</strong> o <strong>eliminar</strong> cualquier observación antes de guardar.
-                                    </div>
-
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered table-hover align-middle">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th>#</th>
-                                                    <th>Espalda</th>
-                                                    <th>Brazos</th>
-                                                    <th>Piernas</th>
-                                                    <th>Carga</th>
-                                                    <th>Frecuencia</th>
-                                                    <th>Código</th>
-                                                    <th>Categoría</th>
-                                                    <th>Nivel</th>
-                                                    <th>Acción</th>
-                                                    <th>Acciones</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="tbody-observaciones">
-                                                <tr id="fila-vacia">
-                                                    <td colspan="11" class="text-center text-muted py-4">
-                                                        Aún no hay observaciones registradas.
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-
-                                    <div id="inputs-ocultos"></div>
+                                <div class="rounded-2xl bg-gray-50 border border-gray-200 p-4 mt-4">
+                                    <strong>Acción requerida:</strong><br>
+                                    <span id="accion-requerida">-</span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- COLUMNA DERECHA -->
-                        <div class="col-12 col-lg-4">
-                            <div class="sticky-top" style="top: 20px;">
-                                <div class="card border-0 shadow-sm rounded-4 mb-4">
-                                    <div class="card-header text-white border-0 rounded-top-4 px-4 py-3" style="background: linear-gradient(90deg, #198754, #157347);">
-                                        <h5 class="fw-bold mb-0">Resumen automático</h5>
-                                    </div>
-                                    <div class="card-body px-4 py-4">
-                                        <div class="row g-3">
-                                            <div class="col-6">
-                                                <div class="border rounded-4 p-3 text-center bg-light h-100">
-                                                    <div class="text-muted small">Observaciones</div>
-                                                    <div class="fs-3 fw-bold" id="total-posturas">0</div>
-                                                </div>
-                                            </div>
+                        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                            <div class="px-5 pt-5">
+                                <h3 class="text-lg font-bold text-gray-900">Acciones</h3>
+                            </div>
 
-                                            <div class="col-6">
-                                                <div class="border rounded-4 p-3 text-center bg-light h-100">
-                                                    <div class="text-muted small">Frecuencia total</div>
-                                                    <div class="fs-3 fw-bold" id="frecuencia-total">0</div>
-                                                </div>
-                                            </div>
+                            <div class="p-5 grid gap-3">
+                                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-semibold px-5 py-3 rounded-lg shadow-sm">
+                                    Guardar evaluación
+                                </button>
 
-                                            <div class="col-6">
-                                                <div class="border rounded-4 p-3 text-center bg-light h-100">
-                                                    <div class="text-muted small">Categoría máxima</div>
-                                                    <div class="fs-3 fw-bold" id="categoria-maxima">-</div>
-                                                </div>
-                                            </div>
+                                <a href="{{ route('owas.index') }}"
+                                   class="text-center bg-white border border-blue-300 text-blue-700 hover:bg-blue-50 font-semibold px-5 py-3 rounded-lg">
+                                    Ver evaluaciones OWAS
+                                </a>
 
-                                            <div class="col-6">
-                                                <div class="border rounded-4 p-3 text-center bg-light h-100">
-                                                    <div class="text-muted small">Nivel global</div>
-                                                    <div class="fs-6 fw-bold" id="nivel-riesgo">-</div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="alert alert-light border rounded-4 mt-3 mb-0">
-                                            <strong>Acción requerida:</strong><br>
-                                            <span id="accion-requerida">-</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="card border-0 shadow-sm rounded-4">
-                                    <div class="card-header bg-white border-0 px-4 pt-4">
-                                        <h5 class="fw-bold mb-0">Acciones</h5>
-                                    </div>
-                                    <div class="card-body px-4 pb-4 d-grid gap-2">
-                                        <button type="submit" class="btn btn-success btn-lg">
-                                            Guardar evaluación
-                                        </button>
-
-                                        <a href="{{ route('owas.index') }}" class="btn btn-outline-primary btn-lg">
-                                            Ver evaluaciones OWAS
-                                        </a>
-
-                                        <a href="{{ route('evaluaciones.index') }}" class="btn btn-outline-secondary btn-lg">
-                                            Volver
-                                        </a>
-                                    </div>
-                                </div>
+                                <a href="{{ route('evaluaciones.index') }}"
+                                   class="text-center bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold px-5 py-3 rounded-lg">
+                                    Volver
+                                </a>
                             </div>
                         </div>
                     </div>
-                </form>
+                </div>
             </div>
-        </div>
+        </form>
     </div>
 
     <script>
@@ -347,10 +331,10 @@
         };
 
         const categorias = {
-            1: { nivel: 'Bajo', accion: 'No requiere acción.', color: 'success' },
-            2: { nivel: 'Medio', accion: 'Se requieren acciones correctivas en un futuro cercano.', color: 'warning' },
-            3: { nivel: 'Alto', accion: 'Se requieren acciones correctivas lo antes posible.', color: 'danger' },
-            4: { nivel: 'Muy alto', accion: 'Se requiere tomar acciones correctivas inmediatamente.', color: 'dark' }
+            1: { nivel: 'Bajo', accion: 'No requiere acción.', color: 'green' },
+            2: { nivel: 'Medio', accion: 'Se requieren acciones correctivas en un futuro cercano.', color: 'yellow' },
+            3: { nivel: 'Alto', accion: 'Se requieren acciones correctivas lo antes posible.', color: 'red' },
+            4: { nivel: 'Muy alto', accion: 'Se requiere tomar acciones correctivas inmediatamente.', color: 'gray' }
         };
 
         const textos = {
@@ -383,6 +367,14 @@
 
         let observaciones = [];
 
+        function categoriaBadge(cat) {
+            const color = categorias[cat].color;
+            if (color === 'green') return 'bg-green-100 text-green-700';
+            if (color === 'yellow') return 'bg-yellow-100 text-yellow-700';
+            if (color === 'red') return 'bg-red-100 text-red-700';
+            return 'bg-gray-800 text-white';
+        }
+
         function obtenerActual() {
             const espalda = document.getElementById('espalda').value;
             const brazos = document.getElementById('brazos').value;
@@ -407,9 +399,11 @@
 
         function actualizarVistaPrevia() {
             const actual = obtenerActual();
+            const badge = document.getElementById('preview-categoria');
+
             document.getElementById('preview-codigo').textContent = actual.codigo;
-            document.getElementById('preview-categoria').textContent = actual.categoria;
-            document.getElementById('preview-categoria').className = `badge bg-${categorias[actual.categoria].color} fs-6`;
+            badge.textContent = actual.categoria;
+            badge.className = `inline-flex px-3 py-1 rounded-full text-sm font-semibold ${categoriaBadge(actual.categoria)}`;
             document.getElementById('preview-nivel').textContent = actual.nivel;
             document.getElementById('preview-accion').textContent = actual.accion;
         }
@@ -441,8 +435,8 @@
             document.getElementById('frecuencia').value = obs.frecuencia;
             document.getElementById('editando-index').value = index;
 
-            document.getElementById('modo-edicion-badge').classList.remove('d-none');
-            document.getElementById('btn-cancelar-edicion').classList.remove('d-none');
+            document.getElementById('modo-edicion-badge').classList.remove('hidden');
+            document.getElementById('btn-cancelar-edicion').classList.remove('hidden');
             document.getElementById('btn-agregar').textContent = 'Guardar cambios';
 
             actualizarVistaPrevia();
@@ -477,8 +471,8 @@
 
         function salirModoEdicion() {
             document.getElementById('editando-index').value = '';
-            document.getElementById('modo-edicion-badge').classList.add('d-none');
-            document.getElementById('btn-cancelar-edicion').classList.add('d-none');
+            document.getElementById('modo-edicion-badge').classList.add('hidden');
+            document.getElementById('btn-cancelar-edicion').classList.add('hidden');
             document.getElementById('btn-agregar').textContent = 'Agregar observación';
         }
 
@@ -497,7 +491,7 @@
             if (observaciones.length === 0) {
                 tbody.innerHTML = `
                     <tr id="fila-vacia">
-                        <td colspan="11" class="text-center text-muted py-4">
+                        <td colspan="11" class="text-center text-gray-500 py-6">
                             Aún no hay observaciones registradas.
                         </td>
                     </tr>
@@ -509,22 +503,22 @@
 
             observaciones.forEach((obs, index) => {
                 tbody.innerHTML += `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td>${textos.espalda[obs.espalda]}</td>
-                        <td>${textos.brazos[obs.brazos]}</td>
-                        <td>${textos.piernas[obs.piernas]}</td>
-                        <td>${textos.carga[obs.carga]}</td>
-                        <td>${obs.frecuencia}</td>
-                        <td><strong>${obs.codigo}</strong></td>
-                        <td><span class="badge bg-${categorias[obs.categoria].color}">${obs.categoria}</span></td>
-                        <td>${obs.nivel}</td>
-                        <td>${obs.accion}</td>
-                        <td>
-                            <div class="d-flex flex-wrap gap-1">
-                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="editarObservacion(${index})">Editar</button>
-                                <button type="button" class="btn btn-sm btn-outline-success" onclick="duplicarObservacion(${index})">Duplicar</button>
-                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarObservacion(${index})">Eliminar</button>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3">${index + 1}</td>
+                        <td class="px-4 py-3">${textos.espalda[obs.espalda]}</td>
+                        <td class="px-4 py-3">${textos.brazos[obs.brazos]}</td>
+                        <td class="px-4 py-3">${textos.piernas[obs.piernas]}</td>
+                        <td class="px-4 py-3">${textos.carga[obs.carga]}</td>
+                        <td class="px-4 py-3">${obs.frecuencia}</td>
+                        <td class="px-4 py-3 font-bold">${obs.codigo}</td>
+                        <td class="px-4 py-3"><span class="inline-flex px-3 py-1 rounded-full text-xs font-semibold ${categoriaBadge(obs.categoria)}">${obs.categoria}</span></td>
+                        <td class="px-4 py-3">${obs.nivel}</td>
+                        <td class="px-4 py-3">${obs.accion}</td>
+                        <td class="px-4 py-3">
+                            <div class="flex flex-wrap gap-1">
+                                <button type="button" class="px-3 py-1.5 rounded-lg border border-blue-200 text-blue-700 hover:bg-blue-50 text-xs font-semibold" onclick="editarObservacion(${index})">Editar</button>
+                                <button type="button" class="px-3 py-1.5 rounded-lg border border-green-200 text-green-700 hover:bg-green-50 text-xs font-semibold" onclick="duplicarObservacion(${index})">Duplicar</button>
+                                <button type="button" class="px-3 py-1.5 rounded-lg border border-red-200 text-red-700 hover:bg-red-50 text-xs font-semibold" onclick="eliminarObservacion(${index})">Eliminar</button>
                             </div>
                         </td>
                     </tr>

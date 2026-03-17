@@ -7,29 +7,26 @@
         body {
             font-family: DejaVu Sans, sans-serif;
             font-size: 12px;
-            color: #222;
-            margin: 30px;
-        }
-
-        h1, h2, h3 {
-            margin: 0;
+            color: #1f2937;
+            margin: 28px;
         }
 
         .header {
-            border-bottom: 2px solid #1d4ed8;
+            border-bottom: 3px solid #1d4ed8;
             padding-bottom: 10px;
             margin-bottom: 20px;
         }
 
         .header h1 {
+            margin: 0;
             color: #1d4ed8;
             font-size: 22px;
         }
 
-        .sub {
-            color: #555;
+        .header p {
+            margin: 5px 0 0 0;
+            color: #6b7280;
             font-size: 12px;
-            margin-top: 4px;
         }
 
         .section {
@@ -43,31 +40,31 @@
             font-weight: bold;
             border: 1px solid #bfdbfe;
             margin-bottom: 10px;
+            font-size: 13px;
         }
 
-        .grid {
+        table {
             width: 100%;
             border-collapse: collapse;
         }
 
-        .grid td {
-            padding: 6px 8px;
-            border-bottom: 1px solid #e5e7eb;
+        .grid td, .grid th {
+            border: 1px solid #d1d5db;
+            padding: 7px 8px;
             vertical-align: top;
         }
 
-        .label {
-            font-weight: bold;
-            width: 180px;
+        .grid th {
             background: #f9fafb;
+            text-align: left;
+            width: 180px;
         }
 
         .cards {
             width: 100%;
             border-collapse: separate;
             border-spacing: 10px 0;
-            margin-top: 10px;
-            margin-bottom: 10px;
+            margin-top: 8px;
         }
 
         .card {
@@ -79,7 +76,7 @@
 
         .card .title {
             font-size: 11px;
-            color: #555;
+            color: #6b7280;
             text-transform: uppercase;
         }
 
@@ -90,70 +87,67 @@
             margin-top: 4px;
         }
 
-        .risk {
-            padding: 12px;
+        .risk-box {
             border: 1px solid #fde68a;
             background: #fffbeb;
-            margin-top: 10px;
+            padding: 12px;
+            margin-top: 12px;
         }
 
-        table.detalle {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
+        .risk-box p {
+            margin: 4px 0;
         }
 
-        table.detalle th,
-        table.detalle td {
+        .detalle th,
+        .detalle td {
             border: 1px solid #d1d5db;
             padding: 8px;
             text-align: left;
             font-size: 11px;
         }
 
-        table.detalle th {
+        .detalle th {
             background: #f3f4f6;
         }
     </style>
 </head>
 <body>
-
     <div class="header">
         <h1>Reporte de Evaluación REBA</h1>
-        <div class="sub">Resultado ergonómico generado por el sistema</div>
+        <p>Resultado ergonómico generado por ErgoTech</p>
     </div>
 
     <div class="section">
         <div class="section-title">Datos generales</div>
         <table class="grid">
             <tr>
-                <td class="label">Empresa</td>
+                <th>Empresa</th>
                 <td>{{ $reba->evaluacion->empresa->nombre ?? 'N/A' }}</td>
-                <td class="label">Sucursal</td>
+                <th>Sucursal</th>
                 <td>{{ $reba->evaluacion->sucursal->nombre ?? 'N/A' }}</td>
             </tr>
             <tr>
-                <td class="label">Puesto</td>
+                <th>Puesto</th>
                 <td>{{ $reba->evaluacion->puesto->nombre ?? 'N/A' }}</td>
-                <td class="label">Trabajador</td>
+                <th>Trabajador</th>
                 <td>
                     {{ trim(($reba->evaluacion->trabajador->nombre ?? '') . ' ' . ($reba->evaluacion->trabajador->apellido_paterno ?? '') . ' ' . ($reba->evaluacion->trabajador->apellido_materno ?? '')) ?: 'N/A' }}
                 </td>
             </tr>
             <tr>
-                <td class="label">Fecha</td>
+                <th>Fecha</th>
                 <td>{{ $reba->evaluacion->fecha_evaluacion ?? 'N/A' }}</td>
-                <td class="label">Evaluador</td>
+                <th>Evaluador</th>
                 <td>{{ $reba->evaluacion->usuario->name ?? 'N/A' }}</td>
             </tr>
             <tr>
-                <td class="label">Área evaluada</td>
+                <th>Área evaluada</th>
                 <td>{{ $reba->evaluacion->area_evaluada ?? 'N/A' }}</td>
-                <td class="label">Actividad general</td>
+                <th>Actividad general</th>
                 <td>{{ $reba->evaluacion->actividad ?? 'N/A' }}</td>
             </tr>
             <tr>
-                <td class="label">Observaciones</td>
+                <th>Observaciones</th>
                 <td colspan="3">{{ $reba->evaluacion->observaciones ?? 'Sin observaciones' }}</td>
             </tr>
         </table>
@@ -177,21 +171,20 @@
                     <div class="value">{{ $reba->puntuacion_c }}</div>
                 </td>
                 <td class="card">
-                    <div class="title">Puntuación Final</div>
+                    <div class="title">Puntuación final</div>
                     <div class="value">{{ $reba->puntuacion_final }}</div>
                 </td>
             </tr>
         </table>
 
-        <div class="risk">
-            <strong>Nivel de riesgo:</strong> {{ $reba->nivel_riesgo }}<br>
-            <strong>Acción requerida:</strong> {{ $reba->accion_requerida }}
+        <div class="risk-box">
+            <p><strong>Nivel de riesgo:</strong> {{ $reba->nivel_riesgo }}</p>
+            <p><strong>Acción requerida:</strong> {{ $reba->accion_requerida }}</p>
         </div>
     </div>
 
     <div class="section">
         <div class="section-title">Detalle de la evaluación</div>
-
         <table class="detalle">
             <thead>
                 <tr>
@@ -213,6 +206,5 @@
             </tbody>
         </table>
     </div>
-
 </body>
 </html>

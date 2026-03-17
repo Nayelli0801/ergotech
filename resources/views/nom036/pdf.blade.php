@@ -7,84 +7,74 @@
         body {
             font-family: DejaVu Sans, sans-serif;
             font-size: 12px;
-            color: #222;
-            margin: 25px;
+            color: #1f2937;
+            margin: 28px;
         }
 
-        h1, h2, h3 {
-            margin: 0;
-        }
-
-        .titulo {
-            text-align: center;
+        .header {
+            border-bottom: 3px solid #1d4ed8;
+            padding-bottom: 10px;
             margin-bottom: 20px;
         }
 
-        .titulo h1 {
-            font-size: 20px;
+        .header h1 {
+            margin: 0;
             color: #1d4ed8;
+            font-size: 22px;
         }
 
-        .titulo p {
-            margin-top: 6px;
-            font-size: 11px;
-            color: #555;
+        .header p {
+            margin: 5px 0 0 0;
+            color: #6b7280;
+            font-size: 12px;
         }
 
-        .bloque {
+        .section {
             margin-bottom: 18px;
         }
 
-        .bloque h3 {
-            background: #eaf2ff;
+        .section-title {
+            background: #eff6ff;
             color: #1d4ed8;
             padding: 8px 10px;
-            border: 1px solid #cfe0ff;
+            font-weight: bold;
+            border: 1px solid #bfdbfe;
+            margin-bottom: 10px;
             font-size: 13px;
         }
 
-        .contenido {
-            border: 1px solid #d9d9d9;
-            border-top: none;
-            padding: 10px;
-        }
-
-        .grid {
+        table {
             width: 100%;
             border-collapse: collapse;
         }
 
-        .grid td {
-            padding: 6px 8px;
+        .grid td, .grid th {
+            border: 1px solid #d1d5db;
+            padding: 7px 8px;
             vertical-align: top;
         }
 
-        .etiqueta {
-            font-weight: bold;
+        .grid th {
+            background: #f9fafb;
+            text-align: left;
             width: 180px;
         }
 
-        table.detalle {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 8px;
-        }
-
-        table.detalle th,
-        table.detalle td {
-            border: 1px solid #cfcfcf;
+        .detalle th,
+        .detalle td {
+            border: 1px solid #d1d5db;
             padding: 8px;
             font-size: 11px;
-        }
-
-        table.detalle th {
-            background: #f3f4f6;
             text-align: left;
         }
 
-        .riesgo {
-            font-weight: bold;
+        .detalle th {
+            background: #f3f4f6;
+        }
+
+        .risk {
             color: #b91c1c;
+            font-weight: bold;
         }
 
         .footer {
@@ -96,84 +86,134 @@
     </style>
 </head>
 <body>
+    @php
+        $detallesGenerales = $nom036->detalles->where('seccion', 'General');
+        $tareasSeleccionadas = optional($detallesGenerales->firstWhere('concepto', 'Tareas seleccionadas'))->valor ?? 'No especificadas';
+        $tareaObservada = optional($detallesGenerales->firstWhere('concepto', 'Tarea observada'))->valor ?? 'No especificada';
+        $medioAyuda = optional($detallesGenerales->firstWhere('concepto', 'Medio de ayuda utilizado'))->valor ?? 'No especificado';
+        $descripcionApoyo = optional($detallesGenerales->firstWhere('concepto', 'Descripción del apoyo o equipo utilizado'))->valor ?? 'No especificada';
 
-    <div class="titulo">
+        $secciones = $nom036->detalles
+            ->whereNotIn('seccion', ['General', 'Resultado'])
+            ->groupBy('seccion');
+
+        $resultados = $nom036->detalles->where('seccion', 'Resultado');
+    @endphp
+
+    <div class="header">
         <h1>Reporte de Evaluación NOM-036</h1>
-        <p>Factores de riesgo ergonómico por manejo manual de cargas</p>
+        <p>Factores de riesgo ergonómico en el trabajo - Manejo manual de cargas</p>
     </div>
 
-    <div class="bloque">
-        <h3>Datos generales</h3>
-        <div class="contenido">
-            <table class="grid">
-                <tr>
-                    <td class="etiqueta">Empresa:</td>
-                    <td>{{ $nom036->evaluacion->empresa->nombre ?? 'N/A' }}</td>
-                    <td class="etiqueta">Sucursal:</td>
-                    <td>{{ $nom036->evaluacion->sucursal->nombre ?? 'N/A' }}</td>
-                </tr>
-                <tr>
-                    <td class="etiqueta">Puesto:</td>
-                    <td>{{ $nom036->evaluacion->puesto->nombre ?? 'N/A' }}</td>
-                    <td class="etiqueta">Trabajador:</td>
-                    <td>{{ $nom036->evaluacion->trabajador->nombre ?? 'N/A' }}</td>
-                </tr>
-                <tr>
-                    <td class="etiqueta">Fecha:</td>
-                    <td>{{ $nom036->evaluacion->fecha_evaluacion ?? 'N/A' }}</td>
-                    <td class="etiqueta">Tipo de actividad:</td>
-                    <td>{{ $nom036->tipo_actividad ?? 'N/A' }}</td>
-                </tr>
-                <tr>
-                    <td class="etiqueta">Nivel de riesgo:</td>
-                    <td class="riesgo">{{ $nom036->nivel_riesgo ?? 'N/A' }}</td>
-                    <td class="etiqueta">Resultado final:</td>
-                    <td>{{ $nom036->evaluacion->resultado_final ?? 'N/A' }}</td>
-                </tr>
-            </table>
-        </div>
+    <div class="section">
+        <div class="section-title">Datos generales</div>
+        <table class="grid">
+            <tr>
+                <th>Empresa</th>
+                <td>{{ $nom036->evaluacion->empresa->nombre ?? 'N/A' }}</td>
+                <th>Sucursal</th>
+                <td>{{ $nom036->evaluacion->sucursal->nombre ?? 'N/A' }}</td>
+            </tr>
+            <tr>
+                <th>Puesto</th>
+                <td>{{ $nom036->evaluacion->puesto->nombre ?? 'N/A' }}</td>
+                <th>Trabajador</th>
+                <td>{{ $nom036->evaluacion->trabajador->nombre ?? 'N/A' }}</td>
+            </tr>
+            <tr>
+                <th>Fecha</th>
+                <td>{{ $nom036->evaluacion->fecha_evaluacion ?? 'N/A' }}</td>
+                <th>Resultado final</th>
+                <td>{{ $nom036->evaluacion->resultado_final ?? 'N/A' }}</td>
+            </tr>
+            <tr>
+                <th>Nivel de riesgo</th>
+                <td class="risk">{{ $nom036->nivel_riesgo ?? 'N/A' }}</td>
+                <th>Recomendación</th>
+                <td>{{ $nom036->evaluacion->recomendaciones ?? 'N/A' }}</td>
+            </tr>
+        </table>
     </div>
 
-    <div class="bloque">
-        <h3>Observaciones</h3>
-        <div class="contenido">
-            {{ $nom036->observaciones ?? 'Sin observaciones.' }}
-        </div>
+    <div class="section">
+        <div class="section-title">Datos de la actividad</div>
+        <table class="grid">
+            <tr>
+                <th>Tareas seleccionadas</th>
+                <td>{{ $tareasSeleccionadas }}</td>
+            </tr>
+            <tr>
+                <th>Tarea observada</th>
+                <td>{{ $tareaObservada }}</td>
+            </tr>
+            <tr>
+                <th>Medio de ayuda utilizado</th>
+                <td>{{ $medioAyuda }}</td>
+            </tr>
+            <tr>
+                <th>Descripción del apoyo o equipo</th>
+                <td>{{ $descripcionApoyo }}</td>
+            </tr>
+        </table>
     </div>
 
-    <div class="bloque">
-        <h3>Detalle de factores evaluados</h3>
-        <div class="contenido">
+    <div class="section">
+        <div class="section-title">Observaciones</div>
+        <table class="grid">
+            <tr>
+                <td>{{ $nom036->observaciones ?? 'Sin observaciones.' }}</td>
+            </tr>
+        </table>
+    </div>
+
+    @foreach($secciones as $nombreSeccion => $items)
+        <div class="section">
+            <div class="section-title">{{ $nombreSeccion }}</div>
             <table class="detalle">
                 <thead>
                     <tr>
-                        <th>Sección</th>
                         <th>Concepto</th>
-                        <th>Valor</th>
+                        <th>Valor seleccionado</th>
                         <th>Resultado</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($nom036->detalles as $detalle)
+                    @foreach($items as $detalle)
                         <tr>
-                            <td>{{ $detalle->seccion }}</td>
                             <td>{{ $detalle->concepto }}</td>
                             <td>{{ $detalle->valor }}</td>
-                            <td>{{ $detalle->resultado }}</td>
+                            <td>{{ $detalle->resultado ?? '—' }}</td>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="4">No hay detalles registrados.</td>
-                        </tr>
-                    @endforelse
+                    @endforeach
                 </tbody>
             </table>
         </div>
+    @endforeach
+
+    <div class="section">
+        <div class="section-title">Resultado final</div>
+        <table class="detalle">
+            <thead>
+                <tr>
+                    <th>Concepto</th>
+                    <th>Valor</th>
+                    <th>Resultado</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($resultados as $detalle)
+                    <tr>
+                        <td>{{ $detalle->concepto }}</td>
+                        <td>{{ $detalle->valor }}</td>
+                        <td>{{ $detalle->resultado ?? '—' }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
     </div>
 
     <div class="footer">
-        Reporte generado por Ergotech
+        Reporte generado por ErgoTech
     </div>
-
 </body>
 </html>

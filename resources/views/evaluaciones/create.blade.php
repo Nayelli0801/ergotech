@@ -3,7 +3,9 @@
         <div class="bg-white shadow-lg rounded-2xl overflow-hidden border border-gray-200">
             <div class="bg-blue-700 text-white px-6 py-4">
                 <h2 class="text-2xl font-bold">Nueva evaluación</h2>
-                <p class="text-sm text-blue-100 mt-1">Captura los datos generales y después selecciona el método de evaluación.</p>
+                <p class="text-sm text-blue-100 mt-1">
+                    Captura los datos generales y después selecciona el método de evaluación.
+                </p>
             </div>
 
             <div class="p-6">
@@ -15,7 +17,7 @@
 
                 @if($errors->any())
                     <div class="mb-4 rounded-lg bg-red-100 border border-red-300 text-red-700 px-4 py-3">
-                        <ul class="list-disc pl-5">
+                        <ul class="list-disc pl-5 space-y-1">
                             @foreach($errors->all() as $error)
                                 <li>{{ $error }}</li>
                             @endforeach
@@ -96,16 +98,16 @@
                             </div>
 
                             <div>
-    <label class="block text-sm font-medium text-gray-700 mb-1">Método</label>
-    <select name="metodo" class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500" required>
-        <option value="">Seleccione un método</option>
-        <option value="REBA" {{ old('metodo') == 'REBA' ? 'selected' : '' }}>REBA</option>
-        <option value="RULA" {{ old('metodo') == 'RULA' ? 'selected' : '' }}>RULA</option>
-        <option value="OWAS" {{ old('metodo') == 'OWAS' ? 'selected' : '' }}>OWAS</option>
-        <option value="NIOSH" {{ old('metodo') == 'NIOSH' ? 'selected' : '' }}>NIOSH</option>
-        <option value="NOM-036" {{ old('metodo') == 'NOM-036' ? 'selected' : '' }}>NOM-036</option>
-    </select>
-</div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Método</label>
+                                <select name="metodo" class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500" required>
+                                    <option value="">Seleccione un método</option>
+                                    <option value="REBA" {{ old('metodo') == 'REBA' ? 'selected' : '' }}>REBA</option>
+                                    <option value="RULA" {{ old('metodo') == 'RULA' ? 'selected' : '' }}>RULA</option>
+                                    <option value="OWAS" {{ old('metodo') == 'OWAS' ? 'selected' : '' }}>OWAS</option>
+                                    <option value="NIOSH" {{ old('metodo') == 'NIOSH' ? 'selected' : '' }}>NIOSH</option>
+                                    <option value="NOM-036" {{ old('metodo') == 'NOM-036' ? 'selected' : '' }}>NOM-036</option>
+                                </select>
+                            </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Área evaluada</label>

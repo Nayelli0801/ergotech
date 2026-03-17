@@ -29,104 +29,163 @@ class Nom036Controller extends Controller
         $evaluacion = Evaluacion::findOrFail($evaluacionId);
 
         $request->validate([
-            'tipo_actividad' => 'required|string|max:255',
-            'objeto_manipulado' => 'nullable|string|max:255',
-            'peso_carga' => 'nullable|numeric|min:0',
-            'frecuencia' => 'nullable|numeric|min:0',
-            'duracion' => 'nullable|numeric|min:0',
-            'distancia_recorrida' => 'nullable|numeric|min:0',
-            'altura_inicial' => 'nullable|numeric|min:0',
-            'altura_final' => 'nullable|numeric|min:0',
-            'postura_tronco' => 'nullable|string|max:255',
-            'postura_brazos' => 'nullable|string|max:255',
-            'postura_piernas' => 'nullable|string|max:255',
-            'agarre' => 'nullable|string|max:255',
-            'condiciones_ambientales' => 'nullable|string|max:255',
-            'superficie_trabajo' => 'nullable|string|max:255',
-            'espacio_trabajo' => 'nullable|string|max:255',
+            'tareas' => 'required|array|min:1',
+            'tareas.*' => 'string|in:levantar,bajar,transportar,empujar,jalar',
+            'medio_ayuda' => 'nullable|string|max:255',
+            'descripcion_apoyo' => 'nullable|string|max:255',
+            'tarea_nombre' => 'nullable|string|max:255',
             'observaciones' => 'nullable|string',
+
+            'lev_peso_frecuencia' => 'nullable|string',
+            'lev_distancia_horizontal' => 'nullable|string',
+            'lev_asimetria' => 'nullable|string',
+            'lev_restricciones_posturales' => 'nullable|string',
+            'lev_agarre_carga' => 'nullable|string',
+            'lev_superficie_suelo' => 'nullable|string',
+            'lev_factores_ambientales' => 'nullable|string',
+
+            'baj_peso_frecuencia' => 'nullable|string',
+            'baj_control_descenso' => 'nullable|string',
+            'baj_asimetria' => 'nullable|string',
+            'baj_restricciones_posturales' => 'nullable|string',
+            'baj_agarre_carga' => 'nullable|string',
+            'baj_superficie_suelo' => 'nullable|string',
+
+            'tra_peso_frecuencia' => 'nullable|string',
+            'tra_distancia_transporte' => 'nullable|string',
+            'tra_asimetria' => 'nullable|string',
+            'tra_agarre_carga' => 'nullable|string',
+            'tra_superficie_suelo' => 'nullable|string',
+            'tra_obstaculos' => 'nullable|string',
+            'tra_factores_ambientales' => 'nullable|string',
+
+            'emp_peso_carga' => 'nullable|string',
+            'emp_postura' => 'nullable|string',
+            'emp_agarre_mano' => 'nullable|string',
+            'emp_patron_trabajo' => 'nullable|string',
+            'emp_distancia_viaje' => 'nullable|string',
+            'emp_condicion_equipo' => 'nullable|string',
+
+            'jal_peso_carga' => 'nullable|string',
+            'jal_postura' => 'nullable|string',
+            'jal_agarre_mano' => 'nullable|string',
+            'jal_patron_trabajo' => 'nullable|string',
+            'jal_distancia_viaje' => 'nullable|string',
+            'jal_condicion_equipo' => 'nullable|string',
         ]);
 
         DB::beginTransaction();
 
         try {
-            $asimetria = $request->has('asimetria') ? 1 : 0;
-            $movimientosRepetitivos = $request->has('movimientos_repetitivos') ? 1 : 0;
-            $fuerzaBrusca = $request->has('fuerza_brusca') ? 1 : 0;
-
+            $tareas = $request->tareas ?? [];
+            $detalles = [];
             $puntaje = 0;
 
-            if (($request->peso_carga ?? 0) >= 25) {
-                $puntaje += 3;
-            } elseif (($request->peso_carga ?? 0) >= 15) {
-                $puntaje += 2;
-            } elseif (($request->peso_carga ?? 0) >= 5) {
-                $puntaje += 1;
+            foreach ($tareas as $tarea) {
+                switch ($tarea) {
+                    case 'levantar':
+                        $campos = [
+                            'lev_peso_frecuencia' => 'Peso y frecuencia de la carga',
+                            'lev_distancia_horizontal' => 'Distancia horizontal entre las manos y la espalda baja',
+                            'lev_asimetria' => 'Asimetría de la espalda o la carga',
+                            'lev_restricciones_posturales' => 'Restricciones posturales por espacio disponible',
+                            'lev_agarre_carga' => 'Agarre de la carga',
+                            'lev_superficie_suelo' => 'Superficie del suelo',
+                            'lev_factores_ambientales' => 'Factores ambientales',
+                        ];
+                        $seccion = 'Levantar';
+                        break;
+
+                    case 'bajar':
+                        $campos = [
+                            'baj_peso_frecuencia' => 'Peso y frecuencia de la carga',
+                            'baj_control_descenso' => 'Control de descenso',
+                            'baj_asimetria' => 'Asimetría',
+                            'baj_restricciones_posturales' => 'Restricciones posturales',
+                            'baj_agarre_carga' => 'Agarre de la carga',
+                            'baj_superficie_suelo' => 'Superficie del suelo',
+                        ];
+                        $seccion = 'Bajar';
+                        break;
+
+                    case 'transportar':
+                        $campos = [
+                            'tra_peso_frecuencia' => 'Peso y frecuencia de la carga',
+                            'tra_distancia_transporte' => 'Distancia de transporte',
+                            'tra_asimetria' => 'Asimetría de la carga',
+                            'tra_agarre_carga' => 'Agarre de la carga',
+                            'tra_superficie_suelo' => 'Superficie del suelo',
+                            'tra_obstaculos' => 'Obstáculos en la ruta',
+                            'tra_factores_ambientales' => 'Factores ambientales',
+                        ];
+                        $seccion = 'Transportar';
+                        break;
+
+                    case 'empujar':
+                        $campos = [
+                            'emp_peso_carga' => 'Peso de la carga',
+                            'emp_postura' => 'Postura',
+                            'emp_agarre_mano' => 'Agarre de la mano',
+                            'emp_patron_trabajo' => 'Patrón de trabajo',
+                            'emp_distancia_viaje' => 'Distancia por viaje',
+                            'emp_condicion_equipo' => 'Condición del equipo auxiliar',
+                        ];
+                        $seccion = 'Empujar';
+                        break;
+
+                    case 'jalar':
+                        $campos = [
+                            'jal_peso_carga' => 'Peso de la carga',
+                            'jal_postura' => 'Postura',
+                            'jal_agarre_mano' => 'Agarre de la mano',
+                            'jal_patron_trabajo' => 'Patrón de trabajo',
+                            'jal_distancia_viaje' => 'Distancia por viaje',
+                            'jal_condicion_equipo' => 'Condición del equipo auxiliar',
+                        ];
+                        $seccion = 'Jalar';
+                        break;
+
+                    default:
+                        $campos = [];
+                        $seccion = 'General';
+                        break;
+                }
+
+                foreach ($campos as $campo => $concepto) {
+                    [$valorNumerico, $descripcion] = $this->separarValorDescripcion($request->$campo);
+                    $puntaje += $valorNumerico;
+
+                    $detalles[] = $this->detalleNom(
+                        $seccion,
+                        $concepto,
+                        $descripcion,
+                        $valorNumerico
+                    );
+                }
             }
 
-            if (($request->frecuencia ?? 0) >= 10) {
-                $puntaje += 3;
-            } elseif (($request->frecuencia ?? 0) >= 5) {
-                $puntaje += 2;
-            } elseif (($request->frecuencia ?? 0) > 0) {
-                $puntaje += 1;
-            }
-
-            if (($request->duracion ?? 0) >= 4) {
-                $puntaje += 3;
-            } elseif (($request->duracion ?? 0) >= 2) {
-                $puntaje += 2;
-            } elseif (($request->duracion ?? 0) > 0) {
-                $puntaje += 1;
-            }
-
-            if ($asimetria) $puntaje += 1;
-            if ($movimientosRepetitivos) $puntaje += 1;
-            if ($fuerzaBrusca) $puntaje += 1;
-
-            if (($request->postura_tronco ?? '') === 'forzada') $puntaje += 2;
-            if (($request->postura_brazos ?? '') === 'forzada') $puntaje += 1;
-            if (($request->postura_piernas ?? '') === 'forzada') $puntaje += 1;
-
-            if (($request->agarre ?? '') === 'malo') $puntaje += 1;
-            if (($request->superficie_trabajo ?? '') === 'irregular') $puntaje += 1;
-            if (($request->espacio_trabajo ?? '') === 'reducido') $puntaje += 1;
-            if (($request->condiciones_ambientales ?? '') === 'desfavorables') $puntaje += 1;
-
-            if ($puntaje <= 3) {
-                $nivelRiesgo = 'Bajo';
-                $recomendacion = 'Mantener seguimiento y condiciones actuales.';
-            } elseif ($puntaje <= 6) {
-                $nivelRiesgo = 'Medio';
-                $recomendacion = 'Revisar condiciones de trabajo y proponer mejoras.';
-            } elseif ($puntaje <= 9) {
-                $nivelRiesgo = 'Alto';
-                $recomendacion = 'Se requiere intervención pronta.';
-            } else {
-                $nivelRiesgo = 'Muy alto';
-                $recomendacion = 'Se requiere intervención inmediata.';
-            }
+            [$nivelRiesgo, $recomendacion] = $this->clasificarNom036($puntaje);
 
             $nom036 = Nom036Evaluacion::create([
                 'evaluacion_id' => $evaluacion->id,
-                'tipo_actividad' => $request->tipo_actividad,
-                'objeto_manipulado' => $request->objeto_manipulado,
-                'peso_carga' => $request->peso_carga,
-                'frecuencia' => $request->frecuencia,
-                'duracion' => $request->duracion,
-                'distancia_recorrida' => $request->distancia_recorrida,
-                'altura_inicial' => $request->altura_inicial,
-                'altura_final' => $request->altura_final,
-                'postura_tronco' => $request->postura_tronco,
-                'postura_brazos' => $request->postura_brazos,
-                'postura_piernas' => $request->postura_piernas,
-                'agarre' => $request->agarre,
-                'asimetria' => $asimetria,
-                'movimientos_repetitivos' => $movimientosRepetitivos,
-                'fuerza_brusca' => $fuerzaBrusca,
-                'condiciones_ambientales' => $request->condiciones_ambientales,
-                'superficie_trabajo' => $request->superficie_trabajo,
-                'espacio_trabajo' => $request->espacio_trabajo,
+                'tipo_actividad' => implode(',', $tareas),
+                'objeto_manipulado' => $request->tarea_nombre,
+                'peso_carga' => null,
+                'frecuencia' => null,
+                'duracion' => null,
+                'distancia_recorrida' => null,
+                'altura_inicial' => null,
+                'altura_final' => null,
+                'postura_tronco' => null,
+                'postura_brazos' => null,
+                'postura_piernas' => null,
+                'agarre' => null,
+                'asimetria' => false,
+                'movimientos_repetitivos' => false,
+                'fuerza_brusca' => false,
+                'condiciones_ambientales' => null,
+                'superficie_trabajo' => null,
+                'espacio_trabajo' => null,
                 'nivel_riesgo' => $nivelRiesgo,
                 'observaciones' => $request->observaciones,
             ]);
@@ -137,28 +196,37 @@ class Nom036Controller extends Controller
                 'recomendaciones' => $recomendacion,
             ]);
 
-            $detalles = [
-                ['seccion' => 'Carga', 'concepto' => 'Tipo de actividad', 'valor' => $request->tipo_actividad, 'resultado' => null],
-                ['seccion' => 'Carga', 'concepto' => 'Objeto manipulado', 'valor' => $request->objeto_manipulado, 'resultado' => null],
-                ['seccion' => 'Carga', 'concepto' => 'Peso de la carga', 'valor' => $request->peso_carga, 'resultado' => null],
-                ['seccion' => 'Tiempo', 'concepto' => 'Frecuencia', 'valor' => $request->frecuencia, 'resultado' => null],
-                ['seccion' => 'Tiempo', 'concepto' => 'Duración', 'valor' => $request->duracion, 'resultado' => null],
-                ['seccion' => 'Distancias', 'concepto' => 'Distancia recorrida', 'valor' => $request->distancia_recorrida, 'resultado' => null],
-                ['seccion' => 'Distancias', 'concepto' => 'Altura inicial', 'valor' => $request->altura_inicial, 'resultado' => null],
-                ['seccion' => 'Distancias', 'concepto' => 'Altura final', 'valor' => $request->altura_final, 'resultado' => null],
-                ['seccion' => 'Posturas', 'concepto' => 'Postura del tronco', 'valor' => $request->postura_tronco, 'resultado' => null],
-                ['seccion' => 'Posturas', 'concepto' => 'Postura de brazos', 'valor' => $request->postura_brazos, 'resultado' => null],
-                ['seccion' => 'Posturas', 'concepto' => 'Postura de piernas', 'valor' => $request->postura_piernas, 'resultado' => null],
-                ['seccion' => 'Condiciones', 'concepto' => 'Agarre', 'valor' => $request->agarre, 'resultado' => null],
-                ['seccion' => 'Condiciones', 'concepto' => 'Asimetría', 'valor' => $asimetria ? 'Sí' : 'No', 'resultado' => null],
-                ['seccion' => 'Condiciones', 'concepto' => 'Movimientos repetitivos', 'valor' => $movimientosRepetitivos ? 'Sí' : 'No', 'resultado' => null],
-                ['seccion' => 'Condiciones', 'concepto' => 'Fuerza brusca', 'valor' => $fuerzaBrusca ? 'Sí' : 'No', 'resultado' => null],
-                ['seccion' => 'Ambiente', 'concepto' => 'Condiciones ambientales', 'valor' => $request->condiciones_ambientales, 'resultado' => null],
-                ['seccion' => 'Ambiente', 'concepto' => 'Superficie de trabajo', 'valor' => $request->superficie_trabajo, 'resultado' => null],
-                ['seccion' => 'Ambiente', 'concepto' => 'Espacio de trabajo', 'valor' => $request->espacio_trabajo, 'resultado' => null],
-                ['seccion' => 'Resultado', 'concepto' => 'Puntaje total', 'valor' => $puntaje, 'resultado' => 'Calculado automáticamente'],
-                ['seccion' => 'Resultado', 'concepto' => 'Nivel de riesgo', 'valor' => $nivelRiesgo, 'resultado' => 'Calculado automáticamente'],
-            ];
+            Nom036Detalle::create([
+                'nom036_evaluacion_id' => $nom036->id,
+                'seccion' => 'General',
+                'concepto' => 'Tareas seleccionadas',
+                'valor' => $this->tareasBonitas($tareas),
+                'resultado' => null,
+            ]);
+
+            Nom036Detalle::create([
+                'nom036_evaluacion_id' => $nom036->id,
+                'seccion' => 'General',
+                'concepto' => 'Tarea observada',
+                'valor' => $request->tarea_nombre ?? 'No especificada',
+                'resultado' => null,
+            ]);
+
+            Nom036Detalle::create([
+                'nom036_evaluacion_id' => $nom036->id,
+                'seccion' => 'General',
+                'concepto' => 'Medio de ayuda utilizado',
+                'valor' => $request->medio_ayuda ?? 'No especificado',
+                'resultado' => null,
+            ]);
+
+            Nom036Detalle::create([
+                'nom036_evaluacion_id' => $nom036->id,
+                'seccion' => 'General',
+                'concepto' => 'Descripción del apoyo o equipo utilizado',
+                'valor' => $request->descripcion_apoyo ?? 'No especificada',
+                'resultado' => null,
+            ]);
 
             foreach ($detalles as $detalle) {
                 Nom036Detalle::create([
@@ -170,6 +238,30 @@ class Nom036Controller extends Controller
                 ]);
             }
 
+            Nom036Detalle::create([
+                'nom036_evaluacion_id' => $nom036->id,
+                'seccion' => 'Resultado',
+                'concepto' => 'Puntaje total',
+                'valor' => (string) $puntaje,
+                'resultado' => 'Calculado automáticamente',
+            ]);
+
+            Nom036Detalle::create([
+                'nom036_evaluacion_id' => $nom036->id,
+                'seccion' => 'Resultado',
+                'concepto' => 'Nivel de riesgo',
+                'valor' => $nivelRiesgo,
+                'resultado' => 'Calculado automáticamente',
+            ]);
+
+            Nom036Detalle::create([
+                'nom036_evaluacion_id' => $nom036->id,
+                'seccion' => 'Resultado',
+                'concepto' => 'Recomendación',
+                'valor' => $recomendacion,
+                'resultado' => 'Calculado automáticamente',
+            ]);
+
             DB::commit();
 
             return redirect()->route('nom036.show', $nom036->id)
@@ -179,28 +271,6 @@ class Nom036Controller extends Controller
             return back()->withInput()->with('error', 'Error al guardar: ' . $e->getMessage());
         }
     }
-
-    public function pdf($id)
-     {
-    $nom036 = Nom036Evaluacion::with([
-        'evaluacion.empresa',
-        'evaluacion.sucursal',
-        'evaluacion.puesto',
-        'evaluacion.trabajador',
-        'evaluacion.usuario',
-        'detalles'
-    ])->findOrFail($id);
-
-    $pdf = Pdf::loadView('nom036.pdf', compact('nom036'))
-        ->setPaper('a4', 'portrait');
-
-    $nombreArchivo = 'nom036_' . $nom036->id . '.pdf';
-
-    return $pdf->download($nombreArchivo);
-     }
-
-
-
 
     public function show($id)
     {
@@ -213,5 +283,78 @@ class Nom036Controller extends Controller
         ])->findOrFail($id);
 
         return view('nom036.show', compact('nom036'));
+    }
+
+    public function pdf($id)
+    {
+        $nom036 = Nom036Evaluacion::with([
+            'evaluacion.empresa',
+            'evaluacion.sucursal',
+            'evaluacion.puesto',
+            'evaluacion.trabajador',
+            'evaluacion.usuario',
+            'detalles'
+        ])->findOrFail($id);
+
+        $pdf = Pdf::loadView('nom036.pdf', compact('nom036'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->download('nom036_' . $nom036->id . '.pdf');
+    }
+
+    private function clasificarNom036(int $puntaje): array
+    {
+        if ($puntaje <= 4) {
+            return ['Bajo', 'La tarea puede mantenerse bajo observación.'];
+        }
+
+        if ($puntaje <= 8) {
+            return ['Medio', 'Examinar las tareas con detenimiento.'];
+        }
+
+        if ($puntaje <= 12) {
+            return ['Alto', 'Se requiere una acción correctiva pronta.'];
+        }
+
+        return ['Alto', 'Se necesita una acción inmediata. Se puede exponer a una proporción significativa de la población laboral a un riesgo de lesiones.'];
+    }
+
+    private function separarValorDescripcion($valor): array
+    {
+        if (!$valor || !str_contains($valor, '|')) {
+            return [0, 'No especificado'];
+        }
+
+        [$numero, $descripcion] = explode('|', $valor, 2);
+
+        return [(int) $numero, trim($descripcion)];
+    }
+
+    private function detalleNom(string $seccion, string $concepto, ?string $valor, $resultado): array
+    {
+        return [
+            'seccion' => $seccion,
+            'concepto' => $concepto,
+            'valor' => $valor ?: 'No especificado',
+            'resultado' => is_null($resultado) ? null : 'Valor: ' . $resultado,
+        ];
+    }
+
+    private function tareasBonitas(array $tareas): string
+    {
+        $mapa = [
+            'levantar' => 'Levantar',
+            'bajar' => 'Bajar',
+            'transportar' => 'Transportar',
+            'empujar' => 'Empujar',
+            'jalar' => 'Jalar',
+        ];
+
+        $nombres = [];
+        foreach ($tareas as $tarea) {
+            $nombres[] = $mapa[$tarea] ?? $tarea;
+        }
+
+        return implode(', ', $nombres);
     }
 }

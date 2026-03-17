@@ -51,13 +51,42 @@
                                         {{ trim(($evaluacion->trabajador->nombre ?? '') . ' ' . ($evaluacion->trabajador->apellido_paterno ?? '') . ' ' . ($evaluacion->trabajador->apellido_materno ?? '')) ?: 'N/A' }}
                                     </td>
                                     <td class="px-4 py-3 text-sm text-gray-700">{{ $evaluacion->metodo->nombre ?? 'N/A' }}</td>
-                                    <td class="px-4 py-3 text-sm text-gray-700">{{ $evaluacion->fecha ?? 'N/A' }}</td>
+                                    <td class="px-4 py-3 text-sm text-gray-700">{{ $evaluacion->fecha_evaluacion ?? 'N/A' }}</td>
                                     <td class="px-4 py-3 text-center">
-                                        @if(strtoupper($evaluacion->metodo->nombre ?? '') === 'REBA' && $evaluacion->rebaEvaluacion)
+                                        @php
+                                            $metodo = strtoupper($evaluacion->metodo->nombre ?? '');
+                                        @endphp
+
+                                        @if($metodo === 'REBA' && $evaluacion->rebaEvaluacion)
                                             <a href="{{ route('reba.show', $evaluacion->rebaEvaluacion->id) }}"
                                                class="inline-block bg-cyan-500 hover:bg-cyan-600 text-white text-sm font-semibold px-3 py-2 rounded-lg">
                                                 Ver REBA
                                             </a>
+
+                                        @elseif($metodo === 'RULA' && $evaluacion->rulaEvaluacion)
+                                            <a href="{{ route('rula.show', $evaluacion->rulaEvaluacion->id) }}"
+                                               class="inline-block bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-3 py-2 rounded-lg">
+                                                Ver RULA
+                                            </a>
+
+                                        @elseif($metodo === 'OWAS' && $evaluacion->owasEvaluacion)
+                                            <a href="{{ route('owas.show', $evaluacion->owasEvaluacion->id) }}"
+                                               class="inline-block bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold px-3 py-2 rounded-lg">
+                                                Ver OWAS
+                                            </a>
+
+                                        @elseif($metodo === 'NIOSH' && $evaluacion->nioshEvaluacion)
+                                            <a href="{{ route('niosh.show', $evaluacion->nioshEvaluacion->id) }}"
+                                               class="inline-block bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-3 py-2 rounded-lg">
+                                                Ver NIOSH
+                                            </a>
+
+                                        @elseif(($metodo === 'NOM-036' || $metodo === 'NOM036' || $metodo === 'NOM 036') && $evaluacion->nom036)
+                                            <a href="{{ route('nom036.show', $evaluacion->nom036->id) }}"
+                                               class="inline-block bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold px-3 py-2 rounded-lg">
+                                                Ver NOM-036
+                                            </a>
+
                                         @else
                                             <span class="text-gray-400 text-sm">Sin detalle</span>
                                         @endif

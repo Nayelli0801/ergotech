@@ -23,6 +23,8 @@ class EvaluacionController extends Controller
             'metodo',
             'rebaEvaluacion',
             'rulaEvaluacion',
+            'owasEvaluacion',
+            'nioshEvaluacion',
             'nom036'
         ])->latest()->get();
 
@@ -83,7 +85,7 @@ class EvaluacionController extends Controller
                 return redirect()->route('owas.create', $evaluacion->id);
 
             case 'NIOSH':
-                return back()->withInput()->with('error', 'NIOSH aún no está implementado.');
+                return redirect()->route('niosh.create', $evaluacion->id);
 
             case 'NOM-036':
             case 'NOM036':

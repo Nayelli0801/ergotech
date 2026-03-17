@@ -194,24 +194,46 @@
             </div>
 
             <div class="flex flex-wrap gap-3">
-                <button type="button" id="btnCalcularManual" class="bg-blue-700 hover:bg-blue-800 text-white text-sm font-semibold px-5 py-2.5 rounded-lg shadow-sm">Calcular</button>
-                <button type="submit" id="btnGuardar" class="bg-green-600 text-white text-sm font-semibold px-5 py-2.5 rounded-lg shadow-sm disabled:opacity-50 disabled:cursor-not-allowed" disabled>Guardar evaluación</button>
-                <a href="{{ route('evaluaciones.index') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-semibold px-5 py-2.5 rounded-lg">Cancelar</a>
+                <button type="button" id="btnCalcularManual" class="bg-blue-700 hover:bg-blue-800 text-white text-sm font-semibold px-5 py-2.5 rounded-lg shadow-sm">
+                    Calcular
+                </button>
+                <button type="submit" id="btnGuardar" class="bg-green-600 text-white text-sm font-semibold px-5 py-2.5 rounded-lg shadow-sm disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                    Guardar evaluación
+                </button>
+                <a href="{{ route('evaluaciones.index') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-semibold px-5 py-2.5 rounded-lg">
+                    Cancelar
+                </a>
             </div>
 
             <div id="resultadoReba" class="hidden bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-5">
                 <h3 class="text-lg sm:text-xl font-bold text-blue-700 mb-4">Resultado previo</h3>
 
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
-                    <div class="bg-slate-50 border rounded-xl p-3"><p class="text-xs uppercase tracking-wide text-gray-500">Puntuación A</p><p id="prevA" class="text-xl font-bold text-slate-700 mt-1">0</p></div>
-                    <div class="bg-green-50 border rounded-xl p-3"><p class="text-xs uppercase tracking-wide text-gray-500">Puntuación B</p><p id="prevB" class="text-xl font-bold text-green-700 mt-1">0</p></div>
-                    <div class="bg-yellow-50 border rounded-xl p-3"><p class="text-xs uppercase tracking-wide text-gray-500">Puntuación C</p><p id="prevC" class="text-xl font-bold text-yellow-700 mt-1">0</p></div>
-                    <div class="bg-purple-50 border rounded-xl p-3"><p class="text-xs uppercase tracking-wide text-gray-500">Puntuación Final</p><p id="prevFinal" class="text-xl font-bold text-purple-700 mt-1">0</p></div>
+                    <div class="bg-slate-50 border rounded-xl p-3">
+                        <p class="text-xs uppercase tracking-wide text-gray-500">Puntuación A</p>
+                        <p id="prevA" class="text-xl font-bold text-slate-700 mt-1">0</p>
+                    </div>
+                    <div class="bg-green-50 border rounded-xl p-3">
+                        <p class="text-xs uppercase tracking-wide text-gray-500">Puntuación B</p>
+                        <p id="prevB" class="text-xl font-bold text-green-700 mt-1">0</p>
+                    </div>
+                    <div class="bg-yellow-50 border rounded-xl p-3">
+                        <p class="text-xs uppercase tracking-wide text-gray-500">Puntuación C</p>
+                        <p id="prevC" class="text-xl font-bold text-yellow-700 mt-1">0</p>
+                    </div>
+                    <div class="bg-purple-50 border rounded-xl p-3">
+                        <p class="text-xs uppercase tracking-wide text-gray-500">Puntuación Final</p>
+                        <p id="prevFinal" class="text-xl font-bold text-purple-700 mt-1">0</p>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5">
-                    <div class="rounded-xl bg-blue-50 border border-blue-100 p-4"><p class="text-sm"><span class="font-semibold">Nivel de riesgo:</span> <span id="prevNivel">-</span></p></div>
-                    <div class="rounded-xl bg-amber-50 border border-amber-100 p-4"><p class="text-sm"><span class="font-semibold">Acción requerida:</span> <span id="prevAccion">-</span></p></div>
+                    <div class="rounded-xl bg-blue-50 border border-blue-100 p-4">
+                        <p class="text-sm"><span class="font-semibold">Nivel de riesgo:</span> <span id="prevNivel">-</span></p>
+                    </div>
+                    <div class="rounded-xl bg-amber-50 border border-amber-100 p-4">
+                        <p class="text-sm"><span class="font-semibold">Acción requerida:</span> <span id="prevAccion">-</span></p>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">

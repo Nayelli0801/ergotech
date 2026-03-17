@@ -3,7 +3,7 @@
         <div class="mb-5">
             <h2 class="text-2xl font-bold text-blue-700">Evaluación NOM-036</h2>
             <p class="text-sm text-gray-500 mt-1">
-                Captura las condiciones observadas de manejo manual de cargas. El sistema calculará un nivel de riesgo inicial.
+                Selecciona una o varias tareas realizadas y captura las condiciones observadas. El sistema calculará el riesgo automáticamente.
             </p>
         </div>
 
@@ -23,7 +23,7 @@
             </div>
         @endif
 
-        <form action="{{ route('nom036.store', $evaluacion->id) }}" method="POST" class="space-y-5">
+        <form action="{{ route('nom036.store', $evaluacion->id) }}" method="POST" class="space-y-5" id="nom036Form">
             @csrf
 
             <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -54,152 +54,467 @@
             </div>
 
             <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
-                <h3 class="text-lg font-bold text-blue-700 mb-4">1. Datos de la tarea</h3>
+                <h3 class="text-lg font-bold text-blue-700 mb-4">1. Configuración de la evaluación</h3>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de actividad</label>
-                        <select name="tipo_actividad" class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500" required>
-                            <option value="">Seleccione</option>
-                            <option value="levantar">Levantar</option>
-                            <option value="bajar">Bajar</option>
-                            <option value="transportar">Transportar</option>
-                            <option value="empujar">Empujar</option>
-                            <option value="jalar">Jalar</option>
-                            <option value="arrastrar">Arrastrar</option>
-                        </select>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Tareas realizadas</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <label class="flex items-center gap-2 text-sm text-gray-700">
+                                <input type="checkbox" name="tareas[]" value="levantar" class="tarea-check rounded border-gray-300">
+                                <span>Levantar</span>
+                            </label>
+
+                            <label class="flex items-center gap-2 text-sm text-gray-700">
+                                <input type="checkbox" name="tareas[]" value="bajar" class="tarea-check rounded border-gray-300">
+                                <span>Bajar</span>
+                            </label>
+
+                            <label class="flex items-center gap-2 text-sm text-gray-700">
+                                <input type="checkbox" name="tareas[]" value="transportar" class="tarea-check rounded border-gray-300">
+                                <span>Transportar</span>
+                            </label>
+
+                            <label class="flex items-center gap-2 text-sm text-gray-700">
+                                <input type="checkbox" name="tareas[]" value="empujar" class="tarea-check rounded border-gray-300">
+                                <span>Empujar</span>
+                            </label>
+
+                            <label class="flex items-center gap-2 text-sm text-gray-700">
+                                <input type="checkbox" name="tareas[]" value="jalar" class="tarea-check rounded border-gray-300">
+                                <span>Jalar</span>
+                            </label>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">
+                            Marca todas las tareas que realmente se realizan en la actividad observada.
+                        </p>
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Objeto manipulado</label>
-                        <input type="text" name="objeto_manipulado" class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500" placeholder="Ej. Caja, costal, bandeja">
-                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Medio de ayuda utilizado</label>
+                            <select name="medio_ayuda"
+                                class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">Seleccione</option>
+                                <option value="Sin ayuda">Sin ayuda</option>
+                                <option value="Con equipo auxiliar manual">Con equipo auxiliar manual</option>
+                                <option value="Con equipo con ruedas">Con equipo con ruedas</option>
+                                <option value="Con ayuda de otra persona">Con ayuda de otra persona</option>
+                                <option value="Mixta">Mixta</option>
+                            </select>
+                        </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Peso de la carga (kg)</label>
-                        <input type="number" step="0.01" name="peso_carga" class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500">
-                    </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre de la tarea</label>
+                            <input type="text" name="tarea_nombre"
+                                class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Ej. Levantar caja y transportarla al área de empaque">
+                        </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Frecuencia</label>
-                        <input type="number" step="0.01" name="frecuencia" class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500" placeholder="Veces por periodo">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Duración (horas)</label>
-                        <input type="number" step="0.01" name="duracion" class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Distancia recorrida (m)</label>
-                        <input type="number" step="0.01" name="distancia_recorrida" class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Altura inicial (cm)</label>
-                        <input type="number" step="0.01" name="altura_inicial" class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Altura final (cm)</label>
-                        <input type="number" step="0.01" name="altura_final" class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Descripción del apoyo o equipo utilizado</label>
+                            <input type="text" name="descripcion_apoyo"
+                                class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Ej. Diablito, carrito, mesa elevadora, apoyo de compañero">
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
-                <h3 class="text-lg font-bold text-blue-700 mb-4">2. Posturas y condiciones</h3>
+            {{-- LEVANTAR --}}
+            <div id="bloque_levantar" class="hidden bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+                <h3 class="text-lg font-bold text-blue-700 mb-4">2. Cuestionario: Levantar</h3>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Postura del tronco</label>
-                        <select name="postura_tronco" class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Peso y frecuencia de la carga</label>
+                        <select name="lev_peso_frecuencia" class="w-full rounded-lg border-gray-300">
                             <option value="">Seleccione</option>
-                            <option value="neutral">Neutral</option>
-                            <option value="forzada">Forzada</option>
+                            <option value="0|Carga ligera y frecuencia baja">Carga ligera y frecuencia baja</option>
+                            <option value="1|Carga moderada o frecuencia media">Carga moderada o frecuencia media</option>
+                            <option value="2|Carga alta o frecuencia alta">Carga alta o frecuencia alta</option>
+                            <option value="3|Carga muy alta y/o frecuencia muy alta">Carga muy alta y/o frecuencia muy alta</option>
                         </select>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Postura de brazos</label>
-                        <select name="postura_brazos" class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Distancia horizontal entre las manos y la espalda baja</label>
+                        <select name="lev_distancia_horizontal" class="w-full rounded-lg border-gray-300">
                             <option value="">Seleccione</option>
-                            <option value="neutral">Neutral</option>
-                            <option value="forzada">Forzada</option>
+                            <option value="0|Manos muy cercanas a la espalda baja">Manos muy cercanas a la espalda baja</option>
+                            <option value="1|Manos cercanas a la espalda baja">Manos cercanas a la espalda baja</option>
+                            <option value="2|Distancia moderada respecto a la espalda baja">Distancia moderada respecto a la espalda baja</option>
+                            <option value="3|Separación grande o brazos muy flexionados">Separación grande o brazos muy flexionados</option>
                         </select>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Postura de piernas</label>
-                        <select name="postura_piernas" class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Asimetría de la espalda o la carga</label>
+                        <select name="lev_asimetria" class="w-full rounded-lg border-gray-300">
                             <option value="">Seleccione</option>
-                            <option value="neutral">Neutral</option>
-                            <option value="forzada">Forzada</option>
+                            <option value="0|No hay asimetría">No hay asimetría</option>
+                            <option value="1|Asimetría leve">Asimetría leve</option>
+                            <option value="2|Asimetría moderada">Asimetría moderada</option>
+                            <option value="3|Asimetría marcada">Asimetría marcada</option>
                         </select>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Agarre</label>
-                        <select name="agarre" class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Restricciones posturales por espacio disponible</label>
+                        <select name="lev_restricciones_posturales" class="w-full rounded-lg border-gray-300">
                             <option value="">Seleccione</option>
-                            <option value="bueno">Bueno</option>
-                            <option value="regular">Regular</option>
-                            <option value="malo">Malo</option>
+                            <option value="0|No existen restricciones posturales">No existen restricciones posturales</option>
+                            <option value="1|Restricciones leves">Restricciones leves</option>
+                            <option value="2|Restricciones moderadas">Restricciones moderadas</option>
+                            <option value="3|Restricciones severas">Restricciones severas</option>
                         </select>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Condiciones ambientales</label>
-                        <select name="condiciones_ambientales" class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Agarre de la carga</label>
+                        <select name="lev_agarre_carga" class="w-full rounded-lg border-gray-300">
                             <option value="">Seleccione</option>
-                            <option value="favorables">Favorables</option>
-                            <option value="desfavorables">Desfavorables</option>
+                            <option value="0|Buen agarre">Buen agarre</option>
+                            <option value="1|Agarre aceptable">Agarre aceptable</option>
+                            <option value="2|Agarre deficiente">Agarre deficiente</option>
+                            <option value="3|Agarre muy deficiente">Agarre muy deficiente</option>
                         </select>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Superficie de trabajo</label>
-                        <select name="superficie_trabajo" class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Superficie del suelo</label>
+                        <select name="lev_superficie_suelo" class="w-full rounded-lg border-gray-300">
                             <option value="">Seleccione</option>
-                            <option value="regular">Regular</option>
-                            <option value="irregular">Irregular</option>
+                            <option value="0|Buen estado, seca, limpia, firme y nivelada">Buen estado, seca, limpia, firme y nivelada</option>
+                            <option value="1|Aceptable">Aceptable</option>
+                            <option value="2|Irregular o con riesgo moderado">Irregular o con riesgo moderado</option>
+                            <option value="3|Mala condición">Mala condición</option>
                         </select>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Espacio de trabajo</label>
-                        <select name="espacio_trabajo" class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Factores ambientales</label>
+                        <select name="lev_factores_ambientales" class="w-full rounded-lg border-gray-300">
                             <option value="">Seleccione</option>
-                            <option value="adecuado">Adecuado</option>
-                            <option value="reducido">Reducido</option>
+                            <option value="0|No existen">No existen</option>
+                            <option value="1|Leves">Leves</option>
+                            <option value="2|Moderados">Moderados</option>
+                            <option value="3|Severos">Severos</option>
                         </select>
                     </div>
                 </div>
+            </div>
 
-                <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <label class="flex items-center gap-2 text-sm text-gray-700">
-                        <input class="rounded border-gray-300" type="checkbox" name="asimetria" value="1">
-                        <span>Existe asimetría o giro del cuerpo</span>
-                    </label>
+            {{-- BAJAR --}}
+            <div id="bloque_bajar" class="hidden bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+                <h3 class="text-lg font-bold text-blue-700 mb-4">2. Cuestionario: Bajar</h3>
 
-                    <label class="flex items-center gap-2 text-sm text-gray-700">
-                        <input class="rounded border-gray-300" type="checkbox" name="movimientos_repetitivos" value="1">
-                        <span>Existen movimientos repetitivos</span>
-                    </label>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Peso y frecuencia de la carga</label>
+                        <select name="baj_peso_frecuencia" class="w-full rounded-lg border-gray-300">
+                            <option value="">Seleccione</option>
+                            <option value="0|Carga ligera y frecuencia baja">Carga ligera y frecuencia baja</option>
+                            <option value="1|Carga moderada o frecuencia media">Carga moderada o frecuencia media</option>
+                            <option value="2|Carga alta o frecuencia alta">Carga alta o frecuencia alta</option>
+                            <option value="3|Carga muy alta y/o frecuencia muy alta">Carga muy alta y/o frecuencia muy alta</option>
+                        </select>
+                    </div>
 
-                    <label class="flex items-center gap-2 text-sm text-gray-700">
-                        <input class="rounded border-gray-300" type="checkbox" name="fuerza_brusca" value="1">
-                        <span>Se aplica fuerza brusca</span>
-                    </label>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Control de descenso</label>
+                        <select name="baj_control_descenso" class="w-full rounded-lg border-gray-300">
+                            <option value="">Seleccione</option>
+                            <option value="0|Totalmente controlado">Totalmente controlado</option>
+                            <option value="1|Ligera dificultad">Ligera dificultad</option>
+                            <option value="2|Difícil de controlar">Difícil de controlar</option>
+                            <option value="3|Descenso brusco o muy difícil">Descenso brusco o muy difícil</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Asimetría</label>
+                        <select name="baj_asimetria" class="w-full rounded-lg border-gray-300">
+                            <option value="">Seleccione</option>
+                            <option value="0|Sin asimetría">Sin asimetría</option>
+                            <option value="1|Leve">Leve</option>
+                            <option value="2|Moderada">Moderada</option>
+                            <option value="3|Marcada">Marcada</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Restricciones posturales</label>
+                        <select name="baj_restricciones_posturales" class="w-full rounded-lg border-gray-300">
+                            <option value="">Seleccione</option>
+                            <option value="0|No existen">No existen</option>
+                            <option value="1|Leves">Leves</option>
+                            <option value="2|Moderadas">Moderadas</option>
+                            <option value="3|Severas">Severas</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Agarre de la carga</label>
+                        <select name="baj_agarre_carga" class="w-full rounded-lg border-gray-300">
+                            <option value="">Seleccione</option>
+                            <option value="0|Buen agarre">Buen agarre</option>
+                            <option value="1|Agarre aceptable">Agarre aceptable</option>
+                            <option value="2|Agarre deficiente">Agarre deficiente</option>
+                            <option value="3|Agarre muy deficiente">Agarre muy deficiente</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Superficie del suelo</label>
+                        <select name="baj_superficie_suelo" class="w-full rounded-lg border-gray-300">
+                            <option value="">Seleccione</option>
+                            <option value="0|Buen estado, seca, limpia, firme y nivelada">Buen estado, seca, limpia, firme y nivelada</option>
+                            <option value="1|Aceptable">Aceptable</option>
+                            <option value="2|Irregular o con riesgo moderado">Irregular o con riesgo moderado</option>
+                            <option value="3|Mala condición">Mala condición</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            {{-- TRANSPORTAR --}}
+            <div id="bloque_transportar" class="hidden bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+                <h3 class="text-lg font-bold text-blue-700 mb-4">2. Cuestionario: Transportar</h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Peso y frecuencia de la carga</label>
+                        <select name="tra_peso_frecuencia" class="w-full rounded-lg border-gray-300">
+                            <option value="">Seleccione</option>
+                            <option value="0|Carga ligera y frecuencia baja">Carga ligera y frecuencia baja</option>
+                            <option value="1|Carga moderada o frecuencia media">Carga moderada o frecuencia media</option>
+                            <option value="2|Carga alta o frecuencia alta">Carga alta o frecuencia alta</option>
+                            <option value="3|Carga muy alta y/o frecuencia muy alta">Carga muy alta y/o frecuencia muy alta</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Distancia de transporte</label>
+                        <select name="tra_distancia_transporte" class="w-full rounded-lg border-gray-300">
+                            <option value="">Seleccione</option>
+                            <option value="0|Entre 0 y 4 m">Entre 0 y 4 m</option>
+                            <option value="1|Entre 4 y 10 m">Entre 4 y 10 m</option>
+                            <option value="2|Entre 10 y 20 m">Entre 10 y 20 m</option>
+                            <option value="3|Más de 20 m">Más de 20 m</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Asimetría de la carga</label>
+                        <select name="tra_asimetria" class="w-full rounded-lg border-gray-300">
+                            <option value="">Seleccione</option>
+                            <option value="0|No hay asimetría">No hay asimetría</option>
+                            <option value="1|Leve">Leve</option>
+                            <option value="2|Moderada">Moderada</option>
+                            <option value="3|Marcada">Marcada</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Agarre de la carga</label>
+                        <select name="tra_agarre_carga" class="w-full rounded-lg border-gray-300">
+                            <option value="">Seleccione</option>
+                            <option value="0|Buen agarre">Buen agarre</option>
+                            <option value="1|Agarre aceptable">Agarre aceptable</option>
+                            <option value="2|Agarre deficiente">Agarre deficiente</option>
+                            <option value="3|Agarre muy deficiente">Agarre muy deficiente</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Superficie del suelo</label>
+                        <select name="tra_superficie_suelo" class="w-full rounded-lg border-gray-300">
+                            <option value="">Seleccione</option>
+                            <option value="0|Buen estado, seca, limpia, firme y nivelada">Buen estado, seca, limpia, firme y nivelada</option>
+                            <option value="1|Aceptable">Aceptable</option>
+                            <option value="2|Irregular o con riesgo moderado">Irregular o con riesgo moderado</option>
+                            <option value="3|Mala condición">Mala condición</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Obstáculos en la ruta</label>
+                        <select name="tra_obstaculos" class="w-full rounded-lg border-gray-300">
+                            <option value="">Seleccione</option>
+                            <option value="0|No hay obstáculos">No hay obstáculos</option>
+                            <option value="1|Obstáculos menores">Obstáculos menores</option>
+                            <option value="2|Obstáculos moderados o pendiente">Obstáculos moderados o pendiente</option>
+                            <option value="3|Ruta muy obstaculizada">Ruta muy obstaculizada</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Factores ambientales</label>
+                        <select name="tra_factores_ambientales" class="w-full rounded-lg border-gray-300">
+                            <option value="">Seleccione</option>
+                            <option value="0|No existen">No existen</option>
+                            <option value="1|Leves">Leves</option>
+                            <option value="2|Moderados">Moderados</option>
+                            <option value="3|Severos">Severos</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            {{-- EMPUJAR --}}
+            <div id="bloque_empujar" class="hidden bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+                <h3 class="text-lg font-bold text-blue-700 mb-4">2. Cuestionario: Empujar</h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Peso de la carga</label>
+                        <select name="emp_peso_carga" class="w-full rounded-lg border-gray-300">
+                            <option value="">Seleccione</option>
+                            <option value="0|Menor a 50 kg">Menor a 50 kg</option>
+                            <option value="1|Entre 50 y 100 kg">Entre 50 y 100 kg</option>
+                            <option value="2|Entre 100 y 200 kg">Entre 100 y 200 kg</option>
+                            <option value="3|Mayor a 200 kg">Mayor a 200 kg</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Postura</label>
+                        <select name="emp_postura" class="w-full rounded-lg border-gray-300">
+                            <option value="">Seleccione</option>
+                            <option value="0|Postura adecuada">Postura adecuada</option>
+                            <option value="1|Ligera inclinación">Ligera inclinación</option>
+                            <option value="2|Inclinación moderada">Inclinación moderada</option>
+                            <option value="3|Postura forzada">Postura forzada</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Agarre de la mano</label>
+                        <select name="emp_agarre_mano" class="w-full rounded-lg border-gray-300">
+                            <option value="">Seleccione</option>
+                            <option value="0|Buen agarre">Buen agarre</option>
+                            <option value="1|Agarre parcial">Agarre parcial</option>
+                            <option value="2|Agarre deficiente">Agarre deficiente</option>
+                            <option value="3|Agarre muy deficiente">Agarre muy deficiente</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Patrón de trabajo</label>
+                        <select name="emp_patron_trabajo" class="w-full rounded-lg border-gray-300">
+                            <option value="">Seleccione</option>
+                            <option value="0|No repetitivo o con amplia recuperación">No repetitivo o con amplia recuperación</option>
+                            <option value="1|Repetitivo con pausas">Repetitivo con pausas</option>
+                            <option value="2|Repetitivo con recuperación limitada">Repetitivo con recuperación limitada</option>
+                            <option value="3|Repetitivo sin pausas">Repetitivo sin pausas</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Distancia por viaje</label>
+                        <select name="emp_distancia_viaje" class="w-full rounded-lg border-gray-300">
+                            <option value="">Seleccione</option>
+                            <option value="0|Menor a 10 m">Menor a 10 m</option>
+                            <option value="1|Entre 10 y 20 m">Entre 10 y 20 m</option>
+                            <option value="2|Entre 20 y 30 m">Entre 20 y 30 m</option>
+                            <option value="3|Más de 30 m">Más de 30 m</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Condición del equipo auxiliar</label>
+                        <select name="emp_condicion_equipo" class="w-full rounded-lg border-gray-300">
+                            <option value="">Seleccione</option>
+                            <option value="0|Buen mantenimiento">Buen mantenimiento</option>
+                            <option value="1|Aceptable">Aceptable</option>
+                            <option value="2|Deficiente">Deficiente</option>
+                            <option value="3|Muy mala">Muy mala</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            {{-- JALAR --}}
+            <div id="bloque_jalar" class="hidden bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+                <h3 class="text-lg font-bold text-blue-700 mb-4">2. Cuestionario: Jalar</h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Peso de la carga</label>
+                        <select name="jal_peso_carga" class="w-full rounded-lg border-gray-300">
+                            <option value="">Seleccione</option>
+                            <option value="0|Menor a 50 kg">Menor a 50 kg</option>
+                            <option value="1|Entre 50 y 100 kg">Entre 50 y 100 kg</option>
+                            <option value="2|Entre 100 y 200 kg">Entre 100 y 200 kg</option>
+                            <option value="3|Mayor a 200 kg">Mayor a 200 kg</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Postura</label>
+                        <select name="jal_postura" class="w-full rounded-lg border-gray-300">
+                            <option value="">Seleccione</option>
+                            <option value="0|Postura adecuada">Postura adecuada</option>
+                            <option value="1|Ligera inclinación">Ligera inclinación</option>
+                            <option value="2|Inclinación moderada">Inclinación moderada</option>
+                            <option value="3|Postura forzada">Postura forzada</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Agarre de la mano</label>
+                        <select name="jal_agarre_mano" class="w-full rounded-lg border-gray-300">
+                            <option value="">Seleccione</option>
+                            <option value="0|Buen agarre">Buen agarre</option>
+                            <option value="1|Agarre parcial">Agarre parcial</option>
+                            <option value="2|Agarre deficiente">Agarre deficiente</option>
+                            <option value="3|Agarre muy deficiente">Agarre muy deficiente</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Patrón de trabajo</label>
+                        <select name="jal_patron_trabajo" class="w-full rounded-lg border-gray-300">
+                            <option value="">Seleccione</option>
+                            <option value="0|No repetitivo o con amplia recuperación">No repetitivo o con amplia recuperación</option>
+                            <option value="1|Repetitivo con pausas">Repetitivo con pausas</option>
+                            <option value="2|Repetitivo con recuperación limitada">Repetitivo con recuperación limitada</option>
+                            <option value="3|Repetitivo sin pausas">Repetitivo sin pausas</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Distancia por viaje</label>
+                        <select name="jal_distancia_viaje" class="w-full rounded-lg border-gray-300">
+                            <option value="">Seleccione</option>
+                            <option value="0|Menor a 10 m">Menor a 10 m</option>
+                            <option value="1|Entre 10 y 20 m">Entre 10 y 20 m</option>
+                            <option value="2|Entre 20 y 30 m">Entre 20 y 30 m</option>
+                            <option value="3|Más de 30 m">Más de 30 m</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Condición del equipo auxiliar</label>
+                        <select name="jal_condicion_equipo" class="w-full rounded-lg border-gray-300">
+                            <option value="">Seleccione</option>
+                            <option value="0|Buen mantenimiento">Buen mantenimiento</option>
+                            <option value="1|Aceptable">Aceptable</option>
+                            <option value="2|Deficiente">Deficiente</option>
+                            <option value="3|Muy mala">Muy mala</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
             <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
                 <h3 class="text-lg font-bold text-blue-700 mb-4">3. Observaciones</h3>
-
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones específicas NOM-036</label>
-                    <textarea name="observaciones" rows="4" class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500" placeholder="Describe hallazgos, condiciones y comentarios relevantes..."></textarea>
+                    <textarea name="observaciones" rows="4"
+                        class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Describe hallazgos, condiciones y comentarios relevantes...">{{ old('observaciones') }}</textarea>
                 </div>
             </div>
 
@@ -208,10 +523,39 @@
                     Guardar evaluación NOM-036
                 </button>
 
-                <a href="{{ route('evaluaciones.index') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold px-5 py-2.5 rounded-lg">
+                <a href="{{ route('evaluaciones.index') }}"
+                    class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold px-5 py-2.5 rounded-lg">
                     Cancelar
                 </a>
             </div>
         </form>
     </div>
+
+    <script>
+        const tareaChecks = document.querySelectorAll('.tarea-check');
+
+        const bloques = {
+            levantar: document.getElementById('bloque_levantar'),
+            bajar: document.getElementById('bloque_bajar'),
+            transportar: document.getElementById('bloque_transportar'),
+            empujar: document.getElementById('bloque_empujar'),
+            jalar: document.getElementById('bloque_jalar'),
+        };
+
+        function toggleBloquesNom036() {
+            Object.values(bloques).forEach(bloque => bloque.classList.add('hidden'));
+
+            tareaChecks.forEach(check => {
+                if (check.checked && bloques[check.value]) {
+                    bloques[check.value].classList.remove('hidden');
+                }
+            });
+        }
+
+        tareaChecks.forEach(check => {
+            check.addEventListener('change', toggleBloquesNom036);
+        });
+
+        window.addEventListener('load', toggleBloquesNom036);
+    </script>
 </x-app-layout>

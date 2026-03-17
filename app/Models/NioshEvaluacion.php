@@ -37,4 +37,9 @@ class NioshEvaluacion extends Model
     {
         return $this->belongsTo(Evaluacion::class, 'evaluacion_id');
     }
+
+    public function detalles()
+    {
+        return $this->hasMany(NioshDetalle::class, 'niosh_evaluacion_id');
+    }
 }

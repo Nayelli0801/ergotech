@@ -17,6 +17,7 @@ use App\Http\Controllers\RebaController;
 use App\Http\Controllers\RulaController;
 use App\Http\Controllers\OwasController;
 use App\Http\Controllers\Nom036Controller;
+use App\Http\Controllers\NioshController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -63,6 +64,12 @@ Route::middleware(['auth', 'rol:admin'])->group(function () {
     Route::post('/owas/store/{evaluacion}', [OwasController::class, 'store'])->name('owas.store');
     Route::get('/owas/{id}', [OwasController::class, 'show'])->name('owas.show');
     Route::get('/owas/{id}/pdf', [OwasController::class, 'pdf'])->name('owas.pdf');
+
+    Route::get('/niosh', [NioshController::class, 'index'])->name('niosh.index');
+    Route::get('/niosh/create/{evaluacion}', [NioshController::class, 'create'])->name('niosh.create');
+    Route::post('/niosh/store/{evaluacion}', [NioshController::class, 'store'])->name('niosh.store');
+    Route::get('/niosh/{id}', [NioshController::class, 'show'])->name('niosh.show');
+    Route::get('/niosh/{id}/pdf', [NioshController::class, 'pdf'])->name('niosh.pdf');
 
     Route::get('/nom036/{evaluacion}/create', [Nom036Controller::class, 'create'])->name('nom036.create');
     Route::post('/nom036/{evaluacion}/store', [Nom036Controller::class, 'store'])->name('nom036.store');
