@@ -28,10 +28,11 @@
                 $tituloPanel = 'Panel Visitante';
             }
         }
+
+        $rol = strtolower(auth()->user()->rol?->nombre ?? 'visitante');
     @endphp
 
     <div class="min-h-screen flex">
-        {{-- Overlay móvil --}}
         <div
             x-show="sidebarOpen"
             x-transition.opacity
@@ -40,13 +41,10 @@
             style="display: none;"
         ></div>
 
-        {{-- Sidebar --}}
         <aside
-            class="fixed inset-y-0 left-0 z-40 w-72 bg-[#2F9CC3] text-white flex flex-col transform transition-transform duration-300
-                   lg:translate-x-0 lg:static lg:flex shadow-2xl lg:shadow-none"
+            class="fixed inset-y-0 left-0 z-40 w-72 bg-[#2F9CC3] text-white flex flex-col transform transition-transform duration-300 lg:translate-x-0 lg:static lg:flex shadow-2xl lg:shadow-none"
             :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
         >
-            {{-- Marca --}}
             <div class="h-24 px-6 border-b border-white/15 flex items-center justify-between">
                 <a href="{{ route('dashboard') }}" class="flex items-center gap-4 min-w-0">
                     <div class="h-14 w-14 bg-white rounded-2xl p-2 flex items-center justify-center shadow-md shrink-0">
@@ -76,7 +74,6 @@
                 </button>
             </div>
 
-            {{-- Navegación --}}
             <nav class="flex-1 px-5 py-6 space-y-6 overflow-y-auto">
                 <div>
                     <p class="px-3 mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/65">
@@ -84,43 +81,40 @@
                     </p>
 
                     <a href="{{ route('dashboard') }}"
-                       class="flex items-center rounded-xl px-4 py-3 text-[15px] transition
-                       {{ request()->routeIs('dashboard') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
+                       class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('dashboard') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
                         Dashboard
                     </a>
                 </div>
 
-                <div>
-                    <p class="px-3 mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/65">
-                        Gestión
-                    </p>
+                @if(in_array($rol, ['admin', 'evaluador']))
+                    <div>
+                        <p class="px-3 mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/65">
+                            Gestión
+                        </p>
 
-                    <div class="space-y-1.5">
-                        <a href="{{ route('empresas.index') }}"
-                           class="flex items-center rounded-xl px-4 py-3 text-[15px] transition
-                           {{ request()->routeIs('empresas.*') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
-                            Empresas
-                        </a>
+                        <div class="space-y-1.5">
+                            <a href="{{ route('empresas.index') }}"
+                               class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('empresas.*') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
+                                Empresas
+                            </a>
 
-                        <a href="{{ route('sucursales.index') }}"
-                           class="flex items-center rounded-xl px-4 py-3 text-[15px] transition
-                           {{ request()->routeIs('sucursales.*') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
-                            Sucursales
-                        </a>
+                            <a href="{{ route('sucursales.index') }}"
+                               class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('sucursales.*') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
+                                Sucursales
+                            </a>
 
-                        <a href="{{ route('puestos.index') }}"
-                           class="flex items-center rounded-xl px-4 py-3 text-[15px] transition
-                           {{ request()->routeIs('puestos.*') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
-                            Puestos
-                        </a>
+                            <a href="{{ route('puestos.index') }}"
+                               class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('puestos.*') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
+                                Puestos
+                            </a>
 
-                        <a href="{{ route('trabajadores.index') }}"
-                           class="flex items-center rounded-xl px-4 py-3 text-[15px] transition
-                           {{ request()->routeIs('trabajadores.*') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
-                            Trabajadores
-                        </a>
+                            <a href="{{ route('trabajadores.index') }}"
+                               class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('trabajadores.*') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
+                                Trabajadores
+                            </a>
+                        </div>
                     </div>
-                </div>
+                @endif
 
                 <div>
                     <p class="px-3 mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/65">
@@ -128,39 +122,46 @@
                     </p>
 
                     <div class="space-y-1.5">
-                        <a href="{{ route('usuarios.index') }}"
-                           class="flex items-center rounded-xl px-4 py-3 text-[15px] transition
-                           {{ request()->routeIs('usuarios.*') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
-                            Usuarios
-                        </a>
+                        @if($rol === 'admin')
+                            <a href="{{ route('usuarios.index') }}"
+                               class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('usuarios.*') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
+                                Usuarios
+                            </a>
+
+                            @if(Route::has('configuracion.index'))
+                                <a href="{{ route('configuracion.index') }}"
+                                   class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('configuracion.*') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
+                                    Configuración
+                                </a>
+                            @endif
+                        @endif
 
                         <a href="{{ route('reportes.index') }}"
-                           class="flex items-center rounded-xl px-4 py-3 text-[15px] transition
-                           {{ request()->routeIs('reportes.*') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
+                           class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('reportes.*') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
                             Reportes
                         </a>
                     </div>
                 </div>
 
-                <div>
-                    <p class="px-3 mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/65">
-                        Evaluación
-                    </p>
+                @if(in_array($rol, ['admin', 'evaluador']))
+                    <div>
+                        <p class="px-3 mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/65">
+                            Evaluación
+                        </p>
 
-                    <div class="space-y-1.5">
-                        <a href="{{ route('evaluaciones.index') }}"
-                           class="flex items-center rounded-xl px-4 py-3 text-[15px] transition
-                           {{ request()->routeIs('evaluaciones.index') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
-                            Evaluaciones
-                        </a>
+                        <div class="space-y-1.5">
+                            <a href="{{ route('evaluaciones.index') }}"
+                               class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('evaluaciones.index') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
+                                Evaluaciones
+                            </a>
 
-                        <a href="{{ route('evaluaciones.create') }}"
-                           class="flex items-center rounded-xl px-4 py-3 text-[15px] transition
-                           {{ request()->routeIs('evaluaciones.create') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
-                            Nueva evaluación
-                        </a>
+                            <a href="{{ route('evaluaciones.create') }}"
+                               class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('evaluaciones.create') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
+                                Nueva evaluación
+                            </a>
+                        </div>
                     </div>
-                </div>
+                @endif
 
                 <div>
                     <p class="px-3 mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/65">
@@ -168,28 +169,23 @@
                     </p>
 
                     <a href="{{ route('profile.edit') }}"
-                       class="flex items-center rounded-xl px-4 py-3 text-[15px] transition
-                       {{ request()->routeIs('profile.*') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
+                       class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('profile.*') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
                         Perfil
                     </a>
                 </div>
             </nav>
 
-            {{-- Logout --}}
             <div class="p-5 border-t border-white/15">
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button
-                        class="w-full rounded-xl px-4 py-3 text-left text-[15px] font-medium text-white/95 hover:bg-white/10 transition">
+                    <button class="w-full rounded-xl px-4 py-3 text-left text-[15px] font-medium text-white/95 hover:bg-white/10 transition">
                         Cerrar sesión
                     </button>
                 </form>
             </div>
         </aside>
 
-        {{-- Contenido --}}
         <div class="flex-1 min-w-0 flex flex-col">
-            {{-- Header --}}
             <header class="h-24 bg-white border-b border-slate-200 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
                 <div class="flex items-center gap-4 min-w-0">
                     <button
@@ -218,7 +214,11 @@
                     </div>
                 </div>
 
-                <div class="flex items-center gap-3 min-w-0">
+                <div class="flex items-center gap-4">
+                    <span class="hidden sm:inline-block text-xs bg-sky-100 text-sky-700 px-3 py-1 rounded-full font-semibold">
+                        {{ ucfirst($rol) }}
+                    </span>
+
                     @if(Auth::user()->profile_photo)
                         <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}"
                              class="w-11 h-11 rounded-full object-cover ring-2 ring-slate-200">
@@ -242,7 +242,6 @@
                 </div>
             </header>
 
-            {{-- Main --}}
             <main class="flex-1 overflow-y-auto">
                 <div class="p-4 sm:p-6 lg:p-8">
                     {{ $slot }}
