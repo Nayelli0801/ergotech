@@ -18,47 +18,44 @@ use App\Http\Controllers\RulaController;
 use App\Http\Controllers\OwasController;
 use App\Http\Controllers\Nom036Controller;
 use App\Http\Controllers\NioshController;
-use App\Http\Controllers\ConfiguracionController; // ← Controlador para configuración (solo admin)
+use App\Http\Controllers\ConfiguracionController;
 
 // Redirigir la raíz al login
 Route::get('/', function () {
     return redirect('/login');
 });
 
-// Rutas para autenticación de dos factores
+// Rutas de autenticación de dos factores
 Route::get('/two-factor', [TwoFactorController::class, 'index'])->name('2fa.index');
 Route::post('/two-factor', [TwoFactorController::class, 'store'])->name('2fa.store');
 
 // Dashboard (accesible para cualquier usuario autenticado)
 Route::middleware(['auth'])->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-// Grupo de rutas para el perfil (accesible para cualquier usuario autenticado)
+// Perfil (accesible para cualquier usuario autenticado)
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Grupo de rutas exclusivas para administradores (middleware 'rol:admin')
-Route::middleware(['auth', 'rol:admin'])->group(function () {
+// =========================================================================
+// GRUPO PARA ADMIN Y EVALUADOR (compartidas) - SIN ESPACIOS EN LA COMA
+// =========================================================================
+Route::middleware(['auth', 'rol:admin,evaluador'])->group(function () {
 
-    // Recursos CRUD completos
-    Route::resource('usuarios', UserController::class);
-    Route::resource('empresas', EmpresaController::class);
-    Route::resource('sucursales', SucursalController::class);
-    Route::resource('puestos', PuestoController::class);
-    Route::resource('trabajadores', TrabajadorController::class);
+    // Gestión (empresas, sucursales, puestos, trabajadores)
+    Route::get('/empresas', [EmpresaController::class, 'index'])->name('empresas.index');
+    Route::get('/empresas/create', [EmpresaController::class, 'create'])->name('empresas.create');
+    Route::post('/empresas', [EmpresaController::class, 'store'])->name('empresas.store');
+    Route::get('/empresas/{empresa}', [EmpresaController::class, 'show'])->name('empresas.show');
+    Route::get('/empresas/{empresa}/edit', [EmpresaController::class, 'edit'])->name('empresas.edit');
+
+    // Evaluaciones (recurso principal)
     Route::resource('evaluaciones', EvaluacionController::class);
-
     // Ruta adicional para seleccionar método en evaluación
     Route::post('/evaluaciones/seleccionar-metodo', [EvaluacionController::class, 'seleccionarMetodo'])
         ->name('evaluaciones.seleccionarMetodo');
-
-    // ⚙️ Ruta de configuración (solo admin) - Usa el controlador ConfiguracionController
-    Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
-
-    // Si prefieres una vista directa sin controlador, puedes usar:
-    // Route::view('/configuracion', 'configuracion.index')->name('configuracion.index');
 
     // Métodos REBA
     Route::get('/reba', [RebaController::class, 'index'])->name('reba.index');
@@ -95,8 +92,20 @@ Route::middleware(['auth', 'rol:admin'])->group(function () {
     Route::get('/nom036/{id}', [Nom036Controller::class, 'show'])->name('nom036.show');
     Route::get('/nom036/{id}/pdf', [Nom036Controller::class, 'pdf'])->name('nom036.pdf');
 
-    // Reportes (también solo admin, aunque podría ser para evaluadores; ajusta si es necesario)
+    // Reportes
     Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
+});
+
+// =========================================================================
+// GRUPO EXCLUSIVO PARA ADMIN (solo admin)
+// =========================================================================
+Route::middleware(['auth', 'rol:admin'])->group(function () {
+
+    // Usuarios (CRUD completo)
+    Route::resource('usuarios', UserController::class);
+
+    // Configuración (solo admin)
+    Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
 });
 
 // Ruta de prueba para ver el rol del usuario autenticado
