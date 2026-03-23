@@ -16,10 +16,28 @@
             </div>
 
             <div class="flex flex-wrap gap-3">
+                {{-- PDF --}}
                 <a href="{{ route('reba.pdf', $reba->id) }}"
-                   class="inline-flex items-center px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-semibold shadow hover:bg-blue-700 transition">
+                   class="inline-flex items-center px-4 py-2 rounded-xl bg-red-600 text-white text-sm font-semibold shadow hover:bg-red-700 transition">
                     Descargar PDF
                 </a>
+
+                {{-- Excel --}}
+                @if(Route::has('reba.excel'))
+                    <a href="{{ route('reba.excel', $reba->id) }}"
+                       class="inline-flex items-center px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-semibold shadow hover:bg-emerald-700 transition">
+                        Descargar Excel
+                    </a>
+                @endif
+
+                {{-- Word --}}
+                @if(Route::has('reba.word'))
+                    <a href="{{ route('reba.word', $reba->id) }}"
+                       class="inline-flex items-center px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-semibold shadow hover:bg-blue-700 transition">
+                        Descargar Word
+                    </a>
+                @endif
+
                 <a href="{{ route('evaluaciones.index') }}"
                    class="inline-flex items-center px-4 py-2 rounded-xl border border-slate-300 bg-white text-slate-700 text-sm font-semibold hover:bg-slate-50 transition">
                     Volver

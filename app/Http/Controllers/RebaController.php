@@ -8,6 +8,11 @@ use App\Models\RebaEvaluacion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Exports\RebaExport;
+use App\Services\Reportes\RebaReportService;
+use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpWord\PhpWord;
+use PhpOffice\PhpWord\IOFactory as WordIOFactory;
 
 class RebaController extends Controller
 {
@@ -378,4 +383,107 @@ class RebaController extends Controller
             default => 'No definido',
         };
     }
+
+    public function excel($id, RebaReportService $reportService)
+{
+    $reba = $reportService->findOrFail((int) $id);
+    $data = $reportService->build($reba);
+
+    return Excel::download(
+        new RebaExport($data),
+        'reba_' . $reba->id . '.xlsx'
+    );
+}
+
+public function word($id, RebaReportService $reportService)
+{
+    $reba = $reportService->findOrFail((int) $id);
+    $data = $reportService->build($reba);
+
+    $phpWord = new PhpWord();
+    $phpWord->setDefaultFontName('Arial');
+    $phpWord->setDefaultFontSize(10);
+
+    $section = $phpWord->addSection([
+        'marginTop' => 800,
+        'marginRight' => 800,
+        'marginBottom' => 800,
+        'marginLeft' => 800,
+    ]);
+
+    $phpWord->addTitleStyle(1, ['bold' => true, 'size' => 16], ['alignment' => 'center']);
+    $phpWord->addTitleStyle(2, ['bold' => true, 'size' => 12]);
+
+    $section->addTitle('Reporte de Evaluación REBA', 1);
+    $section->addTextBreak(1);
+
+    $section->addTitle('Datos generales', 2);
+
+    foreach ($data['general'] as $label => $value) {
+        $section->addText(
+            ucfirst(str_replace('_', ' ', $label)) . ': ' . $value
+        );
+    }
+
+    $section->addTextBreak(1);
+    $section->addTitle('Resultado', 2);
+    $section->addText('Nivel de riesgo: ' . $data['nivel_riesgo']);
+    $section->addText('Acción requerida: ' . $data['accion_requerida']);
+
+    $section->addTextBreak(1);
+    $section->addTitle('Puntuaciones', 2);
+
+    $table = $section->addTable([
+        'borderSize' => 6,
+        'borderColor' => 'D1D5DB',
+        'cellMargin' => 80,
+    ]);
+
+    $table->addRow();
+    $table->addCell(5000)->addText('Indicador', ['bold' => true]);
+    $table->addCell(2000)->addText('Valor', ['bold' => true]);
+
+    foreach ($data['scores'] as $score) {
+        $table->addRow();
+        $table->addCell(5000)->addText($score['label']);
+        $table->addCell(2000)->addText((string) $score['value']);
+    }
+
+    $section->addTextBreak(1);
+    $section->addTitle('Detalle de la evaluación', 2);
+
+    $detailTable = $section->addTable([
+        'borderSize' => 6,
+        'borderColor' => 'D1D5DB',
+        'cellMargin' => 80,
+    ]);
+
+    $detailTable->addRow();
+    $detailTable->addCell(1200)->addText('Sección', ['bold' => true]);
+    $detailTable->addCell(2800)->addText('Concepto', ['bold' => true]);
+    $detailTable->addCell(4500)->addText('Valor', ['bold' => true]);
+    $detailTable->addCell(1200)->addText('Puntaje', ['bold' => true]);
+
+    foreach ($data['detalles'] as $detalle) {
+        $detailTable->addRow();
+        $detailTable->addCell(1200)->addText((string) $detalle['seccion']);
+        $detailTable->addCell(2800)->addText((string) $detalle['concepto']);
+        $detailTable->addCell(4500)->addText((string) $detalle['valor']);
+        $detailTable->addCell(1200)->addText((string) $detalle['puntaje']);
+    }
+
+    $tempDir = storage_path('app/temp');
+
+    if (!is_dir($tempDir)) {
+        mkdir($tempDir, 0775, true);
+    }
+
+    $fileName = 'reba_' . $reba->id . '.docx';
+    $filePath = $tempDir . DIRECTORY_SEPARATOR . $fileName;
+
+    $writer = WordIOFactory::createWriter($phpWord, 'Word2007');
+    $writer->save($filePath);
+
+    return response()->download($filePath, $fileName)->deleteFileAfterSend(true);
+}
 }
