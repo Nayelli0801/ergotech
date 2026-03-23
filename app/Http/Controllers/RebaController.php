@@ -384,6 +384,47 @@ class RebaController extends Controller
         };
     }
 
+private function cleanWordText($value): string
+{
+    $text = (string) ($value ?? '');
+
+    // Quita etiquetas HTML
+    $text = strip_tags($text);
+
+    // Fuerza UTF-8 válido
+    $text = mb_convert_encoding($text, 'UTF-8', 'UTF-8');
+
+    // Quita caracteres inválidos para XML/DOCX
+    $text = preg_replace('/[^\x09\x0A\x0D\x20-\x{D7FF}\x{E000}-\x{FFFD}]/u', '', $text);
+
+    // Normaliza saltos
+    $text = str_replace(["\r\n", "\r"], "\n", $text);
+
+    return trim($text ?? '');
+}
+
+private function safeDocxText($value): string
+{
+    $text = (string) ($value ?? '');
+
+    $text = strip_tags($text);
+
+    $converted = @iconv('UTF-8', 'UTF-8//IGNORE', $text);
+    if ($converted !== false) {
+        $text = $converted;
+    }
+
+    $text = mb_convert_encoding($text, 'UTF-8', 'UTF-8');
+
+    $text = preg_replace('/[^\x09\x0A\x0D\x20-\x{D7FF}\x{E000}-\x{FFFD}]/u', '', $text);
+
+    $text = str_replace(["\r\n", "\r"], "\n", $text);
+
+    return trim($text ?? '');
+}
+
+
+
     public function excel($id, RebaReportService $reportService)
 {
     $reba = $reportService->findOrFail((int) $id);
@@ -400,78 +441,6 @@ public function word($id, RebaReportService $reportService)
     $reba = $reportService->findOrFail((int) $id);
     $data = $reportService->build($reba);
 
-    $phpWord = new PhpWord();
-    $phpWord->setDefaultFontName('Arial');
-    $phpWord->setDefaultFontSize(10);
-
-    $section = $phpWord->addSection([
-        'marginTop' => 800,
-        'marginRight' => 800,
-        'marginBottom' => 800,
-        'marginLeft' => 800,
-    ]);
-
-    $phpWord->addTitleStyle(1, ['bold' => true, 'size' => 16], ['alignment' => 'center']);
-    $phpWord->addTitleStyle(2, ['bold' => true, 'size' => 12]);
-
-    $section->addTitle('Reporte de Evaluación REBA', 1);
-    $section->addTextBreak(1);
-
-    $section->addTitle('Datos generales', 2);
-
-    foreach ($data['general'] as $label => $value) {
-        $section->addText(
-            ucfirst(str_replace('_', ' ', $label)) . ': ' . $value
-        );
-    }
-
-    $section->addTextBreak(1);
-    $section->addTitle('Resultado', 2);
-    $section->addText('Nivel de riesgo: ' . $data['nivel_riesgo']);
-    $section->addText('Acción requerida: ' . $data['accion_requerida']);
-
-    $section->addTextBreak(1);
-    $section->addTitle('Puntuaciones', 2);
-
-    $table = $section->addTable([
-        'borderSize' => 6,
-        'borderColor' => 'D1D5DB',
-        'cellMargin' => 80,
-    ]);
-
-    $table->addRow();
-    $table->addCell(5000)->addText('Indicador', ['bold' => true]);
-    $table->addCell(2000)->addText('Valor', ['bold' => true]);
-
-    foreach ($data['scores'] as $score) {
-        $table->addRow();
-        $table->addCell(5000)->addText($score['label']);
-        $table->addCell(2000)->addText((string) $score['value']);
-    }
-
-    $section->addTextBreak(1);
-    $section->addTitle('Detalle de la evaluación', 2);
-
-    $detailTable = $section->addTable([
-        'borderSize' => 6,
-        'borderColor' => 'D1D5DB',
-        'cellMargin' => 80,
-    ]);
-
-    $detailTable->addRow();
-    $detailTable->addCell(1200)->addText('Sección', ['bold' => true]);
-    $detailTable->addCell(2800)->addText('Concepto', ['bold' => true]);
-    $detailTable->addCell(4500)->addText('Valor', ['bold' => true]);
-    $detailTable->addCell(1200)->addText('Puntaje', ['bold' => true]);
-
-    foreach ($data['detalles'] as $detalle) {
-        $detailTable->addRow();
-        $detailTable->addCell(1200)->addText((string) $detalle['seccion']);
-        $detailTable->addCell(2800)->addText((string) $detalle['concepto']);
-        $detailTable->addCell(4500)->addText((string) $detalle['valor']);
-        $detailTable->addCell(1200)->addText((string) $detalle['puntaje']);
-    }
-
     $tempDir = storage_path('app/temp');
 
     if (!is_dir($tempDir)) {
@@ -481,9 +450,62 @@ public function word($id, RebaReportService $reportService)
     $fileName = 'reba_' . $reba->id . '.docx';
     $filePath = $tempDir . DIRECTORY_SEPARATOR . $fileName;
 
-    $writer = WordIOFactory::createWriter($phpWord, 'Word2007');
+    $phpWord = new \PhpOffice\PhpWord\PhpWord();
+    $phpWord->setDefaultFontName('Arial');
+    $phpWord->setDefaultFontSize(10);
+
+    $section = $phpWord->addSection();
+
+    $section->addText('Reporte de Evaluación REBA', ['bold' => true, 'size' => 16]);
+    $section->addTextBreak(1);
+
+    $section->addText('Prueba base correcta');
+    $section->addTextBreak(1);
+
+    $section->addText('Datos generales', ['bold' => true]);
+
+    foreach ($data['general'] as $label => $value) {
+        $texto = $this->safeDocxText(ucfirst(str_replace('_', ' ', $label)) . ': ' . (string) $value);
+        $section->addText($texto);
+    }
+
+    $section->addTextBreak(1);
+
+    $section->addText('Resultado', ['bold' => true]);
+    $section->addText($this->safeDocxText('Nivel de riesgo: ' . (string) $data['nivel_riesgo']));
+    $section->addText($this->safeDocxText('Acción requerida: ' . (string) $data['accion_requerida']));
+
+    $section->addTextBreak(1);
+
+    $section->addText('Puntuaciones', ['bold' => true]);
+
+    foreach ($data['scores'] as $score) {
+        $linea = $this->safeDocxText((string) $score['label'] . ': ' . (string) $score['value']);
+        $section->addText($linea);
+    }
+
+    $section->addTextBreak(1);
+
+    $section->addText('Detalle (primeras 5 filas)', ['bold' => true]);
+
+    foreach (array_slice($data['detalles'], 0, 5) as $detalle) {
+        $linea = 'Sección: ' . $this->safeDocxText($detalle['seccion'])
+            . ' | Concepto: ' . $this->safeDocxText($detalle['concepto'])
+            . ' | Valor: ' . $this->safeDocxText($detalle['valor'])
+            . ' | Puntaje: ' . $this->safeDocxText($detalle['puntaje']);
+
+        $section->addText($linea);
+    }
+
+    $writer = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
     $writer->save($filePath);
 
-    return response()->download($filePath, $fileName)->deleteFileAfterSend(true);
+    if (function_exists('ob_get_length') && ob_get_length()) {
+        ob_end_clean();
+    }
+
+    return response()->download($filePath, $fileName, [
+        'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    ])->deleteFileAfterSend(true);
 }
 }
