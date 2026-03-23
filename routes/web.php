@@ -58,11 +58,14 @@ Route::middleware(['auth', 'rol:admin,evaluador'])->group(function () {
         ->name('evaluaciones.seleccionarMetodo');
 
     // Métodos REBA
+        // Métodos REBA
     Route::get('/reba', [RebaController::class, 'index'])->name('reba.index');
     Route::get('/reba/create/{evaluacion}', [RebaController::class, 'create'])->name('reba.create');
     Route::post('/reba/store/{evaluacion}', [RebaController::class, 'store'])->name('reba.store');
-    Route::get('/reba/{id}', [RebaController::class, 'show'])->name('reba.show');
     Route::get('/reba/{id}/pdf', [RebaController::class, 'pdf'])->name('reba.pdf');
+    Route::get('/reba/{id}/excel', [RebaController::class, 'excel'])->name('reba.excel');
+    Route::get('/reba/{id}/word', [RebaController::class, 'word'])->name('reba.word');
+    Route::get('/reba/{id}', [RebaController::class, 'show'])->name('reba.show');
 
     // Métodos RULA
     Route::get('/rula', [RulaController::class, 'index'])->name('rula.index');
