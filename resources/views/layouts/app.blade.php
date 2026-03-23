@@ -13,8 +13,6 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-
-<<<<<<< Updated upstream
 <body class="bg-slate-100 text-slate-800" x-data="{ sidebarOpen: false }">
 
     @php
@@ -32,10 +30,6 @@
 
         $rol = strtolower(auth()->user()->rol?->nombre ?? 'visitante');
     @endphp
-=======
-{{-- Alpine.js para controlar el sidebar en móvil --}}
-<body class="bg-gray-100" x-data="{ sidebarOpen: false }">
->>>>>>> Stashed changes
 
     <div class="min-h-screen flex">
         <div
@@ -46,10 +40,6 @@
             style="display: none;"
         ></div>
 
-<<<<<<< Updated upstream
-=======
-        {{-- SIDEBAR con gradiente y efectos --}}
->>>>>>> Stashed changes
         <aside
             class="fixed inset-y-0 left-0 z-40 w-72 bg-[#2F9CC3] text-white flex flex-col transform transition-transform duration-300 lg:translate-x-0 lg:static lg:flex shadow-2xl lg:shadow-none"
             :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
@@ -89,60 +79,50 @@
                         Principal
                     </p>
 
-                    <a href="{{ route('dashboard') }}"
-                       class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('dashboard') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
-                        Dashboard
-                    </a>
+                    @if(Route::has('dashboard'))
+                        <a href="{{ route('dashboard') }}"
+                           class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('dashboard') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
+                            Dashboard
+                        </a>
+                    @endif
                 </div>
 
                 @if(in_array($rol, ['admin', 'evaluador']))
-<<<<<<< Updated upstream
                     <div>
                         <p class="px-3 mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/65">
                             Gestión
                         </p>
 
                         <div class="space-y-1.5">
-                            <a href="{{ route('empresas.index') }}"
-                               class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('empresas.*') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
-                                Empresas
-                            </a>
+                            @if(Route::has('empresas.index'))
+                                <a href="{{ route('empresas.index') }}"
+                                   class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('empresas.*') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
+                                    Empresas
+                                </a>
+                            @endif
 
-                            <a href="{{ route('sucursales.index') }}"
-                               class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('sucursales.*') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
-                                Sucursales
-                            </a>
+                            @if(Route::has('sucursales.index'))
+                                <a href="{{ route('sucursales.index') }}"
+                                   class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('sucursales.*') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
+                                    Sucursales
+                                </a>
+                            @endif
 
-                            <a href="{{ route('puestos.index') }}"
-                               class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('puestos.*') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
-                                Puestos
-                            </a>
+                            @if(Route::has('puestos.index'))
+                                <a href="{{ route('puestos.index') }}"
+                                   class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('puestos.*') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
+                                    Puestos
+                                </a>
+                            @endif
 
-                            <a href="{{ route('trabajadores.index') }}"
-                               class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('trabajadores.*') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
-                                Trabajadores
-                            </a>
+                            @if(Route::has('trabajadores.index'))
+                                <a href="{{ route('trabajadores.index') }}"
+                                   class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('trabajadores.*') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
+                                    Trabajadores
+                                </a>
+                            @endif
                         </div>
                     </div>
-=======
-                    <p class="text-blue-200 text-xs uppercase tracking-wider mt-4">Gestión</p>
-                    <a href="{{ route('empresas.index') }}"
-                       class="block px-4 py-2 rounded-lg transition {{ request()->routeIs('empresas.*') ? 'bg-blue-900 font-semibold shadow-inner' : 'hover:bg-blue-600 hover:pl-5' }}">
-                        Empresas
-                    </a>
-                    <a href="{{ route('sucursales.index') }}"
-                       class="block px-4 py-2 rounded-lg transition {{ request()->routeIs('sucursales.*') ? 'bg-blue-900 font-semibold shadow-inner' : 'hover:bg-blue-600 hover:pl-5' }}">
-                        Sucursales
-                    </a>
-                    <a href="{{ route('puestos.index') }}"
-                       class="block px-4 py-2 rounded-lg transition {{ request()->routeIs('puestos.*') ? 'bg-blue-900 font-semibold shadow-inner' : 'hover:bg-blue-600 hover:pl-5' }}">
-                        Puestos
-                    </a>
-                    <a href="{{ route('trabajadores.index') }}"
-                       class="block px-4 py-2 rounded-lg transition {{ request()->routeIs('trabajadores.*') ? 'bg-blue-900 font-semibold shadow-inner' : 'hover:bg-blue-600 hover:pl-5' }}">
-                        Trabajadores
-                    </a>
->>>>>>> Stashed changes
                 @endif
 
                 <div>
@@ -150,26 +130,27 @@
                         Sistema
                     </p>
 
-<<<<<<< Updated upstream
                     <div class="space-y-1.5">
-                        @if($rol === 'admin')
+                        @if($rol === 'admin' && Route::has('usuarios.index'))
                             <a href="{{ route('usuarios.index') }}"
                                class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('usuarios.*') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
                                 Usuarios
                             </a>
-
-                            @if(Route::has('configuracion.index'))
-                                <a href="{{ route('configuracion.index') }}"
-                                   class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('configuracion.*') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
-                                    Configuración
-                                </a>
-                            @endif
                         @endif
 
-                        <a href="{{ route('reportes.index') }}"
-                           class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('reportes.*') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
-                            Reportes
-                        </a>
+                        @if($rol === 'admin' && Route::has('configuracion.index'))
+                            <a href="{{ route('configuracion.index') }}"
+                               class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('configuracion.*') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
+                                Configuración
+                            </a>
+                        @endif
+
+                        @if(Route::has('reportes.index'))
+                            <a href="{{ route('reportes.index') }}"
+                               class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('reportes.*') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
+                                Reportes
+                            </a>
+                        @endif
                     </div>
                 </div>
 
@@ -180,15 +161,19 @@
                         </p>
 
                         <div class="space-y-1.5">
-                            <a href="{{ route('evaluaciones.index') }}"
-                               class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('evaluaciones.index') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
-                                Evaluaciones
-                            </a>
+                            @if(Route::has('evaluaciones.index'))
+                                <a href="{{ route('evaluaciones.index') }}"
+                                   class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('evaluaciones.index') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
+                                    Evaluaciones
+                                </a>
+                            @endif
 
-                            <a href="{{ route('evaluaciones.create') }}"
-                               class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('evaluaciones.create') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
-                                Nueva evaluación
-                            </a>
+                            @if(Route::has('evaluaciones.create'))
+                                <a href="{{ route('evaluaciones.create') }}"
+                                   class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('evaluaciones.create') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
+                                    Nueva evaluación
+                                </a>
+                            @endif
                         </div>
                     </div>
                 @endif
@@ -198,75 +183,30 @@
                         Cuenta
                     </p>
 
-                    <a href="{{ route('profile.edit') }}"
-                       class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('profile.*') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
-                        Perfil
-                    </a>
+                    @if(Route::has('profile.edit'))
+                        <a href="{{ route('profile.edit') }}"
+                           class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('profile.*') ? 'bg-[#1E6F8C] text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/10' }}">
+                            Perfil
+                        </a>
+                    @endif
                 </div>
-=======
-                {{-- SOLO ADMIN ve Usuarios y Configuración --}}
-                @if($rol === 'admin')
-    <a href="{{ route('usuarios.index') }}"
-       class="block px-4 py-2 rounded-lg transition {{ request()->routeIs('usuarios.*') ? 'bg-blue-900 font-semibold shadow-inner' : 'hover:bg-blue-600 hover:pl-5' }}">
-        Usuarios
-    </a>
-    {{-- <a href="{{ route('configuracion.index') }}"
-       class="block px-4 py-2 rounded-lg transition hover:bg-blue-600 hover:pl-5">
-        Configuración
-    </a> --}}
-@endif
-
-                {{-- Reportes: visible para admin y evaluador (según rutas) --}}
-                @if(in_array($rol, ['admin', 'evaluador']))
-                    <a href="{{ route('reportes.index') }}"
-                       class="block px-4 py-2 rounded-lg transition {{ request()->routeIs('reportes.*') ? 'bg-blue-900 font-semibold shadow-inner' : 'hover:bg-blue-600 hover:pl-5' }}">
-                        Reportes
-                    </a>
-                @endif
-
-                {{-- SECCIÓN EVALUACIÓN: admin y evaluador --}}
-                @if(in_array($rol, ['admin', 'evaluador']))
-                    <p class="text-blue-200 text-xs uppercase tracking-wider mt-4">Evaluación</p>
-                    <a href="{{ route('evaluaciones.index') }}"
-                       class="block px-4 py-2 rounded-lg transition {{ request()->routeIs('evaluaciones.index') ? 'bg-blue-900 font-semibold shadow-inner' : 'hover:bg-blue-600 hover:pl-5' }}">
-                        Evaluaciones
-                    </a>
-                    <a href="{{ route('evaluaciones.create') }}"
-                       class="block px-4 py-2 rounded-lg transition {{ request()->routeIs('evaluaciones.create') ? 'bg-blue-900 font-semibold shadow-inner' : 'hover:bg-blue-600 hover:pl-5' }}">
-                        Nueva evaluación
-                    </a>
-                @endif
-
-                <p class="text-blue-200 text-xs uppercase tracking-wider mt-4">Cuenta</p>
-                <a href="{{ route('profile.edit') }}"
-                   class="block px-4 py-2 rounded-lg transition {{ request()->routeIs('profile.*') ? 'bg-blue-900 font-semibold shadow-inner' : 'hover:bg-blue-600 hover:pl-5' }}">
-                    Perfil
-                </a>
->>>>>>> Stashed changes
             </nav>
 
             <div class="p-5 border-t border-white/15">
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button class="w-full rounded-xl px-4 py-3 text-left text-[15px] font-medium text-white/95 hover:bg-white/10 transition">
-                        Cerrar sesión
-                    </button>
-                </form>
+                @if(Route::has('logout'))
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button class="w-full rounded-xl px-4 py-3 text-left text-[15px] font-medium text-white/95 hover:bg-white/10 transition">
+                            Cerrar sesión
+                        </button>
+                    </form>
+                @endif
             </div>
         </aside>
 
-<<<<<<< Updated upstream
         <div class="flex-1 min-w-0 flex flex-col">
             <header class="h-24 bg-white border-b border-slate-200 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
                 <div class="flex items-center gap-4 min-w-0">
-=======
-        {{-- CONTENIDO PRINCIPAL (derecha) --}}
-        <div class="flex-1 min-w-0 flex flex-col">
-            {{-- HEADER con botón hamburguesa y datos del usuario --}}
-            <header class="bg-white shadow px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-                <div class="flex items-center gap-3">
-                    {{-- Botón para abrir sidebar en móvil --}}
->>>>>>> Stashed changes
                     <button
                         class="lg:hidden inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-3 py-2 text-slate-700 shadow-sm"
                         @click="sidebarOpen = true"
@@ -275,7 +215,6 @@
                         ☰
                     </button>
 
-<<<<<<< Updated upstream
                     <div class="hidden sm:flex h-11 w-11 rounded-xl bg-slate-100 items-center justify-center overflow-hidden">
                         <img
                             src="{{ asset('images/ergotech-logo.png') }}"
@@ -296,17 +235,6 @@
 
                 <div class="flex items-center gap-4">
                     <span class="hidden sm:inline-block text-xs bg-sky-100 text-sky-700 px-3 py-1 rounded-full font-semibold">
-=======
-                    {{-- Título dinámico según el rol (ej. "Panel Evaluador") --}}
-                    <h1 class="text-lg sm:text-xl font-semibold text-gray-800">
-                        Panel {{ ucfirst($rol) }}
-                    </h1>
-                </div>
-
-                <div class="flex items-center gap-4">
-                    {{-- Badge con el nombre del rol (visible en sm+) --}}
-                    <span class="hidden sm:inline-block text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-semibold">
->>>>>>> Stashed changes
                         {{ ucfirst($rol) }}
                     </span>
 
@@ -333,17 +261,10 @@
                 </div>
             </header>
 
-<<<<<<< Updated upstream
             <main class="flex-1 overflow-y-auto">
                 <div class="p-4 sm:p-6 lg:p-8">
                     {{ $slot }}
                 </div>
-=======
-            {{-- MAIN: aquí se inyecta el contenido de cada página (usando $slot) --}}
-            {{-- Aseguramos padding adecuado para que el contenido no esté pegado a los bordes --}}
-            <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-                {{ $slot }}
->>>>>>> Stashed changes
             </main>
         </div>
     </div>

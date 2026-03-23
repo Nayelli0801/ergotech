@@ -20,45 +20,41 @@ use App\Http\Controllers\Nom036Controller;
 use App\Http\Controllers\NioshController;
 use App\Http\Controllers\ConfiguracionController;
 
-// Redirigir la raíz al login
+// Inicio
 Route::get('/', function () {
     return redirect('/login');
 });
 
-// Rutas de autenticación de dos factores
+// 2FA
 Route::get('/two-factor', [TwoFactorController::class, 'index'])->name('2fa.index');
 Route::post('/two-factor', [TwoFactorController::class, 'store'])->name('2fa.store');
 
-// Dashboard (accesible para cualquier usuario autenticado)
+// Dashboard
 Route::middleware(['auth'])->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-// Perfil (accesible para cualquier usuario autenticado)
+// Perfil
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// =========================================================================
-// GRUPO PARA ADMIN Y EVALUADOR (compartidas) - SIN ESPACIOS EN LA COMA
-// =========================================================================
+// =========================
+// ADMIN Y EVALUADOR
+// =========================
 Route::middleware(['auth', 'rol:admin,evaluador'])->group(function () {
 
-    // Gestión (empresas, sucursales, puestos, trabajadores)
-    Route::get('/empresas', [EmpresaController::class, 'index'])->name('empresas.index');
-    Route::get('/empresas/create', [EmpresaController::class, 'create'])->name('empresas.create');
-    Route::post('/empresas', [EmpresaController::class, 'store'])->name('empresas.store');
-    Route::get('/empresas/{empresa}', [EmpresaController::class, 'show'])->name('empresas.show');
-    Route::get('/empresas/{empresa}/edit', [EmpresaController::class, 'edit'])->name('empresas.edit');
+    Route::resource('empresas', EmpresaController::class);
+    Route::resource('sucursales', SucursalController::class);
+    Route::resource('puestos', PuestoController::class);
+    Route::resource('trabajadores', TrabajadorController::class);
 
-    // Evaluaciones (recurso principal)
     Route::resource('evaluaciones', EvaluacionController::class);
-    // Ruta adicional para seleccionar método en evaluación
+
     Route::post('/evaluaciones/seleccionar-metodo', [EvaluacionController::class, 'seleccionarMetodo'])
         ->name('evaluaciones.seleccionarMetodo');
 
-    // Métodos REBA
-        // Métodos REBA
+    // REBA
     Route::get('/reba', [RebaController::class, 'index'])->name('reba.index');
     Route::get('/reba/create/{evaluacion}', [RebaController::class, 'create'])->name('reba.create');
     Route::post('/reba/store/{evaluacion}', [RebaController::class, 'store'])->name('reba.store');
@@ -67,7 +63,7 @@ Route::middleware(['auth', 'rol:admin,evaluador'])->group(function () {
     Route::get('/reba/{id}/word', [RebaController::class, 'word'])->name('reba.word');
     Route::get('/reba/{id}', [RebaController::class, 'show'])->name('reba.show');
 
-    // Métodos RULA
+    // RULA
     Route::get('/rula', [RulaController::class, 'index'])->name('rula.index');
     Route::get('/rula/create/{evaluacion}', [RulaController::class, 'create'])->name('rula.create');
     Route::post('/rula/calcular', [RulaController::class, 'calcular'])->name('rula.calcular');
@@ -75,21 +71,21 @@ Route::middleware(['auth', 'rol:admin,evaluador'])->group(function () {
     Route::get('/rula/{id}', [RulaController::class, 'show'])->name('rula.show');
     Route::get('/rula/{id}/pdf', [RulaController::class, 'pdf'])->name('rula.pdf');
 
-    // Métodos OWAS
+    // OWAS
     Route::get('/owas', [OwasController::class, 'index'])->name('owas.index');
     Route::get('/owas/create/{evaluacion}', [OwasController::class, 'create'])->name('owas.create');
     Route::post('/owas/store/{evaluacion}', [OwasController::class, 'store'])->name('owas.store');
     Route::get('/owas/{id}', [OwasController::class, 'show'])->name('owas.show');
     Route::get('/owas/{id}/pdf', [OwasController::class, 'pdf'])->name('owas.pdf');
 
-    // Métodos NIOSH
+    // NIOSH
     Route::get('/niosh', [NioshController::class, 'index'])->name('niosh.index');
     Route::get('/niosh/create/{evaluacion}', [NioshController::class, 'create'])->name('niosh.create');
     Route::post('/niosh/store/{evaluacion}', [NioshController::class, 'store'])->name('niosh.store');
     Route::get('/niosh/{id}', [NioshController::class, 'show'])->name('niosh.show');
     Route::get('/niosh/{id}/pdf', [NioshController::class, 'pdf'])->name('niosh.pdf');
 
-    // Métodos NOM-036
+    // NOM-036
     Route::get('/nom036/{evaluacion}/create', [Nom036Controller::class, 'create'])->name('nom036.create');
     Route::post('/nom036/{evaluacion}/store', [Nom036Controller::class, 'store'])->name('nom036.store');
     Route::get('/nom036/{id}', [Nom036Controller::class, 'show'])->name('nom036.show');
@@ -99,22 +95,18 @@ Route::middleware(['auth', 'rol:admin,evaluador'])->group(function () {
     Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
 });
 
-// =========================================================================
-// GRUPO EXCLUSIVO PARA ADMIN (solo admin)
-// =========================================================================
+// =========================
+// SOLO ADMIN
+// =========================
 Route::middleware(['auth', 'rol:admin'])->group(function () {
-
-    // Usuarios (CRUD completo)
     Route::resource('usuarios', UserController::class);
-
-    // Configuración (solo admin)
     Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
 });
 
-// Ruta de prueba para ver el rol del usuario autenticado
+// Prueba
 Route::get('/prueba-rol', function () {
     return Auth::user()->rol?->nombre;
 })->middleware('auth');
 
-// Archivo de rutas de autenticación (login, registro, etc.)
+// Auth
 require __DIR__ . '/auth.php';
