@@ -3,7 +3,7 @@
 
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div>
-                <h2 class="text-3xl font-bold text-blue-700">Reportes de Evaluaciones</h2>
+                <h2 class="text-3xl font-bold text-sky-600">Reportes de Evaluaciones</h2>
                 <p class="text-sm text-gray-500 mt-1">
                     Consulta, filtra, exporta y analiza las evaluaciones registradas en ErgoTech.
                 </p>
@@ -64,7 +64,7 @@
 
             <div class="mt-5 flex flex-wrap gap-3">
                 <button id="btnAplicarFiltros"
-                        class="px-4 py-2 bg-blue-700 hover:bg-blue-800 rounded-lg font-semibold text-white shadow-sm">
+                        class="px-4 py-2 bg-sky-600 hover:bg-blue-800 rounded-lg font-semibold text-white shadow-sm">
                     Aplicar filtros
                 </button>
 
@@ -102,7 +102,7 @@
 
             <div class="overflow-x-auto">
                 <table class="min-w-full text-left text-sm">
-                    <thead class="bg-blue-700 text-white">
+                    <thead class="bg-sky-600 text-white">
                         <tr>
                             <th class="px-4 py-3">ID</th>
                             <th class="px-4 py-3">Empresa</th>

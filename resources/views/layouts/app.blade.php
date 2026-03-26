@@ -42,10 +42,10 @@
         style="display: none;"
     ></div>
 
-    <aside
-        class="fixed inset-y-0 left-0 z-40 w-72 bg-gradient-to-b from-sky-700 via-sky-600 to-sky-500 text-white flex flex-col transform transition-transform duration-300 lg:translate-x-0 lg:static lg:flex shadow-2xl lg:shadow-none"
-        :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
-    >
+        <aside
+            class="fixed inset-y-0 left-0 z-40 w-72 bg-sky-600 text-white flex flex-col transform transition-transform duration-300 lg:translate-x-0 lg:static lg:flex shadow-xl"
+            :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+        >
 
         <!-- HEADER NUEVO -->
         <div class="px-6 py-5 border-b border-white/20 flex flex-col items-center gap-3">
@@ -73,10 +73,10 @@
         </div>
             <nav class="flex-1 px-5 py-6 space-y-6 overflow-y-auto">
                 <div>
-                    <p class="px-3 mb-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/50 px-2">
+                    <p class="text-[18px] font-bold uppercase tracking-wider text-white mt-4 mb-2">
                         Principal
                     </p>
-
+                <div class="bg-white/20 rounded-xl p-2 space-y-1">
                     @if(Route::has('dashboard'))
                         <a href="{{ route('dashboard') }}"
                            span class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('dashboard') ? 'bg-sky-800 shadow-lg ring-1 ring-white/20 text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/20 hover:translate-x-1 transition-all duration-200' }}">
@@ -87,11 +87,11 @@
 
                 @if(in_array($rol, ['admin', 'evaluador']))
                     <div>
-                        <p class="px-3 mb-3 mt-6 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/50">
+                        <p class="text-[18px] font-bold uppercase tracking-wider text-white mt-4 mb-2">
                             Gestión
                         </p>
 
-                        <div class="space-y-1.5">
+                        <div class="bg-white/20 rounded-xl p-2 space-y-1">
                             @if(Route::has('empresas.index'))
                                 <a href="{{ route('empresas.index') }}"
                                    class="flex items-center rounded-2xl px-4 py-2.5 text-[15px] font-medium transition {{ request()->routeIs('empresas.*') ? 'bg-sky-700 shadow-md text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/20 transition-all duration-200' }}">
@@ -124,11 +124,11 @@
                 @endif
 
                 <div>
-                    <p class="px-3 mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/65">
+                    <p class="text-[18px] font-bold uppercase tracking-wider text-white mt-4 mb-2">
                         Sistema
                     </p>
 
-                    <div class="space-y-1.5">
+                    <div class="bg-white/20 rounded-xl p-2 space-y-1">
                         @if($rol === 'admin' && Route::has('usuarios.index'))
                             <a href="{{ route('usuarios.index') }}"
                                class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('usuarios.*') ? 'bg-sky-700 shadow-md text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/20 transition-all duration-200' }}">
@@ -154,11 +154,11 @@
 
                 @if(in_array($rol, ['admin', 'evaluador']))
                     <div>
-                        <p class="px-3 mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/65">
+                        <p class="text-[18px] font-bold uppercase tracking-wider text-white mt-4 mb-2">
                             Evaluación
                         </p>
 
-                        <div class="space-y-1.5">
+                        <div class="bg-white/20 rounded-xl p-2 space-y-1">
                             @if(Route::has('evaluaciones.index'))
                                 <a href="{{ route('evaluaciones.index') }}"
                                    class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('evaluaciones.index') ? 'bg-sky-700 shadow-md text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/20 transition-all duration-200' }}">
@@ -177,10 +177,10 @@
                 @endif
 
                 <div>
-                    <p class="px-3 mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/65">
+                    <p class="text-[18px] font-bold uppercase tracking-wider text-white mt-4 mb-2">
                         Cuenta
                     </p>
-
+                <div class="bg-white/20 rounded-xl p-2 space-y-1">
                     @if(Route::has('profile.edit'))
                         <a href="{{ route('profile.edit') }}"
                            class="flex items-center rounded-xl px-4 py-3 text-[15px] transition {{ request()->routeIs('profile.*') ? 'bg-sky-700 shadow-md text-white font-semibold shadow-sm' : 'text-white/95 hover:bg-white/20 transition-all duration-200' }}">

@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="max-w-7xl mx-auto py-8 px-6">
         <div class="bg-white shadow-lg rounded-2xl overflow-hidden border border-gray-200">
-            <div class="bg-blue-700 text-white px-6 py-4 flex justify-between items-center">
+            <div class="bg-sky-600 text-white px-6 py-4 flex justify-between items-center">
                 <div>
                     <h2 class="text-2xl font-bold">Trabajadores</h2>
                     <p class="text-sm text-blue-100 mt-1">Listado de trabajadores registrados.</p>

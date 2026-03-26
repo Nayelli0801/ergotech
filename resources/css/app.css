@@ -36,3 +36,78 @@ aside::-webkit-scrollbar-thumb {
     background: #6366f1;
     border-radius: 10px;
 }
+/* ===== TITULOS MENU ===== */
+
+.menuTitle{
+    font-size:18px;
+    font-weight:700;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:white;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding:10px 5px;
+    margin-top:15px;
+
+    cursor:pointer;
+}
+
+
+
+/* ===== SUBMENU ===== */
+
+.subMenu{
+
+    background:rgba(255,255,255,0.35);
+
+    border-radius:12px;
+
+    padding:8px;
+
+    margin-top:6px;
+
+    backdrop-filter:blur(4px);
+
+}
+
+
+
+/* ===== ITEM ===== */
+
+.subItem{
+
+    display:block;
+
+    padding:10px 12px;
+
+    font-size:15px;
+
+    border-radius:8px;
+
+    color:white;
+
+    transition:0.2s;
+
+}
+
+
+.subItem:hover{
+
+    background:rgba(255,255,255,0.25);
+
+}
+
+
+
+/* ===== ACTIVO ===== */
+
+.subItemActive{
+
+    background:#0369a1;
+
+    font-weight:600;
+
+}

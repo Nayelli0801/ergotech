@@ -6,7 +6,7 @@
 <div class="bg-white rounded-xl shadow-lg overflow-hidden">
 
     <!-- Encabezado -->
-    <div class="bg-blue-700 text-white px-6 py-4 flex justify-between items-center">
+    <div class="bg-sky-600 text-white px-6 py-4 flex justify-between items-center">
 
         <div>
             <h2 class="text-xl font-bold">Usuarios</h2>
