@@ -70,6 +70,7 @@ Route::middleware(['auth', 'rol:admin,evaluador'])->group(function () {
     Route::post('/rula/store/{evaluacion}', [RulaController::class, 'store'])->name('rula.store');
     Route::get('/rula/{id}', [RulaController::class, 'show'])->name('rula.show');
     Route::get('/rula/{id}/pdf', [RulaController::class, 'pdf'])->name('rula.pdf');
+    Route::get('/rula/{id}/excel', [RulaController::class, 'excel'])->name('rula.excel');
 
     // OWAS
     Route::get('/owas', [OwasController::class, 'index'])->name('owas.index');
@@ -77,19 +78,21 @@ Route::middleware(['auth', 'rol:admin,evaluador'])->group(function () {
     Route::post('/owas/store/{evaluacion}', [OwasController::class, 'store'])->name('owas.store');
     Route::get('/owas/{id}', [OwasController::class, 'show'])->name('owas.show');
     Route::get('/owas/{id}/pdf', [OwasController::class, 'pdf'])->name('owas.pdf');
-
+    Route::get('/owas/{id}/excel', [OwasController::class, 'excel'])->name('owas.excel');
     // NIOSH
     Route::get('/niosh', [NioshController::class, 'index'])->name('niosh.index');
     Route::get('/niosh/create/{evaluacion}', [NioshController::class, 'create'])->name('niosh.create');
     Route::post('/niosh/store/{evaluacion}', [NioshController::class, 'store'])->name('niosh.store');
     Route::get('/niosh/{id}', [NioshController::class, 'show'])->name('niosh.show');
     Route::get('/niosh/{id}/pdf', [NioshController::class, 'pdf'])->name('niosh.pdf');
+    Route::get('/niosh/{id}/excel', [NioshController::class, 'excel'])->name('niosh.excel');
 
     // NOM-036
     Route::get('/nom036/{evaluacion}/create', [Nom036Controller::class, 'create'])->name('nom036.create');
-    Route::post('/nom036/{evaluacion}/store', [Nom036Controller::class, 'store'])->name('nom036.store');
-    Route::get('/nom036/{id}', [Nom036Controller::class, 'show'])->name('nom036.show');
-    Route::get('/nom036/{id}/pdf', [Nom036Controller::class, 'pdf'])->name('nom036.pdf');
+Route::post('/nom036/{evaluacion}/store', [Nom036Controller::class, 'store'])->name('nom036.store');
+Route::get('/nom036/{id}', [Nom036Controller::class, 'show'])->name('nom036.show');
+Route::get('/nom036/{id}/pdf', [Nom036Controller::class, 'pdf'])->name('nom036.pdf');
+Route::get('/nom036/{id}/excel', [Nom036Controller::class, 'excel'])->name('nom036.excel');
 
     // Reportes
     Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');

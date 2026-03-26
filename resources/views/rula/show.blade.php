@@ -20,6 +20,10 @@
                    class="inline-flex items-center px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-semibold shadow hover:bg-blue-700 transition">
                     Descargar PDF
                 </a>
+                <a href="{{ route('rula.excel', $rula->id) }}"
+                   class="inline-flex items-center px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-semibold shadow hover:bg-emerald-700 transition">
+                    Descargar Excel
+                </a>
                 <a href="{{ route('evaluaciones.index') }}"
                    class="inline-flex items-center px-4 py-2 rounded-xl border border-slate-300 bg-white text-slate-700 text-sm font-semibold hover:bg-slate-50 transition">
                     Volver

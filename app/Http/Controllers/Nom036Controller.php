@@ -8,6 +8,9 @@ use App\Models\Nom036Evaluacion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Exports\Nom036Export;
+use App\Services\Reportes\Nom036ReportService;
+use Maatwebsite\Excel\Facades\Excel;
 
 class Nom036Controller extends Controller
 {
@@ -359,4 +362,15 @@ class Nom036Controller extends Controller
 
         return implode(', ', $nombres);
     }
+
+    public function excel($id, Nom036ReportService $reportService)
+  {
+    $nom036 = $reportService->findOrFail((int) $id);
+    $data = $reportService->build($nom036);
+
+    return Excel::download(
+        new Nom036Export($data),
+        'nom036_' . $nom036->id . '.xlsx'
+    );
+  }
 }

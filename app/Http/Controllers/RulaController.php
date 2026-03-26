@@ -8,6 +8,9 @@ use App\Models\RulaEvaluacion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Exports\RulaExport;
+use App\Services\Reportes\RulaReportService;
+use Maatwebsite\Excel\Facades\Excel;
 
 class RulaController extends Controller
 {
@@ -434,4 +437,15 @@ class RulaController extends Controller
             default => 'No definido',
         };
     }
+
+    public function excel($id, RulaReportService $reportService)
+ {
+    $rula = $reportService->findOrFail((int) $id);
+    $data = $reportService->build($rula);
+
+    return Excel::download(
+        new RulaExport($data),
+        'rula_' . $rula->id . '.xlsx'
+    );
+  }
 }

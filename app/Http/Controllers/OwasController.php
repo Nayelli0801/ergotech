@@ -10,6 +10,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Exports\OwasExport;
+use App\Services\Reportes\OwasReportService;
+use Maatwebsite\Excel\Facades\Excel;
 
 class OwasController extends Controller
 {
@@ -540,4 +543,15 @@ class OwasController extends Controller
             default => 'No definido',
         };
     }
+
+    public function excel($id, OwasReportService $reportService)
+  {
+    $owas = $reportService->findOrFail((int) $id);
+    $data = $reportService->build($owas);
+
+    return Excel::download(
+        new OwasExport($data),
+        'owas_' . $owas->id . '.xlsx'
+    );
+  }
 }
