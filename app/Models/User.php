@@ -8,9 +8,12 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use App\Models\Rol;
 
+// 🔥 IMPORTANTE: Spatie
+use Spatie\Permission\Traits\HasRoles;
+
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, TwoFactorAuthenticatable;
+    use HasFactory, Notifiable, TwoFactorAuthenticatable, HasRoles;
 
     protected $fillable = [
         'name',
@@ -35,11 +38,13 @@ class User extends Authenticatable
         ];
     }
 
+    // 🔹 Relación que ya tenías (NO se toca)
     public function rol()
     {
         return $this->belongsTo(Rol::class, 'rol_id');
     }
 
+    // 🔹 Tus funciones actuales (siguen funcionando)
     public function isAdmin()
     {
         return $this->rol && $this->rol->nombre === 'admin';
@@ -48,5 +53,13 @@ class User extends Authenticatable
     public function isEvaluador()
     {
         return $this->rol && $this->rol->nombre === 'evaluador';
+    }
+
+    // 🔥 OPCIONAL (recomendado): sincronizar rol con Spatie
+    public function syncSpatieRole()
+    {
+        if ($this->rol) {
+            $this->syncRoles([$this->rol->nombre]);
+        }
     }
 }
