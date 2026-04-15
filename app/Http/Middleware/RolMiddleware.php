@@ -9,19 +9,23 @@ use Symfony\Component\HttpFoundation\Response;
 
 class RolMiddleware
 {
-    public function handle(Request $request, Closure $next, $roles): Response
+    public function handle(Request $request, Closure $next, ...$roles): Response
     {
         if (!Auth::check()) {
             return redirect('/login');
         }
 
-        $rolesArray = explode(',', $roles);
-        $rolesArray = array_map('trim', $rolesArray);
-        $rolesArray = array_map('strtolower', $rolesArray);
+        // Obtener rol del usuario
+        $userRole = trim(strtolower(Auth::user()->rol?->nombre ?? ''));
 
-        $userRole = strtolower(Auth::user()->rol?->nombre ?? '');
+        // Normalizar roles recibidos
+        $roles = collect($roles)
+            ->flatMap(fn($r) => explode(',', $r))
+            ->map(fn($r) => strtolower(trim($r)))
+            ->toArray();
 
-        if (!$userRole || !in_array($userRole, $rolesArray)) {
+        // Validación
+        if (!$userRole || !in_array($userRole, $roles)) {
             abort(403, 'No tienes permiso para acceder a esta sección.');
         }
 
