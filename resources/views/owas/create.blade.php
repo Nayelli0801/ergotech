@@ -37,7 +37,7 @@
             </div>
         @endif
 
-        <form action="{{ route('owas.store') }}" method="POST" id="form-owas">
+        <form action="{{ route('owas.store', $evaluacion->id) }}" method="POST" id="form-owas">
             @csrf
 
             <input type="hidden" name="empresa_id" value="{{ $datosBase['empresa_id'] }}">

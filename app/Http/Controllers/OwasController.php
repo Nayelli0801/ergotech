@@ -29,205 +29,218 @@ class OwasController extends Controller
         return view('owas.index', compact('owas'));
     }
 
-    public function create(Request $request)
-    {
-        $datosBase = [
+    public function create(Request $request, $evaluacion)
+{
+    $evaluacionModel = Evaluacion::with([
+        'empresa',
+        'sucursal',
+        'puesto',
+        'trabajador',
+        'metodo',
+        'usuario',
+    ])->findOrFail($evaluacion);
+
+    $datosBase = [
+        'empresa_id' => $evaluacionModel->empresa_id,
+        'sucursal_id' => $evaluacionModel->sucursal_id,
+        'puesto_id' => $evaluacionModel->puesto_id,
+        'trabajador_id' => $evaluacionModel->trabajador_id,
+        'fecha_evaluacion' => $evaluacionModel->fecha_evaluacion,
+        'area_evaluada' => $evaluacionModel->area_evaluada,
+        'actividad_general' => $evaluacionModel->actividad,
+        'observaciones' => $evaluacionModel->observaciones,
+    ];
+
+    return view('owas.create', [
+        'datosBase' => $datosBase,
+        'evaluacion' => $evaluacionModel,
+    ]);
+}
+
+public function store(Request $request, $evaluacion)
+{
+    $request->validate([
+        'empresa_id' => 'required|exists:empresas,id',
+        'sucursal_id' => 'required|exists:sucursales,id',
+        'puesto_id' => 'required|exists:puestos,id',
+        'trabajador_id' => 'required|exists:trabajadores,id',
+        'fecha_evaluacion' => 'required|date',
+
+        'area_evaluada' => 'nullable|string|max:255',
+        'actividad_general' => 'nullable|string|max:255',
+        'observaciones' => 'nullable|string',
+
+        'posturas' => 'required|array|min:1',
+        'posturas.*.espalda' => 'required|integer|min:1|max:4',
+        'posturas.*.brazos' => 'required|integer|min:1|max:3',
+        'posturas.*.piernas' => 'required|integer|min:1|max:7',
+        'posturas.*.carga' => 'required|integer|min:1|max:3',
+        'posturas.*.frecuencia' => 'required|integer|min:1',
+    ]);
+
+    DB::beginTransaction();
+
+    try {
+        $metodo = Metodo::whereRaw('LOWER(nombre) = ?', ['owas'])->first();
+
+        if (!$metodo) {
+            return back()->withInput()->with('error', 'No existe el método OWAS en la tabla metodos.');
+        }
+
+        $resultado = $this->calcularOwasDesdeFormulario($request->posturas);
+
+        $evaluacionModel = Evaluacion::findOrFail($evaluacion);
+
+        $evaluacionModel->update([
             'empresa_id' => $request->empresa_id,
             'sucursal_id' => $request->sucursal_id,
             'puesto_id' => $request->puesto_id,
             'trabajador_id' => $request->trabajador_id,
+            'metodo_id' => $metodo->id,
+            'user_id' => Auth::id(),
             'fecha_evaluacion' => $request->fecha_evaluacion,
             'area_evaluada' => $request->area_evaluada,
-            'actividad_general' => $request->actividad_general,
+            'actividad' => $request->actividad_general,
             'observaciones' => $request->observaciones,
-        ];
-
-        return view('owas.create', compact('datosBase'));
-    }
-
-    public function store(Request $request)
-    {
-        $request->validate([
-            'empresa_id' => 'required|exists:empresas,id',
-            'sucursal_id' => 'required|exists:sucursales,id',
-            'puesto_id' => 'required|exists:puestos,id',
-            'trabajador_id' => 'required|exists:trabajadores,id',
-            'fecha_evaluacion' => 'required|date',
-
-            'area_evaluada' => 'nullable|string|max:255',
-            'actividad_general' => 'nullable|string|max:255',
-            'observaciones' => 'nullable|string',
-
-            'posturas' => 'required|array|min:1',
-            'posturas.*.espalda' => 'required|integer|min:1|max:4',
-            'posturas.*.brazos' => 'required|integer|min:1|max:3',
-            'posturas.*.piernas' => 'required|integer|min:1|max:7',
-            'posturas.*.carga' => 'required|integer|min:1|max:3',
-            'posturas.*.frecuencia' => 'required|integer|min:1',
+            'resultado_final' => $resultado['categoria_final'],
+            'nivel_riesgo' => $resultado['nivel_riesgo'],
+            'recomendaciones' => $resultado['accion_requerida'],
         ]);
 
-        DB::beginTransaction();
+        $owas = OwasEvaluacion::create([
+            'evaluacion_id' => $evaluacionModel->id,
+            'espalda' => $resultado['postura_critica']['espalda'],
+            'brazos' => $resultado['postura_critica']['brazos'],
+            'piernas' => $resultado['postura_critica']['piernas'],
+            'carga' => $resultado['postura_critica']['carga'],
+            'codigo_postura' => $resultado['postura_critica']['codigo_postura'],
+            'categoria_riesgo' => $resultado['postura_critica']['nivel'],
+            'accion_correctiva' => $resultado['postura_critica']['accion'],
+        ]);
 
-        try {
-            $metodo = Metodo::whereRaw('LOWER(nombre) = ?', ['owas'])->first();
-
-            if (!$metodo) {
-                return back()->withInput()->with('error', 'No existe el método OWAS en la tabla metodos.');
-            }
-
-            $resultado = $this->calcularOwasDesdeFormulario($request->posturas);
-
-            $evaluacion = Evaluacion::create([
-                'empresa_id' => $request->empresa_id,
-                'sucursal_id' => $request->sucursal_id,
-                'puesto_id' => $request->puesto_id,
-                'trabajador_id' => $request->trabajador_id,
-                'metodo_id' => $metodo->id,
-                'user_id' => Auth::id(),
-                'fecha_evaluacion' => $request->fecha_evaluacion,
-                'area_evaluada' => $request->area_evaluada,
-                'actividad' => $request->actividad_general,
-                'observaciones' => $request->observaciones,
-                'resultado_final' => $resultado['categoria_final'],
-                'nivel_riesgo' => $resultado['nivel_riesgo'],
-                'recomendaciones' => $resultado['accion_requerida'],
-            ]);
-
-            $owas = OwasEvaluacion::create([
-                'evaluacion_id' => $evaluacion->id,
-                'espalda' => $resultado['postura_critica']['espalda'],
-                'brazos' => $resultado['postura_critica']['brazos'],
-                'piernas' => $resultado['postura_critica']['piernas'],
-                'carga' => $resultado['postura_critica']['carga'],
-                'codigo_postura' => $resultado['postura_critica']['codigo_postura'],
-                'categoria_riesgo' => $resultado['postura_critica']['nivel'],
-                'accion_correctiva' => $resultado['postura_critica']['accion'],
-            ]);
-
-            foreach ($resultado['posturas'] as $index => $postura) {
-                $seccion = 'POSTURA_' . ($index + 1);
-
-                OwasDetalle::create([
-                    'owas_evaluacion_id' => $owas->id,
-                    'seccion' => $seccion,
-                    'concepto' => 'espalda',
-                    'valor' => $this->textoEspalda($postura['espalda']),
-                    'puntaje' => $postura['espalda'],
-                ]);
-
-                OwasDetalle::create([
-                    'owas_evaluacion_id' => $owas->id,
-                    'seccion' => $seccion,
-                    'concepto' => 'brazos',
-                    'valor' => $this->textoBrazos($postura['brazos']),
-                    'puntaje' => $postura['brazos'],
-                ]);
-
-                OwasDetalle::create([
-                    'owas_evaluacion_id' => $owas->id,
-                    'seccion' => $seccion,
-                    'concepto' => 'piernas',
-                    'valor' => $this->textoPiernas($postura['piernas']),
-                    'puntaje' => $postura['piernas'],
-                ]);
-
-                OwasDetalle::create([
-                    'owas_evaluacion_id' => $owas->id,
-                    'seccion' => $seccion,
-                    'concepto' => 'carga',
-                    'valor' => $this->textoCarga($postura['carga']),
-                    'puntaje' => $postura['carga'],
-                ]);
-
-                OwasDetalle::create([
-                    'owas_evaluacion_id' => $owas->id,
-                    'seccion' => $seccion,
-                    'concepto' => 'frecuencia',
-                    'valor' => 'Frecuencia observada',
-                    'puntaje' => $postura['frecuencia'],
-                ]);
-
-                OwasDetalle::create([
-                    'owas_evaluacion_id' => $owas->id,
-                    'seccion' => $seccion,
-                    'concepto' => 'porcentaje',
-                    'valor' => 'Porcentaje de aparición',
-                    'puntaje' => $postura['porcentaje'],
-                ]);
-
-                OwasDetalle::create([
-                    'owas_evaluacion_id' => $owas->id,
-                    'seccion' => $seccion,
-                    'concepto' => 'codigo_postura',
-                    'valor' => $postura['codigo_postura'],
-                    'puntaje' => (int) $postura['codigo_postura'],
-                ]);
-
-                OwasDetalle::create([
-                    'owas_evaluacion_id' => $owas->id,
-                    'seccion' => $seccion,
-                    'concepto' => 'categoria_riesgo',
-                    'valor' => $postura['nivel'],
-                    'puntaje' => $postura['categoria'],
-                ]);
-
-                OwasDetalle::create([
-                    'owas_evaluacion_id' => $owas->id,
-                    'seccion' => $seccion,
-                    'concepto' => 'accion_correctiva',
-                    'valor' => $postura['accion'],
-                    'puntaje' => 0,
-                ]);
-            }
-
-            foreach ($resultado['analisis_partes'] as $parte => $filas) {
-                $seccion = 'PARTE_' . strtoupper($parte);
-
-                foreach ($filas as $fila) {
-                    OwasDetalle::create([
-                        'owas_evaluacion_id' => $owas->id,
-                        'seccion' => $seccion,
-                        'concepto' => $fila['concepto'],
-                        'valor' => $fila['valor'],
-                        'puntaje' => $fila['puntaje'],
-                    ]);
-                }
-            }
+        foreach ($resultado['posturas'] as $index => $postura) {
+            $seccion = 'POSTURA_' . ($index + 1);
 
             OwasDetalle::create([
                 'owas_evaluacion_id' => $owas->id,
-                'seccion' => 'GENERAL',
-                'concepto' => 'actividad_general',
-                'valor' => $request->actividad_general ?? 'No especificada',
+                'seccion' => $seccion,
+                'concepto' => 'espalda',
+                'valor' => $this->textoEspalda($postura['espalda']),
+                'puntaje' => $postura['espalda'],
+            ]);
+
+            OwasDetalle::create([
+                'owas_evaluacion_id' => $owas->id,
+                'seccion' => $seccion,
+                'concepto' => 'brazos',
+                'valor' => $this->textoBrazos($postura['brazos']),
+                'puntaje' => $postura['brazos'],
+            ]);
+
+            OwasDetalle::create([
+                'owas_evaluacion_id' => $owas->id,
+                'seccion' => $seccion,
+                'concepto' => 'piernas',
+                'valor' => $this->textoPiernas($postura['piernas']),
+                'puntaje' => $postura['piernas'],
+            ]);
+
+            OwasDetalle::create([
+                'owas_evaluacion_id' => $owas->id,
+                'seccion' => $seccion,
+                'concepto' => 'carga',
+                'valor' => $this->textoCarga($postura['carga']),
+                'puntaje' => $postura['carga'],
+            ]);
+
+            OwasDetalle::create([
+                'owas_evaluacion_id' => $owas->id,
+                'seccion' => $seccion,
+                'concepto' => 'frecuencia',
+                'valor' => 'Frecuencia observada',
+                'puntaje' => $postura['frecuencia'],
+            ]);
+
+            OwasDetalle::create([
+                'owas_evaluacion_id' => $owas->id,
+                'seccion' => $seccion,
+                'concepto' => 'porcentaje',
+                'valor' => 'Porcentaje de aparición',
+                'puntaje' => $postura['porcentaje'],
+            ]);
+
+            OwasDetalle::create([
+                'owas_evaluacion_id' => $owas->id,
+                'seccion' => $seccion,
+                'concepto' => 'codigo_postura',
+                'valor' => $postura['codigo_postura'],
+                'puntaje' => (int) $postura['codigo_postura'],
+            ]);
+
+            OwasDetalle::create([
+                'owas_evaluacion_id' => $owas->id,
+                'seccion' => $seccion,
+                'concepto' => 'categoria_riesgo',
+                'valor' => $postura['nivel'],
+                'puntaje' => $postura['categoria'],
+            ]);
+
+            OwasDetalle::create([
+                'owas_evaluacion_id' => $owas->id,
+                'seccion' => $seccion,
+                'concepto' => 'accion_correctiva',
+                'valor' => $postura['accion'],
                 'puntaje' => 0,
             ]);
-
-            OwasDetalle::create([
-                'owas_evaluacion_id' => $owas->id,
-                'seccion' => 'GENERAL',
-                'concepto' => 'area_evaluada',
-                'valor' => $request->area_evaluada ?? 'No especificada',
-                'puntaje' => 0,
-            ]);
-
-            OwasDetalle::create([
-                'owas_evaluacion_id' => $owas->id,
-                'seccion' => 'RESULTADO',
-                'concepto' => 'categoria_final',
-                'valor' => $resultado['nivel_riesgo'],
-                'puntaje' => $resultado['categoria_final'],
-            ]);
-
-            DB::commit();
-
-            return redirect()->route('owas.show', $owas->id)
-                ->with('success', 'Evaluación OWAS guardada correctamente.');
-        } catch (\Throwable $e) {
-            DB::rollBack();
-            return back()->withInput()->with('error', 'Error al guardar: ' . $e->getMessage());
         }
-    }
 
+        foreach ($resultado['analisis_partes'] as $parte => $filas) {
+            $seccion = 'PARTE_' . strtoupper($parte);
+
+            foreach ($filas as $fila) {
+                OwasDetalle::create([
+                    'owas_evaluacion_id' => $owas->id,
+                    'seccion' => $seccion,
+                    'concepto' => $fila['concepto'],
+                    'valor' => $fila['valor'],
+                    'puntaje' => $fila['puntaje'],
+                ]);
+            }
+        }
+
+        OwasDetalle::create([
+            'owas_evaluacion_id' => $owas->id,
+            'seccion' => 'GENERAL',
+            'concepto' => 'actividad_general',
+            'valor' => $request->actividad_general ?? 'No especificada',
+            'puntaje' => 0,
+        ]);
+
+        OwasDetalle::create([
+            'owas_evaluacion_id' => $owas->id,
+            'seccion' => 'GENERAL',
+            'concepto' => 'area_evaluada',
+            'valor' => $request->area_evaluada ?? 'No especificada',
+            'puntaje' => 0,
+        ]);
+
+        OwasDetalle::create([
+            'owas_evaluacion_id' => $owas->id,
+            'seccion' => 'RESULTADO',
+            'concepto' => 'categoria_final',
+            'valor' => $resultado['nivel_riesgo'],
+            'puntaje' => $resultado['categoria_final'],
+        ]);
+
+        DB::commit();
+
+        return redirect()->route('owas.show', $owas->id)
+            ->with('success', 'Evaluación OWAS guardada correctamente.');
+    } catch (\Throwable $e) {
+        DB::rollBack();
+        return back()->withInput()->with('error', 'Error al guardar: ' . $e->getMessage());
+    }
+}
     public function show($id)
     {
         $owas = OwasEvaluacion::with([
@@ -533,6 +546,7 @@ class OwasController extends Controller
             default => 'No definido',
         };
     }
+
 
     private function textoCarga($valor): string
     {
