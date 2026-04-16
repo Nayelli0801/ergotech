@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="max-w-4xl mx-auto py-8 px-6">
         <div class="bg-white shadow-lg rounded-2xl border border-gray-200 overflow-hidden">
-            <div class="bg-blue-700 text-white px-6 py-4">
+            <div class="bg-sky-600 text-white px-6 py-4 flex justify-between items-center">
                 <h2 class="text-2xl font-bold">Nueva sucursal</h2>
             </div>
 

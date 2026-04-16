@@ -19,20 +19,29 @@ use App\Http\Controllers\OwasController;
 use App\Http\Controllers\Nom036Controller;
 use App\Http\Controllers\NioshController;
 use App\Http\Controllers\ConfiguracionController;
+use App\Http\Controllers\LogController; // 🔥 NUEVO
 
-// Inicio
+// =========================
+// INICIO
+// =========================
 Route::get('/', function () {
     return redirect('/login');
 });
 
+// =========================
 // 2FA
+// =========================
 Route::get('/two-factor', [TwoFactorController::class, 'index'])->name('2fa.index');
 Route::post('/two-factor', [TwoFactorController::class, 'store'])->name('2fa.store');
 
-// Dashboard
+// =========================
+// DASHBOARD
+// =========================
 Route::middleware(['auth'])->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-// Perfil
+// =========================
+// PERFIL
+// =========================
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -95,22 +104,36 @@ Route::middleware(['auth', 'rol:admin,evaluador'])->group(function () {
     Route::get('/nom036/{id}/pdf', [Nom036Controller::class, 'pdf'])->name('nom036.pdf');
     Route::get('/nom036/{id}/excel', [Nom036Controller::class, 'excel'])->name('nom036.excel');
 
-    // Reportes
+    // Reportes (puedes luego proteger con permiso si quieres)
     Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
 });
 
 // =========================
-// SOLO ADMIN
+// SOLO ADMIN + PERMISOS 🔐
 // =========================
 Route::middleware(['auth', 'rol:admin'])->group(function () {
+
     Route::resource('usuarios', UserController::class);
-    Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
+
+    // 🔐 Configuración protegida por permiso
+    Route::get('/configuracion', [ConfiguracionController::class, 'index'])
+        ->name('configuracion.index')
+        ->middleware('permission:ver configuracion');
+
+    // 🔐 Logs protegidos por permiso
+    Route::get('/logs', [LogController::class, 'index'])
+        ->name('logs.index')
+        ->middleware('permission:ver logs');
 });
 
-// Prueba
+// =========================
+// PRUEBA
+// =========================
 Route::get('/prueba-rol', function () {
     return Auth::user()->rol?->nombre;
 })->middleware('auth');
 
-// Auth
+// =========================
+// AUTH
+// =========================
 require __DIR__ . '/auth.php';

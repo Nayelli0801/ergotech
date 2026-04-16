@@ -2,7 +2,6 @@
 
 <div class="max-w-6xl mx-auto mt-6">
 
-```
 <div class="bg-white rounded-xl shadow-lg overflow-hidden">
 
     <!-- Encabezado -->
@@ -51,12 +50,25 @@
                         {{ $user->email }}
                     </td>
 
+                    <!-- Rol con colores dinámicos -->
                     <td class="p-4">
-                        <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-semibold">
-                            {{ ucfirst(strtolower(optional($user->rol)->nombre ?? 'sin rol')) }}
+                        @php
+                            $rol = strtolower(optional($user->rol)->nombre ?? 'sin rol');
+
+                            $color = match($rol) {
+                                'admin' => 'bg-blue-100 text-blue-700',
+                                'evaluador' => 'bg-green-100 text-green-700',
+                                'visitante' => 'bg-gray-100 text-gray-700',
+                                default => 'bg-gray-100 text-gray-700'
+                            };
+                        @endphp
+
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold {{ $color }}">
+                            {{ ucfirst($rol) }}
                         </span>
                     </td>
 
+                    <!-- Acciones -->
                     <td class="p-4 flex gap-2">
 
                         <a href="{{ route('usuarios.edit', $user->id) }}"
@@ -65,7 +77,8 @@
                         </a>
 
                         <form action="{{ route('usuarios.destroy', $user->id) }}"
-                              method="POST">
+                              method="POST"
+                              onsubmit="return confirm('¿Estás seguro de eliminar este usuario?')">
                             @csrf
                             @method('DELETE')
 
@@ -95,7 +108,6 @@
     </div>
 
 </div>
-```
 
 </div>
 

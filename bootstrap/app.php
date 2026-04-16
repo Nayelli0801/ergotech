@@ -10,11 +10,24 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware) {
+
+    ->withProviders([ // 👈 🔥 AGREGA ESTO
+        App\Providers\EventServiceProvider::class,
+    ])
+
+    ->withMiddleware(function ($middleware) {
         $middleware->alias([
-            'rol' => \App\Http\Middleware\RolMiddleware::class,
-        ]);
+    'rol' => \App\Http\Middleware\RolMiddleware::class,
+
+    // ✅ CORRECTO (sin la "s" en Middleware)
+    'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+    'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+    'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+]);
     })
+
     ->withExceptions(function (Exceptions $exceptions) {
         //
-    })->create();
+    })
+    
+    ->create();
