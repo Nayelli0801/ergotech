@@ -18,8 +18,7 @@ use App\Http\Controllers\RulaController;
 use App\Http\Controllers\OwasController;
 use App\Http\Controllers\Nom036Controller;
 use App\Http\Controllers\NioshController;
-use App\Http\Controllers\ConfiguracionController;
-use App\Http\Controllers\LogController; // 🔥 NUEVO
+use App\Http\Controllers\LogController;
 
 // =========================
 // INICIO
@@ -103,24 +102,23 @@ Route::middleware(['auth', 'rol:admin,evaluador'])->group(function () {
     Route::get('/nom036/{id}', [Nom036Controller::class, 'show'])->name('nom036.show');
     Route::get('/nom036/{id}/pdf', [Nom036Controller::class, 'pdf'])->name('nom036.pdf');
     Route::get('/nom036/{id}/excel', [Nom036Controller::class, 'excel'])->name('nom036.excel');
+});
 
-    // Reportes (puedes luego proteger con permiso si quieres)
+// =========================
+// REPORTES (INCLUYE VISITANTE 👁️)
+// =========================
+Route::middleware(['auth', 'rol:admin,evaluador,visitante'])->group(function () {
     Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
 });
 
 // =========================
-// SOLO ADMIN + PERMISOS 🔐
+// SOLO ADMIN 🔐
 // =========================
 Route::middleware(['auth', 'rol:admin'])->group(function () {
 
     Route::resource('usuarios', UserController::class);
 
-    // 🔐 Configuración protegida por permiso
-    Route::get('/configuracion', [ConfiguracionController::class, 'index'])
-        ->name('configuracion.index')
-        ->middleware('permission:ver configuracion');
-
-    // 🔐 Logs protegidos por permiso
+    // Logs
     Route::get('/logs', [LogController::class, 'index'])
         ->name('logs.index')
         ->middleware('permission:ver logs');

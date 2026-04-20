@@ -1,80 +1,174 @@
-<!DOCTYPE html>
-<html lang="es">
+<x-app-layout>
 
-<head>
-<meta charset="UTF-8">
-<title>ErgoTech</title>
+    @php
+        $metodosLabelsJson = json_encode(array_keys($metodos));
+        $metodosDataJson = json_encode(array_values($metodos));
+        $riesgosLabelsJson = json_encode(array_keys($riesgoPorcentaje));
+        $riesgosDataJson = json_encode(array_values($riesgoPorcentaje));
+    @endphp
 
-@vite(['resources/css/app.css'])
+    <div class="space-y-6">
 
-</head>
+        {{-- HEADER --}}
+        <div>
+            <h2 class="text-2xl md:text-3xl font-bold text-slate-800">
+                Panel de Consulta
+            </h2>
+            <p class="text-sm text-slate-500">
+                Visualiza información general de las evaluaciones ergonómicas registradas en el sistema.
+            </p>
+        </div>
 
-<body class="bg-gray-100">
+        {{-- RESUMEN GENERAL --}}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
-<!-- HERO -->
-<section class="bg-blue-700 text-white py-24">
+            <div class="bg-white border rounded-2xl p-5 shadow-sm">
+                <p class="text-sm text-slate-500">Total de evaluaciones</p>
+                <p class="text-3xl font-bold text-slate-800 mt-1">
+                    {{ $totalEvaluaciones }}
+                </p>
+            </div>
 
-<div class="max-w-6xl mx-auto text-center px-6">
+            <div class="bg-white border rounded-2xl p-5 shadow-sm">
+                <p class="text-sm text-slate-500">Método más utilizado</p>
+                <p class="text-lg font-semibold text-slate-800 mt-1">
+                    {{ array_key_first($metodos) ?? 'N/A' }}
+                </p>
+            </div>
 
-<h1 class="text-5xl font-bold mb-6">
-Bienvenido a ErgoTech
-</h1>
+            <div class="bg-white border rounded-2xl p-5 shadow-sm">
+                <p class="text-sm text-slate-500">Nivel de riesgo predominante</p>
+                <p class="text-lg font-semibold text-slate-800 mt-1">
+                    {{ array_key_first($riesgoPorcentaje) ?? 'N/A' }}
+                </p>
+            </div>
 
-<p class="text-xl mb-8">
-Plataforma de evaluación ergonómica para empresas.
-</p>
+        </div>
 
-<p class="text-lg opacity-80">
-Tu cuenta está registrada pero aún no tiene permisos asignados.
-</p>
+        {{-- GRÁFICAS --}}
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-</div>
+            {{-- MÉTODOS --}}
+            <div class="bg-white border rounded-2xl p-5 shadow-sm">
+                <h3 class="font-semibold text-slate-800 mb-2">
+                    Evaluaciones por método
+                </h3>
+                <p class="text-sm text-slate-500 mb-4">
+                    Distribución general de evaluaciones realizadas.
+                </p>
 
-</section>
+                <div class="h-[280px]">
+                    <canvas id="metodosChart"></canvas>
+                </div>
+            </div>
 
-<!-- INFO -->
+            {{-- RIESGO --}}
+            <div class="bg-white border rounded-2xl p-5 shadow-sm">
+                <h3 class="font-semibold text-slate-800 mb-2">
+                    Niveles de riesgo
+                </h3>
+                <p class="text-sm text-slate-500 mb-4">
+                    Porcentaje de riesgo detectado en evaluaciones.
+                </p>
 
-<section class="py-16">
+                <div class="h-[280px]">
+                    <canvas id="riesgoChart"></canvas>
+                </div>
+            </div>
 
-<div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-8 px-6">
+        </div>
 
-<div class="bg-white p-6 rounded-xl shadow">
-<h3 class="text-xl font-bold mb-2">Evaluaciones</h3>
-<p>Aplicación de métodos ergonómicos como REBA.</p>
-</div>
+        {{-- BARRAS DE RIESGO --}}
+        <div class="bg-white border rounded-2xl p-5 shadow-sm">
+            <h3 class="font-semibold text-slate-800 mb-4">
+                Distribución de riesgo (%)
+            </h3>
 
-<div class="bg-white p-6 rounded-xl shadow">
-<h3 class="text-xl font-bold mb-2">Gestión</h3>
-<p>Administración de empresas y trabajadores.</p>
-</div>
+            <div class="space-y-4">
+                @foreach($riesgoPorcentaje as $nivel => $porcentaje)
 
-<div class="bg-white p-6 rounded-xl shadow">
-<h3 class="text-xl font-bold mb-2">Reportes</h3>
-<p>Generación automática de reportes profesionales.</p>
-</div>
+                    @php
+                        $color = match($nivel) {
+                            'Bajo' => 'bg-emerald-500',
+                            'Medio' => 'bg-amber-500',
+                            'Alto' => 'bg-red-500',
+                            'Muy alto' => 'bg-rose-700',
+                            default => 'bg-slate-500'
+                        };
+                    @endphp
 
-</div>
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span>{{ $nivel }}</span>
+                            <span class="font-semibold">{{ $porcentaje }}%</span>
+                        </div>
 
-</section>
+                        <div class="w-full bg-gray-200 h-2 rounded-full">
+                            <div class="{{ $color }} h-2 rounded-full barra" data-width="{{ $porcentaje }}"></div>
+                        </div>
+                    </div>
 
-<!-- CTA -->
+                @endforeach
+            </div>
+        </div>
 
-<section class="bg-gray-900 text-white py-16 text-center">
+    </div>
 
-<h2 class="text-2xl mb-4">
-Esperando autorización de administrador
-</h2>
+    {{-- DATA --}}
+    <script id="metodos-labels-json" type="application/json">{!! $metodosLabelsJson !!}</script>
+    <script id="metodos-data-json" type="application/json">{!! $metodosDataJson !!}</script>
+    <script id="riesgos-labels-json" type="application/json">{!! $riesgosLabelsJson !!}</script>
+    <script id="riesgos-data-json" type="application/json">{!! $riesgosDataJson !!}</script>
 
-<form method="POST" action="{{ route('logout') }}">
-@csrf
+    @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<button class="bg-red-500 px-6 py-3 rounded-lg">
-Cerrar sesión
-</button>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
 
-</form>
+            // barras animadas
+            document.querySelectorAll('.barra').forEach(b => {
+                b.style.width = (b.dataset.width || 0) + '%';
+            });
 
-</section>
+            const metodosLabels = JSON.parse(document.getElementById('metodos-labels-json').textContent);
+            const metodosData = JSON.parse(document.getElementById('metodos-data-json').textContent);
 
-</body>
-</html>
+            const riesgosLabels = JSON.parse(document.getElementById('riesgos-labels-json').textContent);
+            const riesgosData = JSON.parse(document.getElementById('riesgos-data-json').textContent);
+
+            // chart métodos
+            new Chart(document.getElementById('metodosChart'), {
+                type: 'bar',
+                data: {
+                    labels: metodosLabels,
+                    datasets: [{
+                        data: metodosData
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // chart riesgo
+            new Chart(document.getElementById('riesgoChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: riesgosLabels,
+                    datasets: [{
+                        data: riesgosData
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    cutout: '60%'
+                }
+            });
+
+        });
+    </script>
+    @endpush
+
+</x-app-layout>
