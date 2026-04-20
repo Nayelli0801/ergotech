@@ -1,8 +1,9 @@
 <x-app-layout>
     <div class="max-w-5xl mx-auto py-8 px-6">
         <div class="bg-white shadow-lg rounded-2xl border border-gray-200 overflow-hidden">
-            <div class="bg-yellow-500 text-white px-6 py-4">
+            <div class="bg-sky-600 text-white px-6 py-4">
                 <h2 class="text-2xl font-bold">Editar trabajador</h2>
+                <p class="text-sm text-blue-100">Modifica los datos del trabajador</p>
             </div>
 
             <div class="p-6">

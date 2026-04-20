@@ -19,6 +19,7 @@ class Empresa extends Model
         'correo',
         'direccion',
         'activo',
+        'imagen',
     ];
 
     public function sucursales()

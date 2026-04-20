@@ -1,8 +1,9 @@
 <x-app-layout>
     <div class="max-w-4xl mx-auto py-8 px-6">
         <div class="bg-white shadow-lg rounded-2xl border border-gray-200 overflow-hidden">
-            <div class="bg-yellow-500 text-white px-6 py-4">
-                <h2 class="text-2xl font-bold">Editar puesto</h2>
+            <div class="bg-sky-600 text-white px-6 py-4">
+                <h2 class="text-2xl font-bold">Editar Puesto</h2>
+                <p class="text-sm text-blue-100">Modifica los datos del puesto</p>
             </div>
 
             <div class="p-6">

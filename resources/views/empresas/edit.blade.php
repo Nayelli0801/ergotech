@@ -1,126 +1,200 @@
 <x-app-layout>
-    <div class="p-6 max-w-7xl mx-auto">
-        <h1 class="text-2xl font-bold mb-6">Editar Empresa</h1>
+    <div class="py-8">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        <form action="{{ route('empresas.update', $empresa->id) }}" method="POST" enctype="multipart/form-data" class="bg-white shadow rounded-lg p-6">
-            @csrf
-            @method('PUT')
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Columna izquierda: campos principales (2/3) -->
-                <div class="md:col-span-2 space-y-4">
-                    <!-- Tus campos existentes (sin cambios) -->
-                    <div>
-                        <label class="block font-semibold">Nombre</label>
-                        <input type="text" name="nombre" value="{{ old('nombre', $empresa->nombre) }}" class="w-full border rounded-lg p-2">
-                        @error('nombre') <p class="text-red-500 text-sm">{{ $message }}</p> @enderror
-                    </div>
-                    <div>
-                        <label class="block font-semibold">Razón social</label>
-                        <input type="text" name="razon_social" value="{{ old('razon_social', $empresa->razon_social) }}" class="w-full border rounded-lg p-2">
-                        @error('razon_social') <p class="text-red-500 text-sm">{{ $message }}</p> @enderror
-                    </div>
-                    <div>
-                        <label class="block font-semibold">RFC</label>
-                        <input type="text" name="rfc" value="{{ old('rfc', $empresa->rfc) }}" class="w-full border rounded-lg p-2">
-                        @error('rfc') <p class="text-red-500 text-sm">{{ $message }}</p> @enderror
-                    </div>
-                    <div>
-                        <label class="block font-semibold">Teléfono</label>
-                        <input type="text" name="telefono" value="{{ old('telefono', $empresa->telefono) }}" class="w-full border rounded-lg p-2">
-                        @error('telefono') <p class="text-red-500 text-sm">{{ $message }}</p> @enderror
-                    </div>
-                    <div>
-                        <label class="block font-semibold">Correo</label>
-                        <input type="email" name="correo" value="{{ old('correo', $empresa->correo) }}" class="w-full border rounded-lg p-2">
-                        @error('correo') <p class="text-red-500 text-sm">{{ $message }}</p> @enderror
-                    </div>
-                    <div>
-                        <label class="block font-semibold">Dirección</label>
-                        <textarea name="direccion" class="w-full border rounded-lg p-2">{{ old('direccion', $empresa->direccion) }}</textarea>
-                        @error('direccion') <p class="text-red-500 text-sm">{{ $message }}</p> @enderror
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <input type="checkbox" name="activo" value="1" {{ $empresa->activo ? 'checked' : '' }}>
-                        <label>Activa</label>
-                    </div>
+                <!-- Header -->
+                <div class="bg-sky-600 text-white px-6 py-4 flex justify-between items-center">
+                    <h2 class="text-xl font-semibold">Editar Empresa</h2>
+                    <p class="text-sm text-blue-100">Modifica los datos de la empresa</p>
                 </div>
 
-                <!-- Columna derecha: logo (1/3) - VERSIÓN CORREGIDA (similar al perfil) -->
-                <div class="border-l pl-6 space-y-4">
-                    <label class="block font-semibold">Logo de la empresa</label>
-                    
-                    <!-- Mostrar logo actual (circular o cuadrado, tú eliges) -->
-                    <div class="mb-4 flex justify-center">
-                        @if($empresa->logo)
-                            <img src="{{ Storage::url($empresa->logo) }}" alt="Logo" class="w-40 h-40 object-cover rounded-full shadow-md">
-                        @else
-                            <div class="w-40 h-40 rounded-full bg-gray-200 flex items-center justify-center">
-                                <span class="text-gray-500 text-sm">Sin logo</span>
+                <div class="p-6">
+                    <form method="POST" action="{{ route('empresas.update', $empresa->id) }}">
+                        @csrf
+                        @method('PUT')
+
+                        <div class="grid md:grid-cols-2 gap-6">
+
+                            <!-- IZQUIERDA -->
+                            <div>
+
+                                <div class="mb-5">
+                                    <label class="block text-sm font-medium">Nombre</label>
+                                    <input type="text" name="nombre"
+                                        value="{{ old('nombre', $empresa->nombre) }}"
+                                        class="w-full px-4 py-2 border rounded-lg">
+                                </div>
+
+                                <div class="mb-5">
+                                    <label class="block text-sm font-medium">Razón social</label>
+                                    <input type="text" name="razon_social"
+                                        value="{{ old('razon_social', $empresa->razon_social) }}"
+                                        class="w-full px-4 py-2 border rounded-lg">
+                                </div>
+
+                                <div class="mb-5">
+                                    <label class="block text-sm font-medium">RFC</label>
+                                    <input type="text" name="rfc"
+                                        value="{{ old('rfc', $empresa->rfc) }}"
+                                        class="w-full px-4 py-2 border rounded-lg">
+                                </div>
+
+                                <div class="mb-5">
+                                    <label class="block text-sm font-medium">Teléfono</label>
+                                    <input type="text" name="telefono"
+                                        value="{{ old('telefono', $empresa->telefono) }}"
+                                        class="w-full px-4 py-2 border rounded-lg">
+                                </div>
+
+                                <div class="mb-5">
+                                    <label class="block text-sm font-medium">Correo</label>
+                                    <input type="email" name="correo"
+                                        value="{{ old('correo', $empresa->correo) }}"
+                                        class="w-full px-4 py-2 border rounded-lg">
+                                </div>
+
+                                <div class="mb-5">
+                                    <label class="block text-sm font-medium">Dirección</label>
+                                    <textarea name="direccion"
+                                        class="w-full px-4 py-2 border rounded-lg">{{ old('direccion', $empresa->direccion) }}</textarea>
+                                </div>
+
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" name="activo" value="1"
+                                        {{ $empresa->activo ? 'checked' : '' }}>
+                                    <label>Activa</label>
+                                </div>
+
                             </div>
-                        @endif
-                    </div>
 
-                    <!-- Label que activa el input file (estilo botón) -->
-                    <label class="cursor-pointer inline-flex items-center gap-2 bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition">
-                        Seleccionar imagen
-                        <input type="file" name="logo" id="logo" class="hidden" accept="image/*">
-                    </label>
+                            <!-- DERECHA (LOGO) -->
+                            <div class="flex flex-col items-center">
 
-                    <!-- Nombre del archivo seleccionado -->
-                    <div id="file-name" class="text-sm text-gray-600 mt-2">Ningún archivo seleccionado</div>
+                                <label class="block text-sm font-medium mb-2">Logo</label>
 
-                    <!-- Vista previa de la nueva imagen -->
-                    <div id="preview-container" class="mt-4 hidden">
-                        <p class="text-sm text-gray-600 mb-1">Vista previa:</p>
-                        <img id="preview" src="#" alt="Vista previa" class="w-40 h-40 object-cover rounded-full shadow-md">
-                    </div>
+                                <!-- Logo actual -->
+                                @if($empresa->logo)
+                                    <img src="{{ asset($empresa->logo) }}"
+                                        class="w-32 h-32 object-contain border rounded mb-3">
+                                @else
+                                    <div class="w-32 h-32 bg-gray-200 flex items-center justify-center rounded mb-3">
+                                        Sin logo
+                                    </div>
+                                @endif
 
-                    @error('logo')
-                        <p class="text-red-500 text-sm">{{ $message }}</p>
-                    @enderror
+                                <!-- Preview -->
+                                <img id="preview"
+                                    class="w-32 h-32 object-contain border rounded mb-3 hidden">
+
+                                <!-- Botón -->
+                                <button type="button" id="selectImage"
+                                    class="bg-gray-700 text-white px-4 py-2 rounded-lg">
+                                    Cambiar logo
+                                </button>
+
+                                <input type="file" id="logoInput" class="hidden" accept="image/*">
+
+                                <input type="hidden" name="logo_base64" id="logo_base64">
+
+                            </div>
+
+                        </div>
+
+                        <!-- BOTONES -->
+                        <div class="flex justify-end gap-3 mt-6">
+                            <a href="{{ route('empresas.index') }}"
+                                class="px-6 py-2 border rounded-lg hover:bg-gray-100">
+                                Cancelar
+                            </a>
+
+                            <button type="submit"
+                                class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                Actualizar
+                            </button>
+                        </div>
+
+                    </form>
                 </div>
             </div>
-
-            <!-- Botones de acción -->
-            <div class="flex gap-3 mt-6 pt-4 border-t">
-                <button type="submit" class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600">
-                    Actualizar
-                </button>
-                <a href="{{ route('empresas.index') }}" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
-                    Cancelar
-                </a>
-            </div>
-        </form>
+        </div>
     </div>
 
-    @push('scripts')
+    <!-- MODAL -->
+    <div id="cropModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white p-4 rounded-lg w-[500px]">
+            <h2 class="text-lg font-bold mb-2">Editar logo</h2>
+
+            <img id="modalImage" style="max-width:100%;">
+
+            <div class="flex justify-end gap-2 mt-3">
+                <button type="button" id="cancelCrop" class="bg-gray-400 text-white px-3 py-1 rounded">
+                    Cancelar
+                </button>
+                <button type="button" id="saveCrop" class="bg-blue-500 text-white px-3 py-1 rounded">
+                    Guardar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cropper -->
+    <link href="https://unpkg.com/cropperjs/dist/cropper.min.css" rel="stylesheet"/>
+    <script src="https://unpkg.com/cropperjs/dist/cropper.min.js"></script>
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const fileInput = document.getElementById('logo');
-            const fileNameSpan = document.getElementById('file-name');
-            const previewContainer = document.getElementById('preview-container');
-            const previewImg = document.getElementById('preview');
+        let cropper = null;
 
-            if (fileInput) {
-                fileInput.addEventListener('change', function(e) {
-                    const file = e.target.files[0];
-                    fileNameSpan.textContent = file ? file.name : 'Ningún archivo seleccionado';
+        const input = document.getElementById('logoInput');
+        const modal = document.getElementById('cropModal');
+        const modalImage = document.getElementById('modalImage');
+        const preview = document.getElementById('preview');
+        const base64Input = document.getElementById('logo_base64');
 
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = function(ev) {
-                            previewImg.src = ev.target.result;
-                            previewContainer.classList.remove('hidden');
-                        };
-                        reader.readAsDataURL(file);
-                    } else {
-                        previewContainer.classList.add('hidden');
-                        previewImg.src = '#';
-                    }
-                });
-            }
+        document.getElementById('selectImage').onclick = () => input.click();
+
+        input.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                modalImage.src = ev.target.result;
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            };
+            reader.readAsDataURL(file);
         });
+
+        modalImage.onload = () => {
+            if (cropper) cropper.destroy();
+
+            cropper = new Cropper(modalImage, {
+                aspectRatio: 1,
+                viewMode: 1,
+            });
+        };
+
+        document.getElementById('saveCrop').onclick = () => {
+            if (!cropper) return;
+
+            const canvas = cropper.getCroppedCanvas({
+                width: 400,
+                height: 400,
+            });
+
+            const base64 = canvas.toDataURL('image/png');
+
+            preview.src = base64;
+            preview.classList.remove('hidden');
+            base64Input.value = base64;
+
+            modal.classList.add('hidden');
+        };
+
+        document.getElementById('cancelCrop').onclick = () => {
+            modal.classList.add('hidden');
+        };
     </script>
-    @endpush
 </x-app-layout>

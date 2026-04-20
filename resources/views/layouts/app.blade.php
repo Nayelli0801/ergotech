@@ -253,7 +253,7 @@
                             @endif
                         </p>
                         <p class="text-xs text-slate-500">
-                            {{ Auth::user()->isAdmin() ? 'Administrador' : (Auth::user()->isEvaluador() ? 'Evaluador' : 'Usuario') }}
+                            {{ Auth::user()->isAdmin() ? 'Usuario' : (Auth::user()->isEvaluador() ? 'Usuario' : 'Usuario') }}
                         </p>
                     </div>
                 </div>
