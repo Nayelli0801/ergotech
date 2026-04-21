@@ -9,7 +9,7 @@
     <div class="space-y-6">
         <div class="flex flex-col gap-2">
             <h2 class="text-2xl md:text-3xl font-bold tracking-tight text-slate-800">
-                Panel Evaluador
+                Panel de Consulta
             </h2>
             <p class="text-sm text-slate-500 max-w-3xl">
                 Resumen de evaluaciones registradas y comportamiento general de los niveles de riesgo.
