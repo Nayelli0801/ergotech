@@ -1,8 +1,9 @@
 <x-app-layout>
     <div class="max-w-4xl mx-auto py-8 px-6">
         <div class="bg-white shadow-lg rounded-2xl border border-gray-200 overflow-hidden">
-            <div class="bg-sky-600 text-white px-6 py-4 flex justify-between items-center">
+            <div class="bg-sky-600 text-white px-6 py-4">
                 <h2 class="text-2xl font-bold">Nueva sucursal</h2>
+                <p class="text-sm text-blue-100">Registra una nueva sucursal</p>
             </div>
 
             <div class="p-6">
@@ -24,7 +25,9 @@
                         <select name="empresa_id" class="w-full rounded-lg border-gray-300" required>
                             <option value="">Seleccione una empresa</option>
                             @foreach($empresas as $empresa)
-                                <option value="{{ $empresa->id }}">{{ $empresa->nombre }}</option>
+                                <option value="{{ $empresa->id }}" {{ old('empresa_id') == $empresa->id ? 'selected' : '' }}>
+                                    {{ $empresa->nombre }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
@@ -52,16 +55,19 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
                         <select name="activo" class="w-full rounded-lg border-gray-300" required>
-                            <option value="1">Activa</option>
-                            <option value="0">Inactiva</option>
+                            <option value="1" {{ old('activo', 1) == 1 ? 'selected' : '' }}>Activa</option>
+                            <option value="0" {{ old('activo') == 0 ? 'selected' : '' }}>Inactiva</option>
                         </select>
                     </div>
 
                     <div class="md:col-span-2 flex gap-3 pt-2">
-                        <button type="submit" class="bg-blue-700 hover:bg-blue-800 text-white px-5 py-2.5 rounded-lg">
+                        <button type="submit"
+                                class="bg-sky-600 hover:bg-sky-700 text-white px-5 py-2.5 rounded-lg transition">
                             Guardar
                         </button>
-                        <a href="{{ route('sucursales.index') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-5 py-2.5 rounded-lg">
+
+                        <a href="{{ route('sucursales.index') }}"
+                           class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-5 py-2.5 rounded-lg transition">
                             Cancelar
                         </a>
                     </div>

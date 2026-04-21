@@ -20,51 +20,78 @@
                     </div>
                 @endif
 
+                @if(session('error'))
+                    <div class="mb-4 rounded-lg bg-red-100 border border-red-300 text-red-700 px-4 py-3">
+                        {{ session('error') }}
+                    </div>
+                @endif
+
                 <div class="overflow-x-auto">
                     <table class="min-w-full border border-gray-200 rounded-lg overflow-hidden">
                         <thead class="bg-gray-100">
                             <tr>
-                                <th class="px-4 py-3 text-left">ID</th>
-                                <th class="px-4 py-3 text-left">Nombre completo</th>
-                                <th class="px-4 py-3 text-left">Puesto</th>
-                                <th class="px-4 py-3 text-left">Sexo</th>
-                                <th class="px-4 py-3 text-left">Edad</th>
-                                <th class="px-4 py-3 text-left">Estado</th>
-                                <th class="px-4 py-3 text-center">Acciones</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">ID</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Nombre completo</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Puesto</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Sexo</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Edad</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Estado</th>
+                                <th class="px-4 py-3 text-center text-sm font-semibold text-gray-700">Acciones</th>
                             </tr>
                         </thead>
+
                         <tbody class="divide-y divide-gray-200">
                             @forelse($trabajadores as $trabajador)
                                 <tr class="hover:bg-gray-50">
-                                    <td class="px-4 py-3">{{ $trabajador->id }}</td>
-                                    <td class="px-4 py-3">
+                                    <td class="px-4 py-3 text-sm text-gray-700 font-medium">
+                                        {{ $trabajador->id }}
+                                    </td>
+
+                                    <td class="px-4 py-3 text-sm text-gray-700">
                                         {{ trim(($trabajador->nombre ?? '') . ' ' . ($trabajador->apellido_paterno ?? '') . ' ' . ($trabajador->apellido_materno ?? '')) }}
                                     </td>
-                                    <td class="px-4 py-3">{{ $trabajador->puesto->nombre ?? 'N/A' }}</td>
-                                    <td class="px-4 py-3">{{ $trabajador->sexo ?? 'N/A' }}</td>
-                                    <td class="px-4 py-3">{{ $trabajador->edad ?? 'N/A' }}</td>
-                                    <td class="px-4 py-3">
+
+                                    <td class="px-4 py-3 text-sm text-gray-700">
+                                        {{ $trabajador->puesto->nombre ?? 'N/A' }}
+                                    </td>
+
+                                    <td class="px-4 py-3 text-sm text-gray-700">
+                                        {{ $trabajador->sexo ?? 'N/A' }}
+                                    </td>
+
+                                    <td class="px-4 py-3 text-sm text-gray-700">
+                                        {{ $trabajador->edad ?? 'N/A' }}
+                                    </td>
+
+                                    <td class="px-4 py-3 text-sm">
                                         @if($trabajador->activo)
-                                            <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-sm">Activo</span>
+                                            <span class="inline-block px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold">
+                                                Activo
+                                            </span>
                                         @else
-                                            <span class="bg-red-100 text-red-700 px-2 py-1 rounded text-sm">Inactivo</span>
+                                            <span class="inline-block px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-semibold">
+                                                Inactivo
+                                            </span>
                                         @endif
                                     </td>
-                                    <td class="px-4 py-3 text-center">
-                                        <a href="{{ route('trabajadores.edit', $trabajador->id) }}"
-                                           class="inline-block bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-semibold px-3 py-2 rounded-lg mr-2">
-                                            Editar
-                                        </a>
 
-                                        <form action="{{ route('trabajadores.destroy', $trabajador->id) }}" method="POST" class="inline-block">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit"
-                                                    onclick="return confirm('¿Eliminar este trabajador?')"
-                                                    class="bg-red-500 hover:bg-red-600 text-white text-sm font-semibold px-3 py-2 rounded-lg">
-                                                Eliminar
-                                            </button>
-                                        </form>
+                                    <td class="px-4 py-3 text-center">
+                                        <div class="flex flex-wrap justify-center items-center gap-2">
+                                            <a href="{{ route('trabajadores.edit', $trabajador->id) }}"
+                                               class="inline-flex items-center justify-center w-[100px] h-[38px] bg-sky-100 hover:bg-sky-200 text-sky-700 text-sm font-semibold rounded-lg transition">
+                                                Editar
+                                            </a>
+
+                                            <form action="{{ route('trabajadores.destroy', $trabajador->id) }}" method="POST"
+                                                  onsubmit="return confirm('¿Eliminar este trabajador?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit"
+                                                        class="inline-flex items-center justify-center w-[100px] h-[38px] bg-red-100 hover:bg-red-200 text-red-700 text-sm font-semibold rounded-lg transition">
+                                                    Eliminar
+                                                </button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                             @empty
@@ -77,6 +104,12 @@
                         </tbody>
                     </table>
                 </div>
+
+                @if(method_exists($trabajadores, 'links'))
+                    <div class="mt-4">
+                        {{ $trabajadores->links() }}
+                    </div>
+                @endif
             </div>
         </div>
     </div>

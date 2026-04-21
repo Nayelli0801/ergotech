@@ -1,7 +1,6 @@
 <x-app-layout>
     <div class="max-w-4xl mx-auto py-8 px-6">
         <div class="bg-white shadow-lg rounded-2xl border border-gray-200 overflow-hidden">
-            
             <div class="bg-sky-600 text-white px-6 py-4">
                 <h2 class="text-2xl font-bold">Editar sucursal</h2>
                 <p class="text-sm text-blue-100">Modifica los datos de la sucursal</p>
@@ -22,7 +21,6 @@
                     @csrf
                     @method('PUT')
 
-                    <!-- Empresa -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Empresa</label>
                         <select name="empresa_id" class="w-full rounded-lg border-gray-300" required>
@@ -36,39 +34,34 @@
                         </select>
                     </div>
 
-                    <!-- Nombre -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
-                        <input type="text" name="nombre" 
-                               value="{{ old('nombre', $sucursal->nombre) }}" 
+                        <input type="text" name="nombre"
+                               value="{{ old('nombre', $sucursal->nombre) }}"
                                class="w-full rounded-lg border-gray-300" required>
                     </div>
 
-                    <!-- Dirección -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
-                        <input type="text" name="direccion" 
-                               value="{{ old('direccion', $sucursal->direccion) }}" 
+                        <input type="text" name="direccion"
+                               value="{{ old('direccion', $sucursal->direccion) }}"
                                class="w-full rounded-lg border-gray-300">
                     </div>
 
-                    <!-- Teléfono -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
-                        <input type="text" name="telefono" 
-                               value="{{ old('telefono', $sucursal->telefono) }}" 
+                        <input type="text" name="telefono"
+                               value="{{ old('telefono', $sucursal->telefono) }}"
                                class="w-full rounded-lg border-gray-300">
                     </div>
 
-                    <!-- Responsable -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Responsable</label>
-                        <input type="text" name="responsable" 
-                               value="{{ old('responsable', $sucursal->responsable) }}" 
+                        <input type="text" name="responsable"
+                               value="{{ old('responsable', $sucursal->responsable) }}"
                                class="w-full rounded-lg border-gray-300">
                     </div>
 
-                    <!-- Estado -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
                         <select name="activo" class="w-full rounded-lg border-gray-300" required>
@@ -77,16 +70,17 @@
                         </select>
                     </div>
 
-                    <!-- Botones -->
                     <div class="md:col-span-2 flex gap-3 pt-2">
-                        <button type="submit" class="bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2.5 rounded-lg">
+                        <button type="submit"
+                                class="bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2.5 rounded-lg transition">
                             Actualizar
                         </button>
-                        <a href="{{ route('sucursales.index') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-5 py-2.5 rounded-lg">
+
+                        <a href="{{ route('sucursales.index') }}"
+                           class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-5 py-2.5 rounded-lg transition">
                             Cancelar
                         </a>
                     </div>
-
                 </form>
             </div>
         </div>

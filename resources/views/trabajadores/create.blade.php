@@ -1,8 +1,9 @@
 <x-app-layout>
     <div class="max-w-5xl mx-auto py-8 px-6">
         <div class="bg-white shadow-lg rounded-2xl border border-gray-200 overflow-hidden">
-            <div class="bg-blue-700 text-white px-6 py-4">
+            <div class="bg-sky-600 text-white px-6 py-4">
                 <h2 class="text-2xl font-bold">Nuevo trabajador</h2>
+                <p class="text-sm text-blue-100">Registra un nuevo trabajador</p>
             </div>
 
             <div class="p-6">
@@ -24,7 +25,7 @@
                         <select name="puesto_id" class="w-full rounded-lg border-gray-300" required>
                             <option value="">Seleccione un puesto</option>
                             @foreach($puestos as $puesto)
-                                <option value="{{ $puesto->id }}">
+                                <option value="{{ $puesto->id }}" {{ old('puesto_id') == $puesto->id ? 'selected' : '' }}>
                                     {{ $puesto->nombre }} - {{ $puesto->sucursal->nombre ?? '' }}
                                 </option>
                             @endforeach
@@ -50,8 +51,8 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">Sexo</label>
                         <select name="sexo" class="w-full rounded-lg border-gray-300">
                             <option value="">Seleccione</option>
-                            <option value="Masculino">Masculino</option>
-                            <option value="Femenino">Femenino</option>
+                            <option value="Masculino" {{ old('sexo') == 'Masculino' ? 'selected' : '' }}>Masculino</option>
+                            <option value="Femenino" {{ old('sexo') == 'Femenino' ? 'selected' : '' }}>Femenino</option>
                         </select>
                     </div>
 
@@ -78,16 +79,17 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
                         <select name="activo" class="w-full rounded-lg border-gray-300" required>
-                            <option value="1">Activo</option>
-                            <option value="0">Inactivo</option>
+                            <option value="1" {{ old('activo', 1) == 1 ? 'selected' : '' }}>Activo</option>
+                            <option value="0" {{ old('activo') == 0 ? 'selected' : '' }}>Inactivo</option>
                         </select>
                     </div>
 
                     <div class="md:col-span-2 flex gap-3 pt-2">
-                        <button type="submit" class="bg-blue-700 hover:bg-blue-800 text-white px-5 py-2.5 rounded-lg">
+                        <button type="submit" class="bg-sky-600 hover:bg-sky-700 text-white px-5 py-2.5 rounded-lg transition">
                             Guardar
                         </button>
-                        <a href="{{ route('trabajadores.index') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-5 py-2.5 rounded-lg">
+
+                        <a href="{{ route('trabajadores.index') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-5 py-2.5 rounded-lg transition">
                             Cancelar
                         </a>
                     </div>

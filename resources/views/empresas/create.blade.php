@@ -1,72 +1,71 @@
 <x-app-layout>
-    <div class="p-6 max-w-3xl mx-auto">
-        <h1 class="text-2xl font-bold mb-6">Nueva Empresa</h1>
-
-        <form action="{{ route('empresas.store') }}" method="POST" class="bg-white shadow rounded-lg p-6 space-y-4">
-            @csrf
-
-            <div>
-                <label class="block font-semibold">Nombre</label>
-                <input type="text" name="nombre" value="{{ old('nombre') }}" class="w-full border rounded-lg p-2">
-                @error('nombre')
-                    <p class="text-red-500 text-sm">{{ $message }}</p>
-                @enderror
+    <div class="max-w-4xl mx-auto py-8 px-6">
+        <div class="bg-white shadow-lg rounded-2xl border border-gray-200 overflow-hidden">
+            <div class="bg-sky-600 text-white px-6 py-4">
+                <h2 class="text-2xl font-bold">Nueva Empresa</h2>
+                <p class="text-sm text-blue-100">Registra una nueva empresa</p>
             </div>
 
-            <div>
-                <label class="block font-semibold">Razón social</label>
-                <input type="text" name="razon_social" value="{{ old('razon_social') }}" class="w-full border rounded-lg p-2">
-                @error('razon_social')
-                    <p class="text-red-500 text-sm">{{ $message }}</p>
-                @enderror
-            </div>
+            <div class="p-6">
+                @if($errors->any())
+                    <div class="mb-4 rounded-lg bg-red-100 border border-red-300 text-red-700 px-4 py-3">
+                        <ul class="list-disc pl-5">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
 
-            <div>
-                <label class="block font-semibold">RFC</label>
-                <input type="text" name="rfc" value="{{ old('rfc') }}" class="w-full border rounded-lg p-2">
-                @error('rfc')
-                    <p class="text-red-500 text-sm">{{ $message }}</p>
-                @enderror
-            </div>
+                <form action="{{ route('empresas.store') }}" method="POST" class="space-y-4">
+                    @csrf
 
-            <div>
-                <label class="block font-semibold">Teléfono</label>
-                <input type="text" name="telefono" value="{{ old('telefono') }}" class="w-full border rounded-lg p-2">
-                @error('telefono')
-                    <p class="text-red-500 text-sm">{{ $message }}</p>
-                @enderror
-            </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                        <input type="text" name="nombre" value="{{ old('nombre') }}" class="w-full border rounded-lg p-2 border-gray-300">
+                    </div>
 
-            <div>
-                <label class="block font-semibold">Correo</label>
-                <input type="email" name="correo" value="{{ old('correo') }}" class="w-full border rounded-lg p-2">
-                @error('correo')
-                    <p class="text-red-500 text-sm">{{ $message }}</p>
-                @enderror
-            </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Razón social</label>
+                        <input type="text" name="razon_social" value="{{ old('razon_social') }}" class="w-full border rounded-lg p-2 border-gray-300">
+                    </div>
 
-            <div>
-                <label class="block font-semibold">Dirección</label>
-                <textarea name="direccion" class="w-full border rounded-lg p-2">{{ old('direccion') }}</textarea>
-                @error('direccion')
-                    <p class="text-red-500 text-sm">{{ $message }}</p>
-                @enderror
-            </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">RFC</label>
+                        <input type="text" name="rfc" value="{{ old('rfc') }}" class="w-full border rounded-lg p-2 border-gray-300">
+                    </div>
 
-            <div class="flex items-center gap-2">
-                <input type="checkbox" name="activo" value="1" checked>
-                <label>Activa</label>
-            </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                        <input type="text" name="telefono" value="{{ old('telefono') }}" class="w-full border rounded-lg p-2 border-gray-300">
+                    </div>
 
-            <div class="flex gap-3">
-                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
-                    Guardar
-                </button>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Correo</label>
+                        <input type="email" name="correo" value="{{ old('correo') }}" class="w-full border rounded-lg p-2 border-gray-300">
+                    </div>
 
-                <a href="{{ route('empresas.index') }}" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
-                    Cancelar
-                </a>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+                        <textarea name="direccion" rows="4" class="w-full border rounded-lg p-2 border-gray-300">{{ old('direccion') }}</textarea>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" name="activo" value="1" checked>
+                        <label class="text-sm text-gray-700">Activa</label>
+                    </div>
+
+                    <div class="flex gap-3 pt-2">
+                        <button type="submit" class="bg-green-600 text-white px-5 py-2.5 rounded-lg hover:bg-green-700 transition">
+                            Guardar
+                        </button>
+
+                        <a href="{{ route('empresas.index') }}" class="bg-gray-200 text-gray-800 px-5 py-2.5 rounded-lg hover:bg-gray-300 transition">
+                            Cancelar
+                        </a>
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
 </x-app-layout>

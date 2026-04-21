@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Empresa;
 use App\Models\Evaluacion;
-use App\Models\Metodo;
-use App\Models\Puesto;
+use App\Models\Empresa;
 use App\Models\Sucursal;
+use App\Models\Puesto;
 use App\Models\Trabajador;
+use App\Models\Metodo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -96,4 +96,67 @@ class EvaluacionController extends Controller
                 return back()->withInput()->with('error', 'Método no válido.');
         }
     }
+
+    public function edit($id)
+    {
+        $evaluacion = Evaluacion::findOrFail($id);
+
+        $empresas = Empresa::where('activo', 1)->get();
+        $sucursales = Sucursal::with('empresa')->where('activo', 1)->get();
+        $puestos = Puesto::with('sucursal')->where('activo', 1)->get();
+        $trabajadores = Trabajador::with('puesto')->where('activo', 1)->get();
+
+        return view('evaluaciones.edit', compact(
+            'evaluacion',
+            'empresas',
+            'sucursales',
+            'puestos',
+            'trabajadores'
+        ));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $evaluacion = Evaluacion::findOrFail($id);
+
+        $request->validate([
+            'empresa_id' => 'required|exists:empresas,id',
+            'sucursal_id' => 'required|exists:sucursales,id',
+            'puesto_id' => 'required|exists:puestos,id',
+            'trabajador_id' => 'required|exists:trabajadores,id',
+            'fecha_evaluacion' => 'required|date',
+            'area_evaluada' => 'nullable|string|max:255',
+            'actividad' => 'nullable|string|max:255',
+            'observaciones' => 'nullable|string',
+        ]);
+
+        $evaluacion->update([
+            'empresa_id' => $request->empresa_id,
+            'sucursal_id' => $request->sucursal_id,
+            'puesto_id' => $request->puesto_id,
+            'trabajador_id' => $request->trabajador_id,
+            'fecha_evaluacion' => $request->fecha_evaluacion,
+            'area_evaluada' => $request->area_evaluada,
+            'actividad' => $request->actividad,
+            'observaciones' => $request->observaciones,
+        ]);
+
+        return redirect()->route('evaluaciones.index')
+            ->with('success', 'Evaluación actualizada correctamente.');
+    }
+
+    public function destroy($id)
+{
+    $evaluacion = Evaluacion::findOrFail($id);
+
+    try {
+        $evaluacion->delete();
+
+        return redirect()->route('evaluaciones.index')
+            ->with('success', 'Evaluación eliminada correctamente.');
+    } catch (\Exception $e) {
+        return redirect()->route('evaluaciones.index')
+            ->with('error', 'No se pudo eliminar la evaluación.');
+    }
+}
 }

@@ -18,7 +18,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Empresa</label>
-                    <select id="filtroEmpresa" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                    <select id="filtroEmpresa" class="w-full rounded-lg border-gray-300 focus:border-sky-500 focus:ring-sky-500">
                         <option value="">Todas las empresas</option>
                         @foreach($empresas ?? [] as $empresa)
                             <option value="{{ $empresa->nombre }}">{{ $empresa->nombre }}</option>
@@ -28,7 +28,7 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Puesto</label>
-                    <select id="filtroPuesto" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                    <select id="filtroPuesto" class="w-full rounded-lg border-gray-300 focus:border-sky-500 focus:ring-sky-500">
                         <option value="">Todos los puestos</option>
                         @foreach($puestos ?? [] as $puesto)
                             <option value="{{ $puesto->nombre }}">{{ $puesto->nombre }}</option>
@@ -38,12 +38,12 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de evaluación</label>
-                    <input type="date" id="filtroFecha" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                    <input type="date" id="filtroFecha" class="w-full rounded-lg border-gray-300 focus:border-sky-500 focus:ring-sky-500">
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Área evaluada</label>
-                    <select id="filtroArea" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                    <select id="filtroArea" class="w-full rounded-lg border-gray-300 focus:border-sky-500 focus:ring-sky-500">
                         <option value="">Todas las áreas</option>
                         <option value="Producción">Producción</option>
                         <option value="Laboratorio">Laboratorio</option>
@@ -57,34 +57,34 @@
                         type="text"
                         id="filtroObservaciones"
                         placeholder="Escribe palabras clave..."
-                        class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                        class="w-full rounded-lg border-gray-300 focus:border-sky-500 focus:ring-sky-500"
                     >
                 </div>
             </div>
 
             <div class="mt-5 flex flex-wrap gap-3">
                 <button id="btnAplicarFiltros"
-                        class="px-4 py-2 bg-sky-600 hover:bg-blue-800 rounded-lg font-semibold text-white shadow-sm">
+                        class="inline-flex items-center justify-center min-w-[150px] h-[42px] bg-sky-600 hover:bg-sky-700 rounded-lg font-semibold text-white transition">
                     Aplicar filtros
                 </button>
 
                 <button id="btnSimplificado"
-                        class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg font-semibold text-white shadow-sm">
+                        class="inline-flex items-center justify-center min-w-[170px] h-[42px] bg-sky-100 hover:bg-sky-200 rounded-lg font-semibold text-sky-700 transition">
                     Generar simplificado
                 </button>
 
                 <button id="btnExcel"
-                        class="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg font-semibold text-white shadow-sm">
+                        class="inline-flex items-center justify-center min-w-[150px] h-[42px] bg-sky-100 hover:bg-sky-200 rounded-lg font-semibold text-sky-700 transition">
                     Exportar a Excel
                 </button>
 
                 <button id="btnGraficas"
-                        class="px-4 py-2 bg-amber-500 hover:bg-amber-600 rounded-lg font-semibold text-white shadow-sm">
+                        class="inline-flex items-center justify-center min-w-[130px] h-[42px] bg-sky-100 hover:bg-sky-200 rounded-lg font-semibold text-sky-700 transition">
                     Ver gráficas
                 </button>
 
                 <button id="btnCancelar"
-                        class="px-4 py-2 bg-gray-500 hover:bg-gray-600 rounded-lg font-semibold text-white shadow-sm">
+                        class="inline-flex items-center justify-center min-w-[140px] h-[42px] bg-red-100 hover:bg-red-200 rounded-lg font-semibold text-red-700 transition">
                     Limpiar filtros
                 </button>
             </div>
