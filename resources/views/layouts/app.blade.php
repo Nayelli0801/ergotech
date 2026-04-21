@@ -215,7 +215,7 @@
 
                     <div class="hidden sm:flex h-11 w-11 rounded-xl bg-slate-50 items-center justify-center overflow-hidden">
                         <img
-                            src="{{ asset('images/ergotech-logo.png') }}"
+                            src="{{ asset('images/logo_chico.png') }}"
                             alt="ErgoTech"
                             class="h-8 w-8 object-contain"
                         >
