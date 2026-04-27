@@ -109,6 +109,7 @@ Route::middleware(['auth', 'rol:admin,evaluador'])->group(function () {
 // =========================
 Route::middleware(['auth', 'rol:admin,evaluador,visitante'])->group(function () {
     Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
+    Route::get('/reportes/excel', [ReporteController::class, 'excel'])->name('reportes.excel');
 });
 
 // =========================

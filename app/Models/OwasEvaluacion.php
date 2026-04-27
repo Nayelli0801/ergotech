@@ -13,6 +13,10 @@ class OwasEvaluacion extends Model
 
     protected $fillable = [
         'evaluacion_id',
+        'espalda',
+        'brazos',
+        'piernas',
+        'carga',
         'codigo_postura',
         'categoria_riesgo',
         'accion_correctiva',

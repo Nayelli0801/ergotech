@@ -107,16 +107,19 @@ public function store(Request $request, $evaluacion)
             'recomendaciones' => $resultado['accion_requerida'],
         ]);
 
-        $owas = OwasEvaluacion::create([
-            'evaluacion_id' => $evaluacionModel->id,
-            'espalda' => $resultado['postura_critica']['espalda'],
-            'brazos' => $resultado['postura_critica']['brazos'],
-            'piernas' => $resultado['postura_critica']['piernas'],
-            'carga' => $resultado['postura_critica']['carga'],
-            'codigo_postura' => $resultado['postura_critica']['codigo_postura'],
-            'categoria_riesgo' => $resultado['postura_critica']['nivel'],
-            'accion_correctiva' => $resultado['postura_critica']['accion'],
-        ]);
+       $owas = OwasEvaluacion::create([
+    'evaluacion_id' => $evaluacionModel->id,
+    'espalda' => $resultado['postura_critica']['espalda'],
+    'brazos' => $resultado['postura_critica']['brazos'],
+    'piernas' => $resultado['postura_critica']['piernas'],
+    'carga' => $resultado['postura_critica']['carga'],
+    'codigo_postura' => $resultado['postura_critica']['codigo_postura'],
+
+    // Aquí debe ir número: 1, 2, 3 o 4
+    'categoria_riesgo' => $resultado['postura_critica']['categoria'],
+
+    'accion_correctiva' => $resultado['postura_critica']['accion'],
+]);
 
         foreach ($resultado['posturas'] as $index => $postura) {
             $seccion = 'POSTURA_' . ($index + 1);
@@ -437,44 +440,47 @@ public function store(Request $request, $evaluacion)
         };
     }
 
-    private function getOwasMatrices(): array
-    {
-        $filas = [
-            '11' => [1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,1,1,1,1,1,1],
-            '12' => [1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,1,1,1,1,1,1],
-            '13' => [1,1,1,1,1,1,1,1,1,2,2,3,2,2,3,1,1,1,1,1,2],
+   private function getOwasMatrices(): array
+{
+    $filas = [
+        '11' => [1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,1,1,1,1,1,1],
+        '12' => [1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,1,1,1,1,1,1],
+        '13' => [1,1,1,1,1,1,1,1,1,2,2,3,2,2,3,1,1,1,1,1,2],
 
-            '21' => [2,2,3,2,2,3,2,2,3,3,3,3,3,3,3,2,2,2,2,3,3],
-            '22' => [2,2,3,2,2,3,2,3,3,3,4,4,3,4,4,3,3,4,2,3,4],
-            '23' => [3,3,4,2,2,3,3,3,3,3,4,4,4,4,4,4,4,4,2,3,4],
+        '21' => [2,2,3,2,2,3,2,2,3,3,3,3,3,3,3,2,2,2,2,3,3],
+        '22' => [2,2,3,2,2,3,2,3,3,3,4,4,3,4,4,3,3,4,2,3,4],
+        '23' => [3,3,4,2,2,3,3,3,3,3,4,4,4,4,4,4,4,4,2,3,4],
 
-            '31' => [1,1,1,1,1,1,1,1,2,3,3,3,4,4,4,1,1,1,1,1,1],
-            '32' => [2,2,3,1,1,1,1,1,2,4,4,4,4,4,4,3,3,3,1,1,1],
-            '33' => [2,2,3,1,1,1,2,3,3,4,4,4,4,4,4,4,4,4,1,1,1],
+        '31' => [1,1,1,1,1,1,1,1,2,3,3,3,4,4,4,1,1,1,1,1,1],
+        '32' => [2,2,3,1,1,1,1,1,2,4,4,4,4,4,4,3,3,3,1,1,1],
+        '33' => [2,2,3,1,1,1,2,3,3,4,4,4,4,4,4,4,4,4,1,1,1],
 
-            '41' => [2,3,3,2,2,3,2,2,3,4,4,4,4,4,4,4,4,4,2,3,4],
-            '42' => [3,3,4,2,3,4,3,3,4,4,4,4,4,4,4,4,4,4,2,3,4],
-            '43' => [4,4,4,2,3,4,3,3,4,4,4,4,4,4,4,4,4,4,2,3,4],
-        ];
+        '41' => [2,3,3,2,2,3,2,2,3,4,4,4,4,4,4,4,4,4,2,3,4],
+        '42' => [3,3,4,2,3,4,3,3,4,4,4,4,4,4,4,4,4,4,2,3,4],
+        '43' => [4,4,4,2,3,4,3,3,4,4,4,4,4,4,4,4,4,4,2,3,4],
+    ];
 
-        $matriz = [];
+    $matriz = [];
 
-        foreach ($filas as $clave => $valores) {
-            $espalda = (int) $clave[0];
-            $brazos = (int) $clave[1];
-            $i = 0;
+    foreach ($filas as $clave => $valores) {
+        $clave = (string) $clave;
 
-            for ($piernas = 1; $piernas <= 7; $piernas++) {
-                for ($carga = 1; $carga <= 3; $carga++) {
-                    $codigo = "{$espalda}{$brazos}{$piernas}{$carga}";
-                    $matriz[$codigo] = $valores[$i];
-                    $i++;
-                }
+        $espalda = (int) substr($clave, 0, 1);
+        $brazos = (int) substr($clave, 1, 1);
+
+        $i = 0;
+
+        for ($piernas = 1; $piernas <= 7; $piernas++) {
+            for ($carga = 1; $carga <= 3; $carga++) {
+                $codigo = "{$espalda}{$brazos}{$piernas}{$carga}";
+                $matriz[$codigo] = $valores[$i] ?? 1;
+                $i++;
             }
         }
-
-        return $matriz;
     }
+
+    return $matriz;
+}
 
     private function getTablaFrecuenciaPartes(): array
     {

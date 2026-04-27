@@ -1,18 +1,58 @@
 <x-app-layout>
     <div class="max-w-7xl mx-auto py-8 px-6 space-y-6">
 
+        {{-- ENCABEZADO --}}
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div>
-                <h2 class="text-3xl font-bold text-sky-600">Reportes de Evaluaciones</h2>
+                <h2 class="text-3xl font-bold text-sky-600">
+                    Centro de reportes ergonómicos
+                </h2>
                 <p class="text-sm text-gray-500 mt-1">
-                    Consulta, filtra, exporta y analiza las evaluaciones registradas en ErgoTech.
+                    Consulta evaluaciones, identifica puestos críticos y genera reportes para seguimiento y toma de decisiones.
                 </p>
+            </div>
+
+            @if($soloLectura)
+                <span class="inline-flex px-4 py-2 rounded-full bg-yellow-100 text-yellow-700 text-sm font-semibold">
+                    Modo visitante: solo lectura
+                </span>
+            @endif
+        </div>
+
+        {{-- RESUMEN EJECUTIVO --}}
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+            <h3 class="text-xl font-bold text-gray-900 mb-1">Resumen ejecutivo</h3>
+            <p class="text-sm text-gray-500 mb-5">
+                Información general del conjunto de evaluaciones registradas.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                <div class="rounded-2xl bg-slate-50 border p-4">
+                    <p class="text-sm text-gray-500">Total de evaluaciones</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ $totalEvaluaciones }}</p>
+                </div>
+
+                <div class="rounded-2xl bg-slate-50 border p-4">
+                    <p class="text-sm text-gray-500">Método más usado</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $metodoMasUsado }}</p>
+                </div>
+
+                <div class="rounded-2xl bg-slate-50 border p-4">
+                    <p class="text-sm text-gray-500">Nivel predominante</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $nivelPredominante }}</p>
+                </div>
+
+                <div class="rounded-2xl bg-red-50 border border-red-200 p-4">
+                    <p class="text-sm text-gray-500">Riesgos altos detectados</p>
+                    <p class="text-3xl font-bold text-red-600">{{ $riesgosAltos }}</p>
+                </div>
             </div>
         </div>
 
+        {{-- FILTROS --}}
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
             <h3 class="text-lg font-semibold text-gray-800 mb-4">
-                Filtros de evaluación
+                Filtros avanzados
             </h3>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -37,64 +77,138 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de evaluación</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Método</label>
+                    <select id="filtroMetodo" class="w-full rounded-lg border-gray-300 focus:border-sky-500 focus:ring-sky-500">
+                        <option value="">Todos los métodos</option>
+                        <option value="REBA">REBA</option>
+                        <option value="RULA">RULA</option>
+                        <option value="OWAS">OWAS</option>
+                        <option value="NIOSH">NIOSH</option>
+                        <option value="NOM-036">NOM-036</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
                     <input type="date" id="filtroFecha" class="w-full rounded-lg border-gray-300 focus:border-sky-500 focus:ring-sky-500">
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Área evaluada</label>
-                    <select id="filtroArea" class="w-full rounded-lg border-gray-300 focus:border-sky-500 focus:ring-sky-500">
-                        <option value="">Todas las áreas</option>
-                        <option value="Producción">Producción</option>
-                        <option value="Laboratorio">Laboratorio</option>
-                        <option value="Empaque">Empaque</option>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nivel de riesgo</label>
+                    <select id="filtroRiesgo" class="w-full rounded-lg border-gray-300 focus:border-sky-500 focus:ring-sky-500">
+                        <option value="">Todos los niveles</option>
+                        <option value="Bajo">Bajo</option>
+                        <option value="Medio">Medio</option>
+                        <option value="Alto">Alto</option>
+                        <option value="Muy alto">Muy alto</option>
+                        <option value="No aceptable">No aceptable</option>
                     </select>
                 </div>
 
-                <div class="md:col-span-2 lg:col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones (contiene)</label>
-                    <input
-                        type="text"
-                        id="filtroObservaciones"
-                        placeholder="Escribe palabras clave..."
-                        class="w-full rounded-lg border-gray-300 focus:border-sky-500 focus:ring-sky-500"
-                    >
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Buscar observaciones</label>
+                    <input type="text" id="filtroObservaciones"
+                           placeholder="Palabra clave..."
+                           class="w-full rounded-lg border-gray-300 focus:border-sky-500 focus:ring-sky-500">
                 </div>
             </div>
 
             <div class="mt-5 flex flex-wrap gap-3">
-                <button id="btnAplicarFiltros"
-                        class="inline-flex items-center justify-center min-w-[150px] h-[42px] bg-sky-600 hover:bg-sky-700 rounded-lg font-semibold text-white transition">
+                <button type="button" id="btnAplicarFiltros"
+                        class="bg-sky-600 hover:bg-sky-700 rounded-lg font-semibold text-white px-5 py-2.5">
                     Aplicar filtros
                 </button>
 
-                <button id="btnSimplificado"
-                        class="inline-flex items-center justify-center min-w-[170px] h-[42px] bg-sky-100 hover:bg-sky-200 rounded-lg font-semibold text-sky-700 transition">
-                    Generar simplificado
-                </button>
-
-                <button id="btnExcel"
-                        class="inline-flex items-center justify-center min-w-[150px] h-[42px] bg-sky-100 hover:bg-sky-200 rounded-lg font-semibold text-sky-700 transition">
-                    Exportar a Excel
-                </button>
-
-                <button id="btnGraficas"
-                        class="inline-flex items-center justify-center min-w-[130px] h-[42px] bg-sky-100 hover:bg-sky-200 rounded-lg font-semibold text-sky-700 transition">
-                    Ver gráficas
-                </button>
-
-                <button id="btnCancelar"
-                        class="inline-flex items-center justify-center min-w-[140px] h-[42px] bg-red-100 hover:bg-red-200 rounded-lg font-semibold text-red-700 transition">
+                <button type="button" id="btnLimpiar"
+                        class="bg-red-100 hover:bg-red-200 rounded-lg font-semibold text-red-700 px-5 py-2.5">
                     Limpiar filtros
                 </button>
+
+                <a href="{{ route('reportes.excel') }}"
+                   class="bg-green-100 hover:bg-green-200 rounded-lg font-semibold text-green-700 px-5 py-2.5">
+                    Exportar reporte Excel
+                </a>
             </div>
         </div>
 
-        <div id="simplificadoSection" class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+        {{-- PUESTOS CRÍTICOS --}}
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            <div class="px-6 py-4 border-b bg-slate-50">
+                <h3 class="text-lg font-bold text-gray-900">Ranking de puestos críticos</h3>
+                <p class="text-sm text-gray-500">Puestos con mayor cantidad de evaluaciones en riesgo alto o muy alto.</p>
+            </div>
+
+            <div class="p-6">
+                @if($puestosCriticos->count())
+                    <div class="space-y-3">
+                        @foreach($puestosCriticos as $index => $puesto)
+                            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 rounded-2xl border p-4 bg-slate-50">
+                                <div>
+                                    <p class="font-bold text-gray-900">
+                                        {{ $index + 1 }}. {{ $puesto['puesto'] }}
+                                    </p>
+                                    <p class="text-sm text-gray-500">
+                                        {{ $puesto['total'] }} evaluaciones registradas
+                                    </p>
+                                </div>
+
+                                <div class="text-right">
+                                    <p class="font-bold text-red-600">
+                                        {{ $puesto['riesgos_altos'] }} riesgos altos
+                                    </p>
+                                    <p class="text-sm text-gray-500">
+                                        {{ $puesto['porcentaje'] }}% del puesto
+                                    </p>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <p class="text-gray-500">No hay información suficiente para generar ranking.</p>
+                @endif
+            </div>
+        </div>
+
+        {{-- RECOMENDACIONES --}}
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+            <h3 class="text-lg font-bold text-gray-900 mb-4">Recomendaciones automáticas</h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="rounded-2xl border bg-slate-50 p-4">
+                    <h4 class="font-bold text-gray-900 mb-2">Seguimiento</h4>
+                    <p class="text-sm text-gray-600">
+                        Priorizar la revisión de evaluaciones con nivel alto, muy alto o no aceptable.
+                    </p>
+                </div>
+
+                <div class="rounded-2xl border bg-slate-50 p-4">
+                    <h4 class="font-bold text-gray-900 mb-2">Puestos críticos</h4>
+                    <p class="text-sm text-gray-600">
+                        Revisar condiciones de trabajo en los puestos con mayor frecuencia de riesgo.
+                    </p>
+                </div>
+
+                <div class="rounded-2xl border bg-slate-50 p-4">
+                    <h4 class="font-bold text-gray-900 mb-2">Exportación</h4>
+                    <p class="text-sm text-gray-600">
+                        Generar reportes en Excel para documentar hallazgos y acciones correctivas.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        {{-- TABLA DETALLADA --}}
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
             <div class="p-4 border-b border-gray-200 flex flex-col md:flex-row md:justify-between md:items-center gap-2">
-                <h3 class="text-lg font-semibold text-gray-800">
-                    Listado de Evaluaciones
-                </h3>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800">
+                        Reporte detallado de evaluaciones
+                    </h3>
+                    <p class="text-sm text-gray-500">
+                        Consulta resultados, niveles de riesgo y acciones recomendadas.
+                    </p>
+                </div>
+
                 <span class="text-sm text-gray-500" id="totalRegistros">
                     Mostrando {{ count($evaluacionesData ?? []) }} registros
                 </span>
@@ -106,52 +220,17 @@
                         <tr>
                             <th class="px-4 py-3">ID</th>
                             <th class="px-4 py-3">Empresa</th>
-                            <th class="px-4 py-3">Puesto</th>
                             <th class="px-4 py-3">Trabajador</th>
+                            <th class="px-4 py-3">Puesto</th>
+                            <th class="px-4 py-3">Método</th>
                             <th class="px-4 py-3">Fecha</th>
-                            <th class="px-4 py-3">Área</th>
                             <th class="px-4 py-3">Resultado</th>
-                            <th class="px-4 py-3">Observaciones</th>
+                            <th class="px-4 py-3">Riesgo</th>
+                            <th class="px-4 py-3">Acción recomendada</th>
                         </tr>
                     </thead>
-                    <tbody id="tablaBody" class="divide-y divide-gray-200">
-                        @forelse($evaluacionesData ?? [] as $eval)
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-4 py-3">{{ $eval['id'] }}</td>
-                                <td class="px-4 py-3">{{ $eval['empresa_nombre'] ?? 'N/A' }}</td>
-                                <td class="px-4 py-3">{{ $eval['puesto_nombre'] ?? 'N/A' }}</td>
-                                <td class="px-4 py-3">{{ $eval['trabajador_nombre'] ?? 'N/A' }}</td>
-                                <td class="px-4 py-3">{{ $eval['fecha'] ?? 'N/A' }}</td>
-                                <td class="px-4 py-3">{{ $eval['area'] ?? 'N/A' }}</td>
-                                <td class="px-4 py-3">{{ $eval['resultado'] ?? 'N/A' }}</td>
-                                <td class="px-4 py-3">
-                                    {{ isset($eval['observaciones']) ? \Illuminate\Support\Str::limit($eval['observaciones'], 30) : '' }}
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="8" class="px-4 py-6 text-center text-gray-500">
-                                    No hay registros para mostrar.
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
+                    <tbody id="tablaBody" class="divide-y divide-gray-200"></tbody>
                 </table>
-            </div>
-        </div>
-
-        <div id="graficasSection" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 hidden">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">
-                Análisis gráfico de evaluaciones
-            </h3>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="bg-gray-50 rounded-xl border p-4">
-                    <canvas id="graficoBarras"></canvas>
-                </div>
-                <div class="bg-gray-50 rounded-xl border p-4">
-                    <canvas id="graficoPastel"></canvas>
-                </div>
             </div>
         </div>
     </div>
@@ -160,47 +239,39 @@
         @json($evaluacionesData ?? [])
     </script>
 
-    @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
-
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const btnSimplificado = document.getElementById('btnSimplificado');
-            const btnExcel = document.getElementById('btnExcel');
-            const btnGraficas = document.getElementById('btnGraficas');
-            const btnAplicarFiltros = document.getElementById('btnAplicarFiltros');
-            const btnCancelar = document.getElementById('btnCancelar');
-            const simplificadoSection = document.getElementById('simplificadoSection');
-            const graficasSection = document.getElementById('graficasSection');
+        document.addEventListener('DOMContentLoaded', function () {
+            const datosBase = JSON.parse(document.getElementById('evaluaciones-data').textContent || '[]');
+            let datosFiltrados = [...datosBase];
+
             const tablaBody = document.getElementById('tablaBody');
             const totalRegistros = document.getElementById('totalRegistros');
 
             const filtroEmpresa = document.getElementById('filtroEmpresa');
             const filtroPuesto = document.getElementById('filtroPuesto');
+            const filtroMetodo = document.getElementById('filtroMetodo');
             const filtroFecha = document.getElementById('filtroFecha');
-            const filtroArea = document.getElementById('filtroArea');
+            const filtroRiesgo = document.getElementById('filtroRiesgo');
             const filtroObservaciones = document.getElementById('filtroObservaciones');
 
-            const evaluacionesOriginales = JSON.parse(
-                document.getElementById('evaluaciones-data').textContent
-            );
+            function normalizar(texto) {
+                return (texto || '').toString().toLowerCase().trim();
+            }
 
-            const datosBase = evaluacionesOriginales.length ? evaluacionesOriginales : [
-                { id: 1, empresa_nombre: 'Empresa A', puesto_nombre: 'Operario', trabajador_nombre: 'Juan Pérez', fecha: '2025-03-01', area: 'Producción', resultado: 85, observaciones: 'Cumple con normas', evaluador_nombre: 'Admin', metodo: 'REBA' },
-                { id: 2, empresa_nombre: 'Empresa A', puesto_nombre: 'Supervisor', trabajador_nombre: 'María López', fecha: '2025-03-02', area: 'Laboratorio', resultado: 92, observaciones: 'Excelente desempeño', evaluador_nombre: 'Admin', metodo: 'RULA' },
-                { id: 3, empresa_nombre: 'Empresa B', puesto_nombre: 'Gerente', trabajador_nombre: 'Carlos Ruiz', fecha: '2025-03-03', area: 'Empaque', resultado: 78, observaciones: 'Requiere mejora en tiempos', evaluador_nombre: 'Admin', metodo: 'OWAS' },
-                { id: 4, empresa_nombre: 'Empresa C', puesto_nombre: 'Operario', trabajador_nombre: 'Ana Gómez', fecha: '2025-03-04', area: 'Producción', resultado: 88, observaciones: 'Buen trabajo', evaluador_nombre: 'Admin', metodo: 'NIOSH' },
-                { id: 5, empresa_nombre: 'Empresa B', puesto_nombre: 'Supervisor', trabajador_nombre: 'Luis Torres', fecha: '2025-03-05', area: 'Laboratorio', resultado: 95, observaciones: 'Sobresaliente', evaluador_nombre: 'Admin', metodo: 'NOM-036' },
-            ];
-
-            let evaluacionesFiltradas = [...datosBase];
-            let chartBarras = null;
-            let chartPastel = null;
-
-            function truncarTexto(texto, limite = 30) {
-                if (!texto) return '';
+            function truncarTexto(texto, limite = 55) {
+                if (!texto) return 'Sin recomendación';
                 return texto.length > limite ? texto.substring(0, limite) + '...' : texto;
+            }
+
+            function claseRiesgo(riesgo) {
+                const r = normalizar(riesgo);
+
+                if (r.includes('muy alto') || r.includes('no aceptable')) return 'bg-red-100 text-red-700';
+                if (r.includes('alto')) return 'bg-orange-100 text-orange-700';
+                if (r.includes('medio')) return 'bg-yellow-100 text-yellow-700';
+                if (r.includes('bajo')) return 'bg-green-100 text-green-700';
+
+                return 'bg-gray-100 text-gray-700';
             }
 
             function renderTabla(datos) {
@@ -209,8 +280,8 @@
                 if (!datos.length) {
                     tablaBody.innerHTML = `
                         <tr>
-                            <td colspan="8" class="px-4 py-6 text-center text-gray-500">
-                                No se encontraron registros con los filtros aplicados.
+                            <td colspan="9" class="px-4 py-8 text-center text-gray-500">
+                                No se encontraron evaluaciones con los filtros aplicados.
                             </td>
                         </tr>
                     `;
@@ -220,157 +291,67 @@
 
                 datos.forEach(e => {
                     const row = document.createElement('tr');
-                    row.className = 'hover:bg-gray-50 border-b border-gray-200';
+                    row.className = 'hover:bg-gray-50';
+
                     row.innerHTML = `
-                        <td class="px-4 py-3">${e.id ?? ''}</td>
+                        <td class="px-4 py-3 font-semibold">${e.id ?? ''}</td>
                         <td class="px-4 py-3">${e.empresa_nombre ?? 'N/A'}</td>
-                        <td class="px-4 py-3">${e.puesto_nombre ?? 'N/A'}</td>
                         <td class="px-4 py-3">${e.trabajador_nombre ?? 'N/A'}</td>
+                        <td class="px-4 py-3">${e.puesto_nombre ?? 'N/A'}</td>
+                        <td class="px-4 py-3 font-semibold">${e.metodo ?? 'N/A'}</td>
                         <td class="px-4 py-3">${e.fecha ?? 'N/A'}</td>
-                        <td class="px-4 py-3">${e.area ?? 'N/A'}</td>
-                        <td class="px-4 py-3">${e.resultado ?? 'N/A'}</td>
-                        <td class="px-4 py-3">${truncarTexto(e.observaciones)}</td>
+                        <td class="px-4 py-3 font-semibold">${e.resultado ?? 'N/A'}</td>
+                        <td class="px-4 py-3">
+                            <span class="inline-flex px-3 py-1 rounded-full text-xs font-semibold ${claseRiesgo(e.nivel_riesgo)}">
+                                ${e.nivel_riesgo ?? 'N/A'}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3">${truncarTexto(e.accion_recomendada)}</td>
                     `;
+
                     tablaBody.appendChild(row);
                 });
 
                 totalRegistros.textContent = `Mostrando ${datos.length} registros`;
             }
 
-            function filtrarEvaluaciones() {
+            function aplicarFiltros() {
                 const empresa = filtroEmpresa.value;
                 const puesto = filtroPuesto.value;
+                const metodo = filtroMetodo.value;
                 const fecha = filtroFecha.value;
-                const area = filtroArea.value;
-                const obs = filtroObservaciones.value.trim().toLowerCase();
+                const riesgo = filtroRiesgo.value;
+                const obs = normalizar(filtroObservaciones.value);
 
-                evaluacionesFiltradas = datosBase.filter(e => {
+                datosFiltrados = datosBase.filter(e => {
                     if (empresa && e.empresa_nombre !== empresa) return false;
                     if (puesto && e.puesto_nombre !== puesto) return false;
+                    if (metodo && normalizar(e.metodo) !== normalizar(metodo)) return false;
                     if (fecha && e.fecha !== fecha) return false;
-                    if (area && e.area !== area) return false;
-                    if (obs && !(e.observaciones || '').toLowerCase().includes(obs)) return false;
+                    if (riesgo && !normalizar(e.nivel_riesgo).includes(normalizar(riesgo))) return false;
+                    if (obs && !normalizar(e.observaciones).includes(obs)) return false;
+
                     return true;
                 });
 
-                renderTabla(evaluacionesFiltradas);
+                renderTabla(datosFiltrados);
             }
 
-            function renderGraficas() {
-                const ctxBarras = document.getElementById('graficoBarras').getContext('2d');
-                const ctxPastel = document.getElementById('graficoPastel').getContext('2d');
+            document.getElementById('btnAplicarFiltros').addEventListener('click', aplicarFiltros);
 
-                const datosGrafica = evaluacionesFiltradas.length ? evaluacionesFiltradas : [];
-
-                const puestos = [...new Set(datosGrafica.map(e => e.puesto_nombre).filter(Boolean))];
-                const promedios = puestos.map(p => {
-                    const datosPuesto = datosGrafica.filter(e => e.puesto_nombre === p);
-                    const suma = datosPuesto.reduce((acc, e) => acc + (parseFloat(e.resultado) || 0), 0);
-                    return datosPuesto.length ? Number((suma / datosPuesto.length).toFixed(2)) : 0;
-                });
-
-                const areas = [...new Set(datosGrafica.map(e => e.area).filter(Boolean))];
-                const conteoAreas = areas.map(a => datosGrafica.filter(e => e.area === a).length);
-
-                if (chartBarras) chartBarras.destroy();
-                if (chartPastel) chartPastel.destroy();
-
-                chartBarras = new Chart(ctxBarras, {
-                    type: 'bar',
-                    data: {
-                        labels: puestos,
-                        datasets: [{
-                            label: 'Promedio de resultado',
-                            data: promedios
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: { display: false },
-                            title: { display: true, text: 'Resultado promedio por puesto' }
-                        },
-                        scales: {
-                            y: { beginAtZero: true, max: 100 }
-                        }
-                    }
-                });
-
-                chartPastel = new Chart(ctxPastel, {
-                    type: 'pie',
-                    data: {
-                        labels: areas,
-                        datasets: [{
-                            data: conteoAreas
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            title: { display: true, text: 'Distribución de evaluaciones por área' }
-                        }
-                    }
-                });
-            }
-
-            btnAplicarFiltros.addEventListener('click', () => {
-                filtrarEvaluaciones();
-                if (!graficasSection.classList.contains('hidden')) {
-                    renderGraficas();
-                }
-            });
-
-            btnSimplificado.addEventListener('click', () => {
-                simplificadoSection.classList.remove('hidden');
-                graficasSection.classList.add('hidden');
-                filtrarEvaluaciones();
-            });
-
-            btnExcel.addEventListener('click', () => {
-                const datosAmpliados = evaluacionesFiltradas.map(e => ({
-                    ID: e.id ?? '',
-                    Empresa: e.empresa_nombre ?? '',
-                    Puesto: e.puesto_nombre ?? '',
-                    Trabajador: e.trabajador_nombre ?? '',
-                    Fecha: e.fecha ?? '',
-                    Área: e.area ?? '',
-                    Resultado: e.resultado ?? '',
-                    Observaciones: e.observaciones ?? '',
-                    Evaluador: e.evaluador_nombre ?? 'No asignado',
-                    Método: e.metodo ?? 'No definido'
-                }));
-
-                const wb = XLSX.utils.book_new();
-                const ws = XLSX.utils.json_to_sheet(datosAmpliados);
-                XLSX.utils.book_append_sheet(wb, ws, 'Evaluaciones');
-                XLSX.writeFile(wb, 'evaluaciones_ergotech.xlsx');
-            });
-
-            btnGraficas.addEventListener('click', () => {
-                simplificadoSection.classList.add('hidden');
-                graficasSection.classList.remove('hidden');
-                filtrarEvaluaciones();
-                renderGraficas();
-            });
-
-            btnCancelar.addEventListener('click', () => {
+            document.getElementById('btnLimpiar').addEventListener('click', function () {
                 filtroEmpresa.value = '';
                 filtroPuesto.value = '';
+                filtroMetodo.value = '';
                 filtroFecha.value = '';
-                filtroArea.value = '';
+                filtroRiesgo.value = '';
                 filtroObservaciones.value = '';
-                evaluacionesFiltradas = [...datosBase];
-                renderTabla(evaluacionesFiltradas);
 
-                if (!graficasSection.classList.contains('hidden')) {
-                    renderGraficas();
-                }
+                datosFiltrados = [...datosBase];
+                renderTabla(datosFiltrados);
             });
 
-            renderTabla(evaluacionesFiltradas);
-            simplificadoSection.classList.remove('hidden');
-            graficasSection.classList.add('hidden');
+            renderTabla(datosFiltrados);
         });
     </script>
-    @endpush
 </x-app-layout>
