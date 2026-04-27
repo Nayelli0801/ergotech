@@ -8,35 +8,37 @@ use Illuminate\Support\Facades\Storage;
 
 class EmpresaController extends Controller
 {
-    // 📌 LISTAR
     public function index()
     {
         $empresas = Empresa::latest()->paginate(10);
         return view('empresas.index', compact('empresas'));
     }
 
-    // 📌 FORM CREAR
     public function create()
     {
         return view('empresas.create');
     }
 
-    // 📌 GUARDAR
     public function store(Request $request)
     {
         $request->validate([
             'nombre' => 'required|string|max:255',
+            'razon_social' => 'nullable|string|max:255',
+            'rfc' => 'nullable|string|max:50',
+            'telefono' => 'nullable|string|max:50',
+            'correo' => 'nullable|email|max:255',
             'direccion' => 'nullable|string',
-            'telefono' => 'nullable|string',
-            'imagen' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'activo' => 'nullable|boolean',
         ]);
 
-        $data = $request->all();
+        $data = $request->except('logo');
 
-        // Guardar imagen
-        if ($request->hasFile('imagen')) {
-            $ruta = $request->file('imagen')->store('empresas', 'public');
-            $data['imagen'] = $ruta;
+        $data['activo'] = $request->has('activo') ? 1 : 0;
+
+        if ($request->hasFile('logo')) {
+            $ruta = $request->file('logo')->store('empresas', 'public');
+            $data['logo'] = $ruta;
         }
 
         Empresa::create($data);
@@ -45,38 +47,44 @@ class EmpresaController extends Controller
             ->with('success', 'Empresa creada correctamente');
     }
 
-    // 📌 FORM EDITAR
+    public function show($id)
+    {
+        $empresa = Empresa::findOrFail($id);
+        return view('empresas.show', compact('empresa'));
+    }
+
     public function edit($id)
     {
         $empresa = Empresa::findOrFail($id);
         return view('empresas.edit', compact('empresa'));
     }
 
-    // 📌 ACTUALIZAR
     public function update(Request $request, $id)
     {
         $empresa = Empresa::findOrFail($id);
 
         $request->validate([
             'nombre' => 'required|string|max:255',
+            'razon_social' => 'nullable|string|max:255',
+            'rfc' => 'nullable|string|max:50',
+            'telefono' => 'nullable|string|max:50',
+            'correo' => 'nullable|email|max:255',
             'direccion' => 'nullable|string',
-            'telefono' => 'nullable|string',
-            'imagen' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'activo' => 'nullable|boolean',
         ]);
 
-        $data = $request->all();
+        $data = $request->except('logo');
 
-        // Si hay nueva imagen
-        if ($request->hasFile('imagen')) {
+        $data['activo'] = $request->has('activo') ? 1 : 0;
 
-            // borrar imagen anterior
-            if ($empresa->imagen) {
-                Storage::delete('public/' . $empresa->imagen);
+        if ($request->hasFile('logo')) {
+            if ($empresa->logo) {
+                Storage::disk('public')->delete($empresa->logo);
             }
 
-            // guardar nueva
-            $ruta = $request->file('imagen')->store('empresas', 'public');
-            $data['imagen'] = $ruta;
+            $ruta = $request->file('logo')->store('empresas', 'public');
+            $data['logo'] = $ruta;
         }
 
         $empresa->update($data);
@@ -85,14 +93,12 @@ class EmpresaController extends Controller
             ->with('success', 'Empresa actualizada correctamente');
     }
 
-    // 📌 ELIMINAR
     public function destroy($id)
     {
         $empresa = Empresa::findOrFail($id);
 
-        // borrar imagen si existe
-        if ($empresa->imagen) {
-            Storage::delete('public/' . $empresa->imagen);
+        if ($empresa->logo) {
+            Storage::disk('public')->delete($empresa->logo);
         }
 
         $empresa->delete();
@@ -100,9 +106,4 @@ class EmpresaController extends Controller
         return redirect()->route('empresas.index')
             ->with('success', 'Empresa eliminada correctamente');
     }
-    public function show($id)
-{
-    $empresa = Empresa::findOrFail($id);
-    return view('empresas.show', compact('empresa'));
-}
 }
