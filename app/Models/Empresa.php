@@ -18,8 +18,8 @@ class Empresa extends Model
         'telefono',
         'correo',
         'direccion',
+        'logo',
         'activo',
-        'imagen',
     ];
 
     public function sucursales()
