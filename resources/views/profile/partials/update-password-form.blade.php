@@ -1,65 +1,57 @@
-{{-- ================================= --}}
-{{-- SECCIÓN: ACTUALIZAR CONTRASEÑA    --}}
-{{-- ================================= --}}
-
 <section>
 
     {{-- Encabezado --}}
     <header>
-        {{-- Título --}}
-        <h2 class="text-lg font-medium text-gray-900">
+        <h2 class="text-lg font-semibold text-slate-800">
             {{ __('Actualizar Contraseña') }}
         </h2>
 
-        {{-- Descripción --}}
-        <p class="mt-1 text-sm text-gray-600">
+        <p class="mt-1 text-sm text-slate-500">
             {{ __('Asegúrate de que tu cuenta esté usando una contraseña larga y aleatoria para mantener la seguridad.') }}
         </p>
     </header>
 
-    {{-- Formulario para actualizar contraseña --}}
+    {{-- Formulario --}}
     <form method="post" action="{{ route('password.update') }}" class="mt-6 space-y-6">
         
-        {{-- Token de seguridad --}}
         @csrf
-        
-        {{-- Método PUT para actualizar --}}
         @method('put')
 
-        {{-- Campo: Contraseña actual --}}
+        {{-- Contraseña actual --}}
         <div>
             <x-input-label 
                 for="update_password_current_password" 
                 :value="__('Contraseña Actual')" 
+                class="text-sm font-medium text-gray-700"
             />
             
             <x-text-input 
                 id="update_password_current_password" 
                 name="current_password" 
                 type="password" 
-                class="mt-1 block w-full" 
+                class="mt-1 block w-full rounded-lg border-gray-300 focus:border-sky-500 focus:ring-sky-500"
                 autocomplete="current-password" 
             />
             
-            {{-- Mostrar errores --}}
             <x-input-error 
                 :messages="$errors->updatePassword->get('current_password')" 
                 class="mt-2" 
             />
         </div>
 
-        {{-- Campo: Nueva contraseña --}}
+        {{-- Nueva contraseña --}}
         <div>
             <x-input-label 
                 for="update_password_password" 
                 :value="__('Nueva Contraseña')" 
+                class="text-sm font-medium text-gray-700"
             />
             
             <x-text-input 
                 id="update_password_password" 
                 name="password" 
                 type="password" 
-                class="mt-1 block w-full" 
+                class="mt-1 block w-full rounded-lg border-gray-300 focus:border-sky-500 focus:ring-sky-500"
                 autocomplete="new-password" 
             />
             
@@ -69,18 +61,19 @@
             />
         </div>
 
-        {{-- Campo: Confirmar contraseña --}}
+        {{-- Confirmar contraseña --}}
         <div>
             <x-input-label 
                 for="update_password_password_confirmation" 
                 :value="__('Confirmar Contraseña')" 
+                class="text-sm font-medium text-gray-700"
             />
             
             <x-text-input 
                 id="update_password_password_confirmation" 
                 name="password_confirmation" 
                 type="password" 
-                class="mt-1 block w-full" 
+                class="mt-1 block w-full rounded-lg border-gray-300 focus:border-sky-500 focus:ring-sky-500"
                 autocomplete="new-password" 
             />
             
@@ -90,22 +83,26 @@
             />
         </div>
 
-        {{-- Botón guardar y mensaje de éxito --}}
+        {{-- Botón --}}
         <div class="flex items-center gap-4">
 
-            {{-- Botón principal --}}
-            <x-primary-button>
+            <button type="submit"
+                class="inline-flex items-center justify-center
+                       w-[140px] h-[42px]
+                       bg-sky-600 hover:bg-sky-700
+                       text-white text-sm font-semibold
+                       rounded-lg shadow-sm transition">
                 {{ __('Guardar') }}
-            </x-primary-button>
+            </button>
 
-            {{-- Mensaje temporal si se actualizó correctamente --}}
+            {{-- Mensaje éxito --}}
             @if (session('status') === 'password-updated')
                 <p
                     x-data="{ show: true }"
                     x-show="show"
                     x-transition
                     x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-gray-600"
+                    class="text-sm text-slate-500"
                 >
                     {{ __('Guardado correctamente.') }}
                 </p>

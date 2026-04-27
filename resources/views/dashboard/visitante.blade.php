@@ -20,8 +20,7 @@
         </div>
 
         {{-- RESUMEN GENERAL --}}
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             <div class="bg-white border rounded-2xl p-5 shadow-sm">
                 <p class="text-sm text-slate-500">Total de evaluaciones</p>
                 <p class="text-3xl font-bold text-slate-800 mt-1">
@@ -31,25 +30,24 @@
 
             <div class="bg-white border rounded-2xl p-5 shadow-sm">
                 <p class="text-sm text-slate-500">Método más utilizado</p>
-                <p class="text-lg font-semibold text-slate-800 mt-1">
+                <p class="text-lg font-semibold text-slate-800 mt-1 break-words">
                     {{ array_key_first($metodos) ?? 'N/A' }}
                 </p>
             </div>
 
-            <div class="bg-white border rounded-2xl p-5 shadow-sm">
+            <div class="bg-white border rounded-2xl p-5 shadow-sm md:col-span-2 xl:col-span-1">
                 <p class="text-sm text-slate-500">Nivel de riesgo predominante</p>
                 <p class="text-lg font-semibold text-slate-800 mt-1">
                     {{ array_key_first($riesgoPorcentaje) ?? 'N/A' }}
                 </p>
             </div>
-
         </div>
 
         {{-- GRÁFICAS --}}
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
 
             {{-- MÉTODOS --}}
-            <div class="bg-white border rounded-2xl p-5 shadow-sm">
+            <div class="bg-white border rounded-2xl p-5 shadow-sm min-w-0">
                 <h3 class="font-semibold text-slate-800 mb-2">
                     Evaluaciones por método
                 </h3>
@@ -57,13 +55,13 @@
                     Distribución general de evaluaciones realizadas.
                 </p>
 
-                <div class="h-[280px]">
+                <div class="relative w-full h-[260px] sm:h-[300px] md:h-[320px]">
                     <canvas id="metodosChart"></canvas>
                 </div>
             </div>
 
             {{-- RIESGO --}}
-            <div class="bg-white border rounded-2xl p-5 shadow-sm">
+            <div class="bg-white border rounded-2xl p-5 shadow-sm min-w-0">
                 <h3 class="font-semibold text-slate-800 mb-2">
                     Niveles de riesgo
                 </h3>
@@ -71,7 +69,7 @@
                     Porcentaje de riesgo detectado en evaluaciones.
                 </p>
 
-                <div class="h-[280px]">
+                <div class="relative w-full h-[260px] sm:h-[300px] md:h-[320px] max-w-full overflow-hidden">
                     <canvas id="riesgoChart"></canvas>
                 </div>
             </div>
@@ -98,13 +96,13 @@
                     @endphp
 
                     <div>
-                        <div class="flex justify-between text-sm mb-1">
-                            <span>{{ $nivel }}</span>
-                            <span class="font-semibold">{{ $porcentaje }}%</span>
+                        <div class="flex justify-between text-sm mb-1 gap-3">
+                            <span class="break-words">{{ $nivel }}</span>
+                            <span class="font-semibold shrink-0">{{ $porcentaje }}%</span>
                         </div>
 
-                        <div class="w-full bg-gray-200 h-2 rounded-full">
-                            <div class="{{ $color }} h-2 rounded-full barra" data-width="{{ $porcentaje }}"></div>
+                        <div class="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+                            <div class="{{ $color }} h-2 rounded-full barra transition-all duration-700" data-width="{{ $porcentaje }}" style="width: 0%;"></div>
                         </div>
                     </div>
 
@@ -125,10 +123,10 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-
-            // barras animadas
             document.querySelectorAll('.barra').forEach(b => {
-                b.style.width = (b.dataset.width || 0) + '%';
+                setTimeout(() => {
+                    b.style.width = (b.dataset.width || 0) + '%';
+                }, 150);
             });
 
             const metodosLabels = JSON.parse(document.getElementById('metodos-labels-json').textContent);
@@ -137,36 +135,76 @@
             const riesgosLabels = JSON.parse(document.getElementById('riesgos-labels-json').textContent);
             const riesgosData = JSON.parse(document.getElementById('riesgos-data-json').textContent);
 
-            // chart métodos
             new Chart(document.getElementById('metodosChart'), {
                 type: 'bar',
                 data: {
                     labels: metodosLabels,
                     datasets: [{
-                        data: metodosData
+                        data: metodosData,
+                        backgroundColor: '#7cc0ee',
+                        borderRadius: 8
                     }]
                 },
                 options: {
                     responsive: true,
-                    plugins: { legend: { display: false } }
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                maxRotation: 0,
+                                minRotation: 0,
+                                autoSkip: false
+                            }
+                        },
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
                 }
             });
 
-            // chart riesgo
             new Chart(document.getElementById('riesgoChart'), {
                 type: 'doughnut',
                 data: {
                     labels: riesgosLabels,
                     datasets: [{
-                        data: riesgosData
+                        data: riesgosData,
+                        backgroundColor: [
+                            '#3b9be6',
+                            '#f06292',
+                            '#f59e42',
+                            '#f3c64e',
+                            '#59c3c3'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
                     }]
                 },
                 options: {
                     responsive: true,
-                    cutout: '60%'
+                    maintainAspectRatio: false,
+                    cutout: '58%',
+                    layout: {
+                        padding: 10
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                boxWidth: 18,
+                                boxHeight: 10,
+                                padding: 12,
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        }
+                    }
                 }
             });
-
         });
     </script>
     @endpush

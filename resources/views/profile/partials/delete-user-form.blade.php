@@ -1,88 +1,90 @@
-{{-- ============================= --}}
-{{-- SECCIÓN: ELIMINAR CUENTA     --}}
-{{-- ============================= --}}
-
 <section class="space-y-6">
 
-    {{-- Encabezado de la sección --}}
+    {{-- HEADER --}}
     <header>
-        {{-- Título --}}
-        <h2 class="text-lg font-medium text-gray-900">
+        <h2 class="text-lg font-semibold text-slate-800">
             {{ __('Eliminar Cuenta') }}
         </h2>
 
-        {{-- Descripción informativa --}}
-        <p class="mt-1 text-sm text-gray-600">
+        <p class="mt-1 text-sm text-slate-500">
             {{ __('Una vez que tu cuenta sea eliminada, todos sus recursos y datos serán eliminados permanentemente. Antes de eliminar tu cuenta, por favor descarga cualquier información que desees conservar.') }}
         </p>
     </header>
 
-    {{-- Botón que abre el modal de confirmación --}}
+    {{-- BOTÓN ABRIR MODAL --}}
     <x-danger-button
         x-data=""
         x-on:click.prevent="$dispatch('open-modal', 'confirm-user-deletion')"
+        class="inline-flex items-center justify-center
+               w-[180px] h-[42px]
+               bg-red-100 hover:bg-red-200 text-red-700
+               text-sm font-semibold rounded-lg
+               shadow-sm transition"
     >
         {{ __('Eliminar Cuenta') }}
     </x-danger-button>
 
-    {{-- Modal de confirmación --}}
+    {{-- MODAL --}}
     <x-modal name="confirm-user-deletion" :show="$errors->userDeletion->isNotEmpty()" focusable>
 
-        {{-- Formulario para eliminar cuenta --}}
-        <form method="post" action="{{ route('profile.destroy') }}" class="p-6">
-
-            {{-- Token de seguridad CSRF --}}
+        <form method="post" action="{{ route('profile.destroy') }}" class="p-6 space-y-5">
             @csrf
-
-            {{-- Método DELETE porque HTML solo permite GET y POST --}}
             @method('delete')
 
-            {{-- Título del modal --}}
-            <h2 class="text-lg font-medium text-gray-900">
+            {{-- TÍTULO --}}
+            <h2 class="text-lg font-semibold text-slate-800">
                 {{ __('¿Estás segura de que deseas eliminar tu cuenta?') }}
             </h2>
 
-            {{-- Mensaje de advertencia --}}
-            <p class="mt-1 text-sm text-gray-600">
+            {{-- DESCRIPCIÓN --}}
+            <p class="text-sm text-slate-500 leading-relaxed">
                 {{ __('Una vez que tu cuenta sea eliminada, todos sus recursos y datos serán eliminados permanentemente. Por favor ingresa tu contraseña para confirmar que deseas eliminar tu cuenta de forma definitiva.') }}
             </p>
 
-            {{-- Campo para confirmar contraseña --}}
-            <div class="mt-6">
-
-                {{-- Etiqueta del input (oculta visualmente) --}}
+            {{-- INPUT --}}
+            <div>
                 <x-input-label 
                     for="password" 
                     value="{{ __('Contraseña') }}" 
                     class="sr-only" 
                 />
 
-                {{-- Input de contraseña --}}
                 <x-text-input
                     id="password"
                     name="password"
                     type="password"
-                    class="mt-1 block w-3/4"
+                    class="mt-1 block w-full rounded-lg border-gray-300 focus:ring-sky-500 focus:border-sky-500"
                     placeholder="{{ __('Contraseña') }}"
                 />
 
-                {{-- Mostrar errores de validación --}}
                 <x-input-error 
                     :messages="$errors->userDeletion->get('password')" 
                     class="mt-2" 
                 />
             </div>
 
-            {{-- Botones del modal --}}
-            <div class="mt-6 flex justify-end">
+            {{-- BOTONES --}}
+            <div class="flex flex-wrap justify-end gap-3 pt-2">
 
-                {{-- Botón cancelar (cierra el modal) --}}
-                <x-secondary-button x-on:click="$dispatch('close')">
+                {{-- CANCELAR --}}
+                <x-secondary-button 
+                    x-on:click="$dispatch('close')"
+                    class="inline-flex items-center justify-center
+                           w-[120px] h-[42px]
+                           bg-gray-200 hover:bg-gray-300 text-gray-800
+                           text-sm font-semibold rounded-lg transition"
+                >
                     {{ __('Cancelar') }}
                 </x-secondary-button>
 
-                {{-- Botón confirmar eliminación --}}
-                <x-danger-button class="ms-3">
+                {{-- ELIMINAR --}}
+                <x-danger-button 
+                    class="inline-flex items-center justify-center
+                           w-[160px] h-[42px]
+                           bg-red-500 hover:bg-red-600 text-white
+                           text-sm font-semibold rounded-lg
+                           shadow-sm transition"
+                >
                     {{ __('Eliminar Cuenta') }}
                 </x-danger-button>
 

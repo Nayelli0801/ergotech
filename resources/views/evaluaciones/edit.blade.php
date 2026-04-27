@@ -1,9 +1,9 @@
 <x-app-layout>
     <div class="max-w-5xl mx-auto py-8 px-6">
         <div class="bg-white shadow-lg rounded-2xl overflow-hidden border border-gray-200">
-            <div class="bg-amber-500 text-white px-6 py-4">
+            <div class="bg-sky-600 text-white px-6 py-4">
                 <h2 class="text-2xl font-bold">Editar evaluación</h2>
-                <p class="text-sm text-amber-100 mt-1">
+                <p class="text-sm text-sky-100 mt-1">
                     Modifica los datos generales de la evaluación.
                 </p>
             </div>
@@ -115,12 +115,12 @@
 
                     <div class="flex justify-end gap-3">
                         <a href="{{ route('evaluaciones.index') }}"
-                           class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold px-5 py-2.5 rounded-lg">
+                           class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold px-5 py-2.5 rounded-lg transition">
                             Cancelar
                         </a>
 
                         <button type="submit"
-                                class="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-5 py-2.5 rounded-lg shadow">
+                                class="bg-sky-600 hover:bg-sky-700 text-white font-semibold px-5 py-2.5 rounded-lg shadow-sm transition">
                             Guardar cambios
                         </button>
                     </div>

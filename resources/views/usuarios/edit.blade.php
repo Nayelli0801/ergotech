@@ -73,17 +73,25 @@
                             </select>
                         </div>
 
-                        <div class="flex justify-end gap-3">
-                            <a href="{{ route('usuarios.index') }}"
-                                class="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition">
-                                Cancelar
-                            </a>
+                        <div class="md:col-span-2 flex flex-wrap justify-end gap-3 pt-2">
 
-                            <button type="submit"
-                                class="px-6 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition">
-                                Actualizar
-                            </button>
-                        </div>
+    {{-- CANCELAR --}}
+    <a href="{{ route('sucursales.index') }}"
+       class="inline-flex items-center justify-center w-[120px] h-[42px]
+              bg-gray-200 hover:bg-gray-300 text-gray-800
+              text-sm font-semibold rounded-lg transition">
+        Cancelar
+    </a>
+
+    {{-- ACTUALIZAR --}}
+    <button type="submit"
+        class="inline-flex items-center justify-center w-[120px] h-[42px]
+               bg-sky-600 hover:bg-sky-700 text-white
+               text-sm font-semibold rounded-lg transition shadow-sm">
+        Actualizar
+    </button>
+
+</div>
                     </form>
                 </div>
             </div>

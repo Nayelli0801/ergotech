@@ -55,15 +55,25 @@
                         <textarea name="descripcion" rows="4" class="w-full rounded-lg border-gray-300">{{ old('descripcion', $puesto->descripcion) }}</textarea>
                     </div>
 
-                    <div class="md:col-span-2 flex gap-3 pt-2">
-                        <button type="submit" class="bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2.5 rounded-lg transition">
-                            Actualizar
-                        </button>
+                    <div class="md:col-span-2 flex flex-wrap justify-end gap-3 pt-2">
 
-                        <a href="{{ route('puestos.index') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-5 py-2.5 rounded-lg transition">
-                            Cancelar
-                        </a>
-                    </div>
+    {{-- CANCELAR --}}
+    <a href="{{ route('sucursales.index') }}"
+       class="inline-flex items-center justify-center w-[120px] h-[42px]
+              bg-gray-200 hover:bg-gray-300 text-gray-800
+              text-sm font-semibold rounded-lg transition">
+        Cancelar
+    </a>
+
+    {{-- ACTUALIZAR --}}
+    <button type="submit"
+        class="inline-flex items-center justify-center w-[120px] h-[42px]
+               bg-sky-600 hover:bg-sky-700 text-white
+               text-sm font-semibold rounded-lg transition shadow-sm">
+        Actualizar
+    </button>
+
+</div>
                 </form>
             </div>
         </div>

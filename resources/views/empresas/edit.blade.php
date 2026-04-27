@@ -99,17 +99,25 @@
                             </div>
                         </div>
 
-                        <div class="flex justify-end gap-3 mt-6">
-                            <a href="{{ route('empresas.index') }}"
-                                class="px-6 py-2 border rounded-lg hover:bg-gray-100 text-gray-700">
-                                Cancelar
-                            </a>
+                        <div class="flex flex-wrap justify-end gap-3 mt-6">
 
-                            <button type="submit"
-                                class="px-6 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition">
-                                Actualizar
-                            </button>
-                        </div>
+    {{-- CANCELAR --}}
+    <a href="{{ route('empresas.index') }}"
+       class="inline-flex items-center justify-center w-[120px] h-[42px]
+              bg-gray-200 hover:bg-gray-300 text-gray-800
+              text-sm font-semibold rounded-lg transition">
+        Cancelar
+    </a>
+
+    {{-- ACTUALIZAR --}}
+    <button type="submit"
+        class="inline-flex items-center justify-center w-[120px] h-[42px]
+               bg-sky-600 hover:bg-sky-700 text-white
+               text-sm font-semibold rounded-lg transition shadow-sm">
+        Actualizar
+    </button>
+
+</div>
                     </form>
                 </div>
             </div>
