@@ -8,13 +8,13 @@ use App\Models\Puesto;
 use App\Exports\ReportesErgonomicosExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ReporteController extends Controller
 {
     public function index()
     {
-        $user = auth()->user();
-        $soloLectura = ($user->rol->nombre ?? '') === 'visitante';
+        $user = Auth::user();        $soloLectura = ($user->rol->nombre ?? '') === 'visitante';
 
         $evaluacionesData = $this->obtenerEvaluacionesData();
 
