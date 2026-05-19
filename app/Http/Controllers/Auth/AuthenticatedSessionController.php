@@ -47,9 +47,10 @@ class AuthenticatedSessionController extends Controller
         // Cerrar sesión temporal hasta validar código
         Auth::logout();
 
-        // Redirigir a la pantalla 2FA mostrando el código demo
-        return redirect()->route('2fa.index')
-            ->with('codigo_demo', $code);
+        // Redirigir a 2FA pasando el código por URL para demo
+        return redirect()->route('2fa.index', [
+            'codigo_demo' => $code,
+        ]);
     }
 
     /**
