@@ -15,6 +15,8 @@ class DatabaseSeeder extends Seeder
             MetodoSeeder::class,
         ]);
 
+        $this->call(DemoUsersSeeder::class);
+
         $rolAdmin = Rol::where('nombre', 'admin')->first();
 
         User::updateOrCreate(
