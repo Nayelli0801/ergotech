@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use App\Models\TwoFactorCode;
-use Illuminate\Support\Facades\Mail;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -22,7 +21,7 @@ class AuthenticatedSessionController extends Controller
     }
 
     /**
-     * Procesar login + enviar código 2FA
+     * Procesar login + generar código 2FA demo
      */
     public function store(LoginRequest $request): RedirectResponse
     {
@@ -30,35 +29,31 @@ class AuthenticatedSessionController extends Controller
 
         $user = auth()->user();
 
-        // 🔹 Generar código 2FA
+        // Generar código 2FA
         $code = rand(100000, 999999);
 
-        // 🔹 Guardar código en BD
+        // Guardar código en BD
         TwoFactorCode::updateOrCreate(
             ['user_id' => $user->id],
             [
                 'code' => $code,
-                'expires_at' => now()->addMinutes(10)
+                'expires_at' => now()->addMinutes(10),
             ]
         );
 
-        // 🔹 Enviar código por correo
-        Mail::raw("Tu código de acceso es: $code", function ($message) use ($user) {
-            $message->to($user->email)
-                    ->subject('Código de verificación - Ergotech');
-        });
-
-        // 🔹 Guardar usuario en sesión temporal
+        // Guardar usuario en sesión temporal
         session(['2fa_user_id' => $user->id]);
 
-        // 🔹 cerrar sesión temporal hasta validar código
+        // Cerrar sesión temporal hasta validar código
         Auth::logout();
 
-        return redirect()->route('2fa.index');
+        // Redirigir a la pantalla 2FA mostrando el código demo
+        return redirect()->route('2fa.index')
+            ->with('codigo_demo', $code);
     }
 
     /**
-     * Cerrar sesión (LOGOUT)
+     * Cerrar sesión
      */
     public function destroy(Request $request): RedirectResponse
     {

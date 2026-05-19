@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Verificación 2FA</title>
-    @vite(['resources/css/app.css'])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
@@ -15,8 +15,14 @@
         </h2>
 
         <p class="text-sm text-gray-600 text-center mb-6">
-            Ingresa el código que enviamos a tu correo electrónico.
+            Ingresa el código de verificación para continuar.
         </p>
+
+        @if(session('codigo_demo'))
+            <div class="mb-4 p-4 rounded-lg bg-yellow-100 text-yellow-800 font-bold text-center border border-yellow-300">
+                Código demo: {{ session('codigo_demo') }}
+            </div>
+        @endif
 
         @if ($errors->any())
             <div class="mb-4 bg-red-100 text-red-600 p-3 rounded-lg text-sm">
