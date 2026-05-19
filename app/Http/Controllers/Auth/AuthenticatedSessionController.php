@@ -35,9 +35,7 @@ class AuthenticatedSessionController extends Controller
 
         session(['2fa_user_id' => $user->id]);
 
-        Auth::logout();
-
-        return redirect('/two-factor?codigo_demo=' . $code . '&user_id=' . $user->id);
+        return redirect()->route('2fa.index');
     }
 
     public function destroy(Request $request): RedirectResponse

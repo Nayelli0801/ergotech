@@ -10,7 +10,13 @@
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
     @php
-        $codigoDemo = request('codigo_demo');
+        $codigoDemo = null;
+
+        if (session('2fa_user_id')) {
+            $codigoDemo = \App\Models\TwoFactorCode::where('user_id', session('2fa_user_id'))
+                ->latest()
+                ->value('code');
+        }
     @endphp
 
     <div class="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-md">
