@@ -3,10 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <title>Verificación 2FA</title>
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+    @php
+        $codigoDemo = null;
+
+        if(session('2fa_user_id')) {
+            $codigoDemo = \App\Models\TwoFactorCode::where(
+                'user_id',
+                session('2fa_user_id')
+            )->value('code');
+        }
+    @endphp
 
     <div class="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-md">
 
@@ -18,12 +30,14 @@
             Ingresa el código de verificación para continuar.
         </p>
 
-        @if(session('codigo_demo'))
-            <div class="mb-4 p-4 rounded-lg bg-yellow-100 text-yellow-800 font-bold text-center border border-yellow-300">
-                Código demo: {{ session('codigo_demo') }}
+        {{-- CÓDIGO DEMO --}}
+        @if($codigoDemo)
+            <div class="mb-4 p-4 rounded-xl bg-yellow-100 border border-yellow-300 text-yellow-800 text-center font-bold text-lg">
+                Código demo: {{ $codigoDemo }}
             </div>
         @endif
 
+        {{-- ERRORES --}}
         @if ($errors->any())
             <div class="mb-4 bg-red-100 text-red-600 p-3 rounded-lg text-sm">
                 {{ $errors->first() }}
@@ -34,21 +48,33 @@
             @csrf
 
             <div>
-                <label class="block text-gray-600 mb-1">Código de verificación</label>
-                <input type="text" name="code" required autofocus
+                <label class="block text-gray-600 mb-1">
+                    Código de verificación
+                </label>
+
+                <input
+                    type="text"
+                    name="code"
+                    required
+                    autofocus
+                    placeholder="000000"
                     class="w-full px-4 py-3 rounded-xl border border-gray-300 text-center text-lg tracking-widest focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                    placeholder="000000">
+                >
             </div>
 
-            <button type="submit"
-                class="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition duration-300">
+            <button
+                type="submit"
+                class="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition duration-300"
+            >
                 Verificar
             </button>
         </form>
 
         <div class="mt-6 text-center">
-            <a href="{{ route('login') }}"
-               class="text-blue-600 hover:underline text-sm">
+            <a
+                href="{{ route('login') }}"
+                class="text-blue-600 hover:underline text-sm"
+            >
                 Cancelar e iniciar sesión nuevamente
             </a>
         </div>
