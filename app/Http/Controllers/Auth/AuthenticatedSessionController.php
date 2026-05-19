@@ -12,27 +12,19 @@ use App\Models\TwoFactorCode;
 
 class AuthenticatedSessionController extends Controller
 {
-    /**
-     * Mostrar formulario de login
-     */
     public function create(): View
     {
         return view('auth.login');
     }
 
-    /**
-     * Procesar login + generar código 2FA demo
-     */
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
 
         $user = auth()->user();
 
-        // Generar código 2FA
         $code = rand(100000, 999999);
 
-        // Guardar código en BD
         TwoFactorCode::updateOrCreate(
             ['user_id' => $user->id],
             [
@@ -41,21 +33,13 @@ class AuthenticatedSessionController extends Controller
             ]
         );
 
-        // Guardar usuario en sesión temporal
         session(['2fa_user_id' => $user->id]);
 
-        // Cerrar sesión temporal hasta validar código
         Auth::logout();
 
-        // Redirigir a 2FA pasando el código por URL para demo
-        return redirect()->route('2fa.index', [
-            'codigo_demo' => $code,
-        ]);
+        return redirect('/two-factor?codigo_demo=' . $code . '&user_id=' . $user->id);
     }
 
-    /**
-     * Cerrar sesión
-     */
     public function destroy(Request $request): RedirectResponse
     {
         Auth::logout();

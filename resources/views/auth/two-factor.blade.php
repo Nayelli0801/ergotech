@@ -10,14 +10,7 @@
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
     @php
-        $codigoDemo = null;
-
-        if(session('2fa_user_id')) {
-            $codigoDemo = \App\Models\TwoFactorCode::where(
-                'user_id',
-                session('2fa_user_id')
-            )->value('code');
-        }
+        $codigoDemo = request('codigo_demo');
     @endphp
 
     <div class="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-md">
@@ -30,14 +23,12 @@
             Ingresa el código de verificación para continuar.
         </p>
 
-        {{-- CÓDIGO DEMO --}}
         @if($codigoDemo)
             <div class="mb-4 p-4 rounded-xl bg-yellow-100 border border-yellow-300 text-yellow-800 text-center font-bold text-lg">
                 Código demo: {{ $codigoDemo }}
             </div>
         @endif
 
-        {{-- ERRORES --}}
         @if ($errors->any())
             <div class="mb-4 bg-red-100 text-red-600 p-3 rounded-lg text-sm">
                 {{ $errors->first() }}
@@ -58,6 +49,7 @@
                     required
                     autofocus
                     placeholder="000000"
+                    value="{{ $codigoDemo }}"
                     class="w-full px-4 py-3 rounded-xl border border-gray-300 text-center text-lg tracking-widest focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 >
             </div>
@@ -71,10 +63,7 @@
         </form>
 
         <div class="mt-6 text-center">
-            <a
-                href="{{ route('login') }}"
-                class="text-blue-600 hover:underline text-sm"
-            >
+            <a href="{{ route('login') }}" class="text-blue-600 hover:underline text-sm">
                 Cancelar e iniciar sesión nuevamente
             </a>
         </div>
