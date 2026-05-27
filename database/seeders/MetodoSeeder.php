@@ -5,29 +5,49 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class MetodoSeeder extends Seeder
+class MetodosSeeder extends Seeder
 {
     public function run(): void
     {
         $metodos = [
             [
-                'nombre' => 'RULA',
-                'descripcion' => 'Rapid Upper Limb Assessment',
+                'nombre' => 'REBA',
+                'descripcion' => 'Evaluación rápida de cuerpo entero.',
                 'activo' => 1,
             ],
             [
-                'nombre' => 'REBA',
-                'descripcion' => 'Rapid Entire Body Assessment',
+                'nombre' => 'RULA',
+                'descripcion' => 'Evaluación rápida de extremidades superiores.',
                 'activo' => 1,
             ],
             [
                 'nombre' => 'OWAS',
-                'descripcion' => 'Ovako Working Posture Analysis System',
+                'descripcion' => 'Clasificación de posturas de trabajo.',
                 'activo' => 1,
             ],
             [
                 'nombre' => 'NIOSH',
-                'descripcion' => 'Ecuación revisada de levantamiento NIOSH',
+                'descripcion' => 'Evaluación de levantamiento manual de cargas.',
+                'activo' => 1,
+            ],
+            [
+                'nombre' => 'NOM-036',
+                'descripcion' => 'Evaluación de factores de riesgo ergonómico por manejo manual de cargas.',
+                'activo' => 1,
+            ],
+            [
+                'nombre' => 'LEY SILLA',
+                'descripcion' => 'Evaluación de cumplimiento sobre disponibilidad de sillas con respaldo, descansos y condiciones de bipedestación prolongada.',
+                'activo' => 1,
+            ],
+            [
+                'nombre' => 'ERGONOMIA GENERAL',
+                'descripcion' => 'Evaluación ergonómica general del puesto de trabajo.',
+                'activo' => 1,
+            ],
+            [
+                'nombre' => 'OCRA',
+                'descripcion' => 'Evaluación del riesgo por movimientos repetitivos de extremidades superiores.',
                 'activo' => 1,
             ],
         ];

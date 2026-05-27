@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-
+use App\Models\OcraEvaluacion;
 class Evaluacion extends Model
 {
     use HasFactory;
@@ -86,6 +86,11 @@ class Evaluacion extends Model
     {
         return $this->hasOne(LeySillaEvaluacion::class, 'evaluacion_id');
     }
+
+    public function ocraEvaluacion()
+{
+    return $this->hasOne(OcraEvaluacion::class, 'evaluacion_id');
+}
 
 
 }

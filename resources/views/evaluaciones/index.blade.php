@@ -89,12 +89,18 @@
                                             <span class="inline-block px-3 py-1 rounded-full bg-amber-100 text-amber-700 text-xs font-semibold">
                                                 NOM-036
                                             </span>
-                                        
                                         @elseif($metodo === 'LEY SILLA')
                                             <span class="inline-block px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-xs font-semibold">
                                                 LEY SILLA
                                             </span>
-                                            
+                                        @elseif($metodo === 'ERGONOMIA GENERAL' || $metodo === 'ERGONOMÍA GENERAL')
+                                            <span class="inline-block px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-xs font-semibold">
+                                                ERGONOMÍA GENERAL
+                                            </span>
+                                        @elseif($metodo === 'OCRA')
+                                            <span class="inline-block px-3 py-1 rounded-full bg-rose-100 text-rose-700 text-xs font-semibold">
+                                                OCRA
+                                            </span>
                                         @else
                                             <span class="inline-block px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-semibold">
                                                 {{ $metodo ?: 'N/A' }}
@@ -133,24 +139,26 @@
                                                    class="inline-flex items-center justify-center w-[100px] h-[38px] bg-sky-600 hover:bg-sky-700 text-white text-sm font-semibold rounded-lg transition">
                                                     Ver
                                                 </a>
-
-                                                @elseif($metodo === 'LEY SILLA' && $evaluacion->leySilla)
-                                                    <a href="{{ route('ley_silla.show', $evaluacion->leySilla->id) }}"
-                                                       class="inline-flex items-center justify-center w-[100px] h-[38px] bg-sky-600 hover:bg-sky-700 text-white text-sm font-semibold rounded-lg transition">
-                                                        Ver
-                                                    </a>
-
-                                                @elseif(($metodo === 'ERGONOMIA GENERAL' || $metodo === 'ERGONOMÍA GENERAL') && $evaluacion->ergonomiaGeneral)
-                                                    <a href="{{ route('ergonomia_general.show', $evaluacion->ergonomiaGeneral->id) }}"
-                                                       class="inline-flex items-center justify-center w-[100px] h-[38px] bg-sky-600 hover:bg-sky-700 text-white text-sm font-semibold rounded-lg transition">
-                                                        Ver
-                                                    </a>    
-
-                                                @else
-                                                    <span class="inline-flex items-center justify-center w-[100px] h-[38px] bg-gray-100 text-gray-400 text-sm font-semibold rounded-lg">
-                                                        Sin detalle
-                                                    </span>
-                                                @endif
+                                            @elseif($metodo === 'LEY SILLA' && $evaluacion->leySilla)
+                                                <a href="{{ route('ley_silla.show', $evaluacion->leySilla->id) }}"
+                                                   class="inline-flex items-center justify-center w-[100px] h-[38px] bg-sky-600 hover:bg-sky-700 text-white text-sm font-semibold rounded-lg transition">
+                                                    Ver
+                                                </a>
+                                            @elseif(($metodo === 'ERGONOMIA GENERAL' || $metodo === 'ERGONOMÍA GENERAL') && $evaluacion->ergonomiaGeneral)
+                                                <a href="{{ route('ergonomia_general.show', $evaluacion->ergonomiaGeneral->id) }}"
+                                                   class="inline-flex items-center justify-center w-[100px] h-[38px] bg-sky-600 hover:bg-sky-700 text-white text-sm font-semibold rounded-lg transition">
+                                                    Ver
+                                                </a>
+                                            @elseif($metodo === 'OCRA' && $evaluacion->ocraEvaluacion)
+                                                <a href="{{ route('ocra.show', $evaluacion->ocraEvaluacion->id) }}"
+                                                   class="inline-flex items-center justify-center w-[100px] h-[38px] bg-sky-600 hover:bg-sky-700 text-white text-sm font-semibold rounded-lg transition">
+                                                    Ver
+                                                </a>
+                                            @else
+                                                <span class="inline-flex items-center justify-center w-[100px] h-[38px] bg-gray-100 text-gray-400 text-sm font-semibold rounded-lg">
+                                                    Sin detalle
+                                                </span>
+                                            @endif
 
                                             <a href="{{ route('evaluaciones.edit', $evaluacion->id) }}"
                                                class="inline-flex items-center justify-center w-[100px] h-[38px] bg-sky-100 hover:bg-sky-200 text-sky-700 text-sm font-semibold rounded-lg transition">
