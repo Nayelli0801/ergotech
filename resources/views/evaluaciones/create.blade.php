@@ -107,6 +107,8 @@
                                     <option value="NIOSH" {{ old('metodo') == 'NIOSH' ? 'selected' : '' }}>NIOSH</option>
                                     <option value="NOM-036" {{ old('metodo') == 'NOM-036' ? 'selected' : '' }}>NOM-036</option>
                                     <option value="LEY SILLA" {{ old('metodo') == 'LEY SILLA' ? 'selected' : '' }}>LEY SILLA</option>
+                                    <option value="ERGONOMIA GENERAL" {{ old('metodo') == 'ERGONOMIA GENERAL' ? 'selected' : '' }}>ERGONOMÍA GENERAL</option>
+                                    <option value="OCRA" {{ old('metodo') == 'OCRA' ? 'selected' : '' }}>OCRA</option>
                                 </select>
                             </div>
 

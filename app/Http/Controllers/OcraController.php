@@ -31,51 +31,111 @@ class OcraController extends Controller
 
         $request->validate([
             'lado_evaluado' => 'required|string|max:50',
-            'duracion_tarea' => 'required|numeric|min:0',
-            'acciones_tecnicas' => 'required|integer|min:0',
-            'frecuencia_acciones' => 'required|integer|min:0',
-            'fuerza' => 'required|integer|min:0|max:10',
-            'postura_hombro' => 'required|integer|min:0|max:10',
-            'postura_codo' => 'required|integer|min:0|max:10',
-            'postura_muneca' => 'required|integer|min:0|max:10',
-            'postura_mano' => 'required|integer|min:0|max:10',
-            'repetitividad' => 'required|integer|min:0|max:10',
-            'factores_adicionales' => 'required|integer|min:0|max:10',
-            'recuperacion' => 'required|integer|min:0|max:10',
+
+            'duracion_turno' => 'required|numeric|min:1',
+            'tiempo_no_repetitivo' => 'required|numeric|min:0',
+            'pausas' => 'required|numeric|min:0',
+            'almuerzo' => 'required|numeric|min:0',
+            'numero_ciclos' => 'required|numeric|min:1',
+
+            'fr' => 'required|numeric|min:0',
+            'atd' => 'required|numeric|min:0',
+            'ate' => 'required|numeric|min:0',
+            'ffz' => 'required|numeric|min:0',
+
+            'pho' => 'required|numeric|min:0',
+            'pco' => 'required|numeric|min:0',
+            'pmu' => 'required|numeric|min:0',
+            'pma' => 'required|numeric|min:0',
+            'pes' => 'required|numeric|min:0',
+
+            'ffm' => 'required|numeric|min:0',
+            'fso' => 'required|numeric|min:0',
+
             'observaciones' => 'nullable|string',
         ]);
 
         DB::beginTransaction();
 
         try {
-            $indice = $this->calcularIndice($request);
-            [$nivel, $recomendaciones] = $this->clasificarRiesgo($indice);
+            $duracionTurno = (float) $request->duracion_turno;
+            $tiempoNoRepetitivo = (float) $request->tiempo_no_repetitivo;
+            $pausas = (float) $request->pausas;
+            $almuerzo = (float) $request->almuerzo;
+            $numeroCiclos = max((float) $request->numero_ciclos, 1);
+
+            $tntr = max($duracionTurno - ($tiempoNoRepetitivo + $pausas + $almuerzo), 0);
+            $tnc = $numeroCiclos > 0 ? round((60 * $tntr) / $numeroCiclos, 2) : 0;
+
+            $fr = (float) $request->fr;
+            $atd = (float) $request->atd;
+            $ate = (float) $request->ate;
+            $ff = max($atd, $ate);
+
+            $ffz = (float) $request->ffz;
+
+            $pho = (float) $request->pho;
+            $pco = (float) $request->pco;
+            $pmu = (float) $request->pmu;
+            $pma = (float) $request->pma;
+            $pes = (float) $request->pes;
+
+            $fp = max($pho, $pco, $pmu, $pma) + $pes;
+
+            $ffm = (float) $request->ffm;
+            $fso = (float) $request->fso;
+            $fc = $ffm + $fso;
+
+            $md = $this->calcularMD($tntr);
+
+            $ickl = round(($fr + $ff + $ffz + $fp + $fc) * $md, 2);
+
+            [$nivelRiesgo, $accionRecomendada, $recomendaciones] = $this->clasificarRiesgo($ickl);
 
             $ocra = OcraEvaluacion::create([
                 'evaluacion_id' => $evaluacion->id,
                 'lado_evaluado' => $request->lado_evaluado,
-                'duracion_tarea' => $request->duracion_tarea,
-                'acciones_tecnicas' => $request->acciones_tecnicas,
-                'frecuencia_acciones' => $request->frecuencia_acciones,
-                'fuerza' => $request->fuerza,
-                'postura_hombro' => $request->postura_hombro,
-                'postura_codo' => $request->postura_codo,
-                'postura_muneca' => $request->postura_muneca,
-                'postura_mano' => $request->postura_mano,
-                'repetitividad' => $request->repetitividad,
-                'factores_adicionales' => $request->factores_adicionales,
-                'recuperacion' => $request->recuperacion,
-                'indice_ocra' => $indice,
-                'nivel_riesgo' => $nivel,
+
+                'duracion_turno' => $duracionTurno,
+                'tiempo_no_repetitivo' => $tiempoNoRepetitivo,
+                'pausas' => $pausas,
+                'almuerzo' => $almuerzo,
+                'numero_ciclos' => $numeroCiclos,
+
+                'tntr' => $tntr,
+                'tnc' => $tnc,
+
+                'fr' => $fr,
+                'atd' => $atd,
+                'ate' => $ate,
+                'ff' => $ff,
+                'ffz' => $ffz,
+
+                'pho' => $pho,
+                'pco' => $pco,
+                'pmu' => $pmu,
+                'pma' => $pma,
+                'pes' => $pes,
+                'fp' => $fp,
+
+                'ffm' => $ffm,
+                'fso' => $fso,
+                'fc' => $fc,
+
+                'md' => $md,
+                'ickl' => $ickl,
+                'indice_ocra' => $ickl,
+                'nivel_riesgo' => $nivelRiesgo,
+                'accion_recomendada' => $accionRecomendada,
                 'recomendaciones' => $recomendaciones,
                 'observaciones' => $request->observaciones,
             ]);
 
-            $this->guardarDetalles($ocra, $request, $indice);
+            $this->guardarDetalles($ocra);
 
             $evaluacion->update([
-                'resultado_final' => $indice,
-                'nivel_riesgo' => $nivel,
+                'resultado_final' => $ickl,
+                'nivel_riesgo' => $nivelRiesgo,
                 'recomendaciones' => $recomendaciones,
                 'observaciones' => $request->observaciones,
             ]);
@@ -84,7 +144,7 @@ class OcraController extends Controller
 
             return redirect()
                 ->route('ocra.show', $ocra->id)
-                ->with('success', 'Evaluación OCRA registrada correctamente.');
+                ->with('success', 'Evaluación Check List OCRA registrada correctamente.');
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -128,59 +188,109 @@ class OcraController extends Controller
         return $pdf->download('reporte_ocra_' . $ocra->id . '.pdf');
     }
 
-    private function calcularIndice(Request $request): float
+    private function calcularMD(float $tntr): float
     {
-        $postura = (
-            $request->postura_hombro +
-            $request->postura_codo +
-            $request->postura_muneca +
-            $request->postura_mano
-        ) / 4;
+        if ($tntr <= 1.87) return 0.01;
+        if ($tntr <= 3.75) return 0.02;
+        if ($tntr <= 7.5) return 0.05;
+        if ($tntr <= 15) return 0.1;
+        if ($tntr <= 30) return 0.2;
+        if ($tntr <= 59) return 0.35;
+        if ($tntr <= 120) return 0.5;
+        if ($tntr <= 180) return 0.65;
+        if ($tntr <= 240) return 0.75;
+        if ($tntr <= 300) return 0.85;
+        if ($tntr <= 360) return 0.925;
+        if ($tntr <= 420) return 0.95;
+        if ($tntr <= 480) return 1;
+        if ($tntr <= 539) return 1.2;
+        if ($tntr <= 599) return 1.5;
+        if ($tntr <= 659) return 2;
+        if ($tntr <= 719) return 2.8;
 
-        $indice = 
-            ($request->frecuencia_acciones * 0.25) +
-            ($request->fuerza * 1.5) +
-            ($postura * 1.2) +
-            ($request->repetitividad * 1.1) +
-            ($request->factores_adicionales * 0.8) -
-            ($request->recuperacion * 0.7);
-
-        return max(round($indice, 2), 0);
+        return 4;
     }
 
-    private function clasificarRiesgo(float $indice): array
+    private function clasificarRiesgo(float $ickl): array
     {
-        if ($indice <= 7.5) {
-            return ['Bajo', 'Mantener condiciones actuales y continuar con vigilancia ergonómica.'];
+        if ($ickl <= 5) {
+            return [
+                'Óptimo',
+                'No se requiere acción correctiva.',
+                'Mantener las condiciones actuales del puesto y continuar con vigilancia preventiva.',
+            ];
         }
 
-        if ($indice <= 11) {
-            return ['Medio', 'Revisar pausas, recuperación, ritmo de trabajo y posturas forzadas.'];
+        if ($ickl <= 7.5) {
+            return [
+                'Aceptable',
+                'No se requiere acción correctiva.',
+                'Mantener las condiciones actuales y revisar periódicamente la tarea.',
+            ];
         }
 
-        if ($indice <= 22.5) {
-            return ['Alto', 'Rediseñar la tarea, reducir repetitividad, mejorar pausas y capacitar al trabajador.'];
+        if ($ickl <= 11) {
+            return [
+                'Incierto',
+                'Se recomienda un nuevo análisis o mejora del puesto.',
+                'Revisar la tarea con mayor detalle, especialmente frecuencia, pausas, posturas y fuerza aplicada.',
+            ];
         }
 
-        return ['Muy alto', 'Intervenir de forma prioritaria. Reducir exposición, fuerza aplicada y frecuencia de acciones técnicas.'];
+        if ($ickl <= 14) {
+            return [
+                'Inaceptable Leve',
+                'Se recomienda mejora del puesto, supervisión médica y entrenamiento.',
+                'Implementar mejoras ergonómicas, ajustar pausas y capacitar al trabajador.',
+            ];
+        }
+
+        if ($ickl <= 22.5) {
+            return [
+                'Inaceptable Medio',
+                'Se recomienda mejora del puesto, supervisión médica y entrenamiento.',
+                'Rediseñar la tarea, reducir frecuencia de acciones, mejorar recuperación y controlar posturas forzadas.',
+            ];
+        }
+
+        return [
+            'Inaceptable Alto',
+            'Se requiere intervención prioritaria, mejora del puesto, supervisión médica y entrenamiento.',
+            'Intervenir de forma inmediata. Reducir exposición, fuerza, repetitividad y factores adicionales.',
+        ];
     }
 
-    private function guardarDetalles(OcraEvaluacion $ocra, Request $request, float $indice): void
+    private function guardarDetalles(OcraEvaluacion $ocra): void
     {
         $detalles = [
-            ['General', 'Lado evaluado', $request->lado_evaluado, null],
-            ['General', 'Duración de la tarea', $request->duracion_tarea . ' horas', null],
-            ['Acciones', 'Acciones técnicas', $request->acciones_tecnicas, $request->acciones_tecnicas],
-            ['Acciones', 'Frecuencia de acciones', $request->frecuencia_acciones, $request->frecuencia_acciones],
-            ['Factores de riesgo', 'Fuerza', $request->fuerza, $request->fuerza],
-            ['Postura', 'Hombro', $request->postura_hombro, $request->postura_hombro],
-            ['Postura', 'Codo', $request->postura_codo, $request->postura_codo],
-            ['Postura', 'Muñeca', $request->postura_muneca, $request->postura_muneca],
-            ['Postura', 'Mano', $request->postura_mano, $request->postura_mano],
-            ['Factores de riesgo', 'Repetitividad', $request->repetitividad, $request->repetitividad],
-            ['Factores adicionales', 'Factores adicionales', $request->factores_adicionales, $request->factores_adicionales],
-            ['Recuperación', 'Recuperación', $request->recuperacion, $request->recuperacion],
-            ['Resultado', 'Índice OCRA', $indice, $indice],
+            ['Organización', 'Duración del turno DT', $ocra->duracion_turno . ' min', $ocra->duracion_turno],
+            ['Organización', 'Tiempo no repetitivo TNR', $ocra->tiempo_no_repetitivo . ' min', $ocra->tiempo_no_repetitivo],
+            ['Organización', 'Pausas P', $ocra->pausas . ' min', $ocra->pausas],
+            ['Organización', 'Almuerzo A', $ocra->almuerzo . ' min', $ocra->almuerzo],
+            ['Organización', 'Número de ciclos NC', $ocra->numero_ciclos, $ocra->numero_ciclos],
+            ['Organización', 'Tiempo Neto de Trabajo Repetitivo TNTR', $ocra->tntr . ' min', $ocra->tntr],
+            ['Organización', 'Tiempo Neto de Ciclo TNC', $ocra->tnc . ' seg', $ocra->tnc],
+
+            ['Factor recuperación', 'FR', $ocra->fr, $ocra->fr],
+            ['Factor frecuencia', 'ATD', $ocra->atd, $ocra->atd],
+            ['Factor frecuencia', 'ATE', $ocra->ate, $ocra->ate],
+            ['Factor frecuencia', 'FF = Max(ATD, ATE)', $ocra->ff, $ocra->ff],
+
+            ['Factor fuerza', 'FFz', $ocra->ffz, $ocra->ffz],
+
+            ['Posturas', 'PHo hombro', $ocra->pho, $ocra->pho],
+            ['Posturas', 'PCo codo', $ocra->pco, $ocra->pco],
+            ['Posturas', 'PMu muñeca', $ocra->pmu, $ocra->pmu],
+            ['Posturas', 'PMa mano/agarre', $ocra->pma, $ocra->pma],
+            ['Posturas', 'PEs movimientos estereotipados', $ocra->pes, $ocra->pes],
+            ['Posturas', 'FP = Max(PHo, PCo, PMu, PMa) + PEs', $ocra->fp, $ocra->fp],
+
+            ['Factores adicionales', 'Ffm físico-mecánicos', $ocra->ffm, $ocra->ffm],
+            ['Factores adicionales', 'Fso socio-organizativos', $ocra->fso, $ocra->fso],
+            ['Factores adicionales', 'FC = Ffm + Fso', $ocra->fc, $ocra->fc],
+
+            ['Resultado', 'MD multiplicador de duración', $ocra->md, $ocra->md],
+            ['Resultado', 'ICKL = (FR + FF + FFz + FP + FC) × MD', $ocra->ickl, $ocra->ickl],
         ];
 
         foreach ($detalles as $detalle) {

@@ -12,10 +12,9 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             RolSeeder::class,
-            MetodoSeeder::class,
+            DemoUsersSeeder::class,
+            MetodosSeeder::class,
         ]);
-
-        $this->call(DemoUsersSeeder::class);
 
         $rolAdmin = Rol::where('nombre', 'admin')->first();
 

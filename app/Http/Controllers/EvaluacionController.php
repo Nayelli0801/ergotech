@@ -27,7 +27,8 @@ class EvaluacionController extends Controller
             'nioshEvaluacion',
             'nom036',
             'leySilla',
-            
+            'ergonomiaGeneral',
+            'ocraEvaluacion',
         ])->latest()->get();
 
         return view('evaluaciones.index', compact('evaluaciones'));
@@ -62,7 +63,9 @@ class EvaluacionController extends Controller
             'observaciones' => 'nullable|string',
         ]);
 
-        $metodo = Metodo::whereRaw('UPPER(nombre) = ?', [strtoupper($request->metodo)])->first();
+        $metodoSeleccionado = strtoupper(trim($request->metodo));
+
+        $metodo = Metodo::whereRaw('UPPER(nombre) = ?', [$metodoSeleccionado])->first();
 
         if (!$metodo) {
             return back()
@@ -83,7 +86,7 @@ class EvaluacionController extends Controller
             'observaciones' => $request->observaciones,
         ]);
 
-        switch (strtoupper($request->metodo)) {
+        switch ($metodoSeleccionado) {
             case 'REBA':
                 return redirect()->route('reba.create', $evaluacion->id);
 
@@ -103,10 +106,13 @@ class EvaluacionController extends Controller
 
             case 'LEY SILLA':
                 return redirect()->route('ley_silla.create', $evaluacion->id);
-            
+
             case 'ERGONOMIA GENERAL':
             case 'ERGONOMÍA GENERAL':
-             return redirect()->route('ergonomia_general.create', $evaluacion->id);
+                return redirect()->route('ergonomia_general.create', $evaluacion->id);
+
+            case 'OCRA':
+                return redirect()->route('ocra.create', $evaluacion->id);
 
             default:
                 return back()

@@ -2,12 +2,12 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Reporte OCRA</title>
+    <title>Reporte Check List OCRA</title>
 
     <style>
         body {
             font-family: DejaVu Sans, sans-serif;
-            font-size: 12px;
+            font-size: 11px;
             color: #1f2937;
             margin: 25px;
         }
@@ -17,28 +17,27 @@
             color: white;
             padding: 18px;
             border-radius: 8px;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
 
         .header h1 {
             margin: 0;
-            font-size: 22px;
+            font-size: 21px;
         }
 
         .header p {
             margin: 4px 0 0;
-            font-size: 12px;
         }
 
         .section {
             border: 1px solid #d1d5db;
             border-radius: 8px;
-            margin-bottom: 16px;
-            padding: 12px;
+            margin-bottom: 14px;
+            padding: 10px;
         }
 
         .section-title {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: bold;
             color: #0369a1;
             margin-bottom: 8px;
@@ -49,18 +48,18 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 8px;
+            margin-top: 6px;
         }
 
         th {
             background: #f3f4f6;
             text-align: left;
-            padding: 7px;
+            padding: 6px;
             border: 1px solid #d1d5db;
         }
 
         td {
-            padding: 7px;
+            padding: 6px;
             border: 1px solid #d1d5db;
         }
 
@@ -69,11 +68,11 @@
             border: 1px solid #7dd3fc;
             padding: 12px;
             border-radius: 8px;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
         }
 
         .resultado-numero {
-            font-size: 28px;
+            font-size: 26px;
             font-weight: bold;
             color: #0369a1;
         }
@@ -87,7 +86,7 @@
 <body>
 
     <div class="header">
-        <h1>Reporte de Evaluación OCRA</h1>
+        <h1>Reporte Check List OCRA</h1>
         <p>Evaluación del riesgo por movimientos repetitivos de extremidades superiores</p>
     </div>
 
@@ -98,24 +97,20 @@
             <tr>
                 <th>Empresa</th>
                 <td>{{ $ocra->evaluacion->empresa->nombre ?? 'N/A' }}</td>
-            </tr>
-            <tr>
                 <th>Sucursal</th>
                 <td>{{ $ocra->evaluacion->sucursal->nombre ?? 'N/A' }}</td>
             </tr>
             <tr>
                 <th>Puesto</th>
                 <td>{{ $ocra->evaluacion->puesto->nombre ?? 'N/A' }}</td>
-            </tr>
-            <tr>
                 <th>Trabajador</th>
-                <td>{{ $ocra->evaluacion->trabajador->nombre ?? 'N/A' }}</td>
+                <td>
+                    {{ trim(($ocra->evaluacion->trabajador->nombre ?? '') . ' ' . ($ocra->evaluacion->trabajador->apellido_paterno ?? '') . ' ' . ($ocra->evaluacion->trabajador->apellido_materno ?? '')) ?: 'N/A' }}
+                </td>
             </tr>
             <tr>
                 <th>Fecha</th>
                 <td>{{ $ocra->evaluacion->fecha_evaluacion }}</td>
-            </tr>
-            <tr>
                 <th>Lado evaluado</th>
                 <td>{{ $ocra->lado_evaluado }}</td>
             </tr>
@@ -123,9 +118,41 @@
     </div>
 
     <div class="resultado">
-        <div>Índice OCRA</div>
-        <div class="resultado-numero">{{ $ocra->indice_ocra }}</div>
+        <div>Índice Check List OCRA</div>
+        <div class="resultado-numero">{{ $ocra->ickl }}</div>
         <div>Nivel de riesgo: <span class="riesgo">{{ $ocra->nivel_riesgo }}</span></div>
+        <div>Acción recomendada: {{ $ocra->accion_recomendada }}</div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Resumen de cálculo</div>
+
+        <table>
+            <tr>
+                <th>TNTR</th>
+                <td>{{ $ocra->tntr }} min</td>
+                <th>TNC</th>
+                <td>{{ $ocra->tnc }} seg</td>
+            </tr>
+            <tr>
+                <th>FR</th>
+                <td>{{ $ocra->fr }}</td>
+                <th>FF</th>
+                <td>{{ $ocra->ff }}</td>
+            </tr>
+            <tr>
+                <th>FFz</th>
+                <td>{{ $ocra->ffz }}</td>
+                <th>FP</th>
+                <td>{{ $ocra->fp }}</td>
+            </tr>
+            <tr>
+                <th>FC</th>
+                <td>{{ $ocra->fc }}</td>
+                <th>MD</th>
+                <td>{{ $ocra->md }}</td>
+            </tr>
+        </table>
     </div>
 
     <div class="section">

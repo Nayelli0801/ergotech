@@ -19,39 +19,24 @@ use App\Http\Controllers\OwasController;
 use App\Http\Controllers\Nom036Controller;
 use App\Http\Controllers\NioshController;
 use App\Http\Controllers\LeySillaController;
-use App\Http\Controllers\LogController;
 use App\Http\Controllers\OcraController;
+use App\Http\Controllers\LogController;
 
-// =========================
-// INICIO
-// =========================
 Route::get('/', function () {
     return redirect('/login');
 });
 
-// =========================
-// 2FA
-// =========================
 Route::get('/two-factor', [TwoFactorController::class, 'index'])->name('2fa.index');
 Route::post('/two-factor', [TwoFactorController::class, 'store'])->name('2fa.store');
 
-// =========================
-// DASHBOARD
-// =========================
 Route::middleware(['auth'])->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-// =========================
-// PERFIL
-// =========================
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// =========================
-// ADMIN Y EVALUADOR
-// =========================
 Route::middleware(['auth', 'rol:admin,evaluador'])->group(function () {
 
     Route::resource('empresas', EmpresaController::class);
@@ -110,27 +95,20 @@ Route::middleware(['auth', 'rol:admin,evaluador'])->group(function () {
     Route::post('/ley-silla/store/{evaluacion}', [LeySillaController::class, 'store'])->name('ley_silla.store');
     Route::get('/ley-silla/{id}', [LeySillaController::class, 'show'])->name('ley_silla.show');
     Route::get('/ley-silla/{id}/pdf', [LeySillaController::class, 'pdf'])->name('ley_silla.pdf');
+
+    // OCRA
+    Route::get('/ocra/create/{evaluacion}', [OcraController::class, 'create'])->name('ocra.create');
+    Route::post('/ocra/store/{evaluacion}', [OcraController::class, 'store'])->name('ocra.store');
+    Route::get('/ocra/{id}', [OcraController::class, 'show'])->name('ocra.show');
+    Route::get('/ocra/{id}/pdf', [OcraController::class, 'pdf'])->name('ocra.pdf');
 });
 
-//ocra
-Route::get('/ocra/create/{evaluacion}', [OcraController::class, 'create'])->name('ocra.create');
-Route::post('/ocra/store/{evaluacion}', [OcraController::class, 'store'])->name('ocra.store');
-Route::get('/ocra/{id}', [OcraController::class, 'show'])->name('ocra.show');
-Route::get('/ocra/{id}/pdf', [OcraController::class, 'pdf'])->name('ocra.pdf');
-
-// =========================
-// REPORTES
-// =========================
 Route::middleware(['auth', 'rol:admin,evaluador,visitante'])->group(function () {
     Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
     Route::get('/reportes/excel', [ReporteController::class, 'excel'])->name('reportes.excel');
 });
 
-// =========================
-// SOLO ADMIN
-// =========================
 Route::middleware(['auth', 'rol:admin'])->group(function () {
-
     Route::resource('usuarios', UserController::class);
 
     Route::get('/logs', [LogController::class, 'index'])
@@ -138,15 +116,8 @@ Route::middleware(['auth', 'rol:admin'])->group(function () {
         ->middleware('permission:ver logs');
 });
 
-
-// =========================
-// PRUEBA
-// =========================
 Route::get('/prueba-rol', function () {
     return Auth::user()->rol?->nombre;
 })->middleware('auth');
 
-// =========================
-// AUTH
-// =========================
 require __DIR__ . '/auth.php';

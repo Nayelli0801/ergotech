@@ -15,7 +15,9 @@ class MetodosSeeder extends Seeder
             ['nombre' => 'OWAS', 'descripcion' => 'Clasificación de posturas de trabajo.', 'activo' => 1],
             ['nombre' => 'NIOSH', 'descripcion' => 'Evaluación de levantamiento manual de cargas.', 'activo' => 1],
             ['nombre' => 'NOM-036', 'descripcion' => 'Evaluación de factores de riesgo ergonómico por manejo manual de cargas.', 'activo' => 1],
+            ['nombre' => 'LEY SILLA', 'descripcion' => 'Evaluación de cumplimiento sobre disponibilidad de sillas con respaldo, descansos y condiciones de bipedestación prolongada.', 'activo' => 1],
             ['nombre' => 'ERGONOMIA GENERAL', 'descripcion' => 'Evaluación ergonómica general del puesto de trabajo.', 'activo' => 1],
+            ['nombre' => 'OCRA', 'descripcion' => 'Evaluación del riesgo por movimientos repetitivos de extremidades superiores.', 'activo' => 1],
         ];
 
         foreach ($metodos as $metodo) {

@@ -1,11 +1,11 @@
 <x-app-layout>
-    <div class="max-w-6xl mx-auto py-8 px-6">
+    <div class="max-w-7xl mx-auto py-8 px-6">
         <div class="bg-white shadow-lg rounded-2xl border border-gray-200 overflow-hidden">
 
             <div class="bg-sky-600 text-white px-6 py-4 flex justify-between items-center">
                 <div>
-                    <h2 class="text-2xl font-bold">Resultado OCRA</h2>
-                    <p class="text-sm">Evaluación de movimientos repetitivos</p>
+                    <h2 class="text-2xl font-bold">Resultado Check List OCRA</h2>
+                    <p class="text-sm text-blue-100">Índice de riesgo por movimientos repetitivos</p>
                 </div>
 
                 <a href="{{ route('ocra.pdf', $ocra->id) }}"
@@ -16,29 +16,81 @@
 
             <div class="p-6 space-y-6">
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="border rounded-xl p-4">
-                        <h3 class="font-bold text-gray-700 mb-2">Datos generales</h3>
-                        <p><strong>Empresa:</strong> {{ $ocra->evaluacion->empresa->nombre ?? 'N/A' }}</p>
-                        <p><strong>Sucursal:</strong> {{ $ocra->evaluacion->sucursal->nombre ?? 'N/A' }}</p>
-                        <p><strong>Puesto:</strong> {{ $ocra->evaluacion->puesto->nombre ?? 'N/A' }}</p>
-                        <p><strong>Trabajador:</strong> {{ $ocra->evaluacion->trabajador->nombre ?? 'N/A' }}</p>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="border rounded-xl p-4 bg-gray-50">
+                        <p class="text-xs text-gray-500">Empresa</p>
+                        <p class="font-bold">{{ $ocra->evaluacion->empresa->nombre ?? 'N/A' }}</p>
                     </div>
 
-                    <div class="border rounded-xl p-4">
-                        <h3 class="font-bold text-gray-700 mb-2">Resultado final</h3>
-                        <p class="text-4xl font-bold text-sky-700">{{ $ocra->indice_ocra }}</p>
-                        <p>
-                            <strong>Nivel de riesgo:</strong>
-                            <span class="font-bold text-red-600">{{ $ocra->nivel_riesgo }}</span>
+                    <div class="border rounded-xl p-4 bg-gray-50">
+                        <p class="text-xs text-gray-500">Puesto</p>
+                        <p class="font-bold">{{ $ocra->evaluacion->puesto->nombre ?? 'N/A' }}</p>
+                    </div>
+
+                    <div class="border rounded-xl p-4 bg-gray-50">
+                        <p class="text-xs text-gray-500">Trabajador</p>
+                        <p class="font-bold">
+                            {{ trim(($ocra->evaluacion->trabajador->nombre ?? '') . ' ' . ($ocra->evaluacion->trabajador->apellido_paterno ?? '') . ' ' . ($ocra->evaluacion->trabajador->apellido_materno ?? '')) ?: 'N/A' }}
                         </p>
-                        <p><strong>Lado evaluado:</strong> {{ $ocra->lado_evaluado }}</p>
+                    </div>
+
+                    <div class="border rounded-xl p-4 bg-gray-50">
+                        <p class="text-xs text-gray-500">Lado evaluado</p>
+                        <p class="font-bold">{{ $ocra->lado_evaluado }}</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="rounded-2xl border border-sky-200 bg-sky-50 p-5">
+                        <p class="text-sm text-gray-600">ICKL</p>
+                        <p class="text-5xl font-bold text-sky-700">{{ $ocra->ickl }}</p>
+                    </div>
+
+                    <div class="rounded-2xl border border-red-200 bg-red-50 p-5">
+                        <p class="text-sm text-gray-600">Nivel de riesgo</p>
+                        <p class="text-2xl font-bold text-red-700">{{ $ocra->nivel_riesgo }}</p>
+                    </div>
+
+                    <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+                        <p class="text-sm text-gray-600">Acción recomendada</p>
+                        <p class="text-sm font-semibold text-amber-800">{{ $ocra->accion_recomendada }}</p>
+                    </div>
+                </div>
+
+                <div class="border rounded-xl p-4">
+                    <h3 class="font-bold text-gray-700 mb-3">Cálculos principales</h3>
+
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-3 text-center">
+                        <div class="bg-gray-50 border rounded-lg p-3">
+                            <p class="text-xs text-gray-500">TNTR</p>
+                            <p class="font-bold">{{ $ocra->tntr }} min</p>
+                        </div>
+
+                        <div class="bg-gray-50 border rounded-lg p-3">
+                            <p class="text-xs text-gray-500">TNC</p>
+                            <p class="font-bold">{{ $ocra->tnc }} seg</p>
+                        </div>
+
+                        <div class="bg-gray-50 border rounded-lg p-3">
+                            <p class="text-xs text-gray-500">FF</p>
+                            <p class="font-bold">{{ $ocra->ff }}</p>
+                        </div>
+
+                        <div class="bg-gray-50 border rounded-lg p-3">
+                            <p class="text-xs text-gray-500">FP</p>
+                            <p class="font-bold">{{ $ocra->fp }}</p>
+                        </div>
+
+                        <div class="bg-gray-50 border rounded-lg p-3">
+                            <p class="text-xs text-gray-500">MD</p>
+                            <p class="font-bold">{{ $ocra->md }}</p>
+                        </div>
                     </div>
                 </div>
 
                 <div class="border rounded-xl overflow-hidden">
                     <div class="bg-gray-100 px-4 py-3 font-bold text-gray-700">
-                        Detalles de evaluación
+                        Detalle completo de factores
                     </div>
 
                     <table class="w-full text-sm">
