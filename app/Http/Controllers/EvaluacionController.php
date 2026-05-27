@@ -107,10 +107,6 @@ class EvaluacionController extends Controller
             case 'LEY SILLA':
                 return redirect()->route('ley_silla.create', $evaluacion->id);
 
-            case 'ERGONOMIA GENERAL':
-            case 'ERGONOMÍA GENERAL':
-                return redirect()->route('ergonomia_general.create', $evaluacion->id);
-
             case 'OCRA':
                 return redirect()->route('ocra.create', $evaluacion->id);
 
